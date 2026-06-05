@@ -9,6 +9,8 @@ source "https://rubygems.org"
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
 gem "jekyll", "~> 4.1"
+# Liquid 4.0.3+ guards taint API for Ruby 3.2+ when using newer Ruby locally
+gem "liquid", ">= 4.0.3", "< 5"
 
 gem "jekyll-theme-hydejack", path: "./#jekyll-theme-hydejack"
 

@@ -4,5 +4,5 @@
 
 [build.environment]
   JEKYLL_ENV = "production"
-  RUBY_VERSION = "3.2.2"
-  # Bundler version comes from Gemfile.lock (BUNDLED WITH 2.4.22)
+  # Match sde-course / bioinformatics-course-hd (Jekyll 4.2 + Liquid 4.0.3 need Ruby < 3.2)
+  RUBY_VERSION = "2.7.1"
