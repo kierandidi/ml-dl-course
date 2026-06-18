@@ -1,168 +1,248 @@
 ---
 layout: post
 title: Day 1 - Math Foundations
-image: /assets/img/lessons/day01.png
+image: /assets/img/sampling_space.png
 accent_image: 
   background: url('/assets/img/sampling_space.png') center/cover
   overlay: false
 accent_color: '#ccc'
 theme_color: '#ccc'
 description: >
-  Gradients, the chain rule, probability, and maximum likelihood estimation.
+  Linear algebra, analytic geometry, vector calculus, integration & differentiation, probability, and differential equations — MML Part I foundations.
 invert_sidebar: true
 ---
 
 # Day 1 - Math Foundations
 
 ### Optional reading for this lesson
-- [Bishop — Pattern Recognition and Machine Learning](https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/), Ch. 1–2
-- [Boyd & Vandenberghe — Convex Optimization](https://web.stanford.edu/~boyd/cvxbook/), §2.1–2.3
-- [3Blue1Brown — Essence of Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3tZaY)
-- [Complete reading list for Day 1](/publications/#day-1) (all resources for this lecture)
-
+- [Deisenroth, Faisal & Ong — *Mathematics for Machine Learning*](https://mml-book.com), Ch. 2–6
+- [Deisenroth & Ong — *There and Back Again: A Tale of Slopes and Expectations*](https://mml-book.github.io/slopes-expectations.html) (NeurIPS 2020 tutorial)
+- [Modern Integration Methods in ML](https://mml-book.github.io/book/additional_chapters/integration-methods.pdf) (MML supplementary chapter)
+- [Diffusion Book — Appendix A: Crash Course on Differential Equations](https://arxiv.org/abs/2510.21890) (pp. 399 ff.)
 
 ### [Slides](/assets/slides/day01.pdf)
 
 ### [Practical](/projects/day01-practical/)
 
-Before we train neural networks we need a shared mathematical language. Today we review multivariate calculus, the chain rule, basic probability, and maximum likelihood — the workhorse principle behind most learning algorithms.
+Machine learning rests on four mathematical pillars laid out in Part I of *Mathematics for Machine Learning* (MML): we represent data as vectors and matrices (linear algebra); measure similarity with norms and inner products (analytic geometry); exploit matrix structure and gradients (decompositions and vector calculus); and quantify uncertainty with probability. Today we also cover integration and differentiation as complementary tools for expectations and optimization, and finish with an ODE/SDE crash course that foreshadows diffusion models in Week 2.
 
 * toc
 {:toc}
 
-## 1. Multivariate Calculus and Gradients
+## 1. Linear Algebra
 
-### 1.1 Partial derivatives and the gradient
+### 1.1 From linear equations to matrices
 
-> For a scalar function $$f: \mathbb{R}^d \to \mathbb{R}$$, the **gradient** is the vector of partial derivatives $$\nabla f(\mathbf{x}) = \left(\frac{\partial f}{\partial x_1}, \ldots, \frac{\partial f}{\partial x_d}\right)^\top.$$ It points in the direction of steepest ascent.
+> A system of $$m$$ linear equations in $$n$$ unknowns can be written as $$\mathbf{A}\mathbf{x} = \mathbf{b}$$ with $$\mathbf{A} \in \mathbb{R}^{m \times n}$$, $$\mathbf{x} \in \mathbb{R}^n$$, $$\mathbf{b} \in \mathbb{R}^m$$. Each row of $$\mathbf{A}$$ defines one hyperplane; solutions lie at their intersection.
 {:.lead}
 
-For a quadratic loss $$L(\mathbf{w}) = \|\mathbf{X}\mathbf{w} - \mathbf{y}\|_2^2$$ with design matrix $$\mathbf{X} \in \mathbb{R}^{n \times d}$$, expanding gives
+Consider two equations in two unknowns:
 
-$$L(\mathbf{w}) = \mathbf{w}^\top \mathbf{X}^\top \mathbf{X} \mathbf{w} - 2\mathbf{y}^\top \mathbf{X}\mathbf{w} + \mathbf{y}^\top\mathbf{y}.$$
+$$\begin{aligned} a_{11} x_1 + a_{12} x_2 &= b_1 \\ a_{21} x_1 + a_{22} x_2 &= b_2 \end{aligned}$$
 
-Differentiating with respect to $$\mathbf{w}$$ yields the closed-form gradient
+Stacking coefficients gives $$\mathbf{A} = \begin{pmatrix} a_{11} & a_{12} \\ a_{21} & a_{22} \end{pmatrix}$$, so one matrix–vector multiply encodes the entire system. This is the bridge from high-school algebra to the language of machine learning, where a dataset of $$n$$ examples each with $$d$$ features is stored as $$\mathbf{X} \in \mathbb{R}^{n \times d}$$.
+
+![Linear systems and matrix view (MML Fig 2.3)](/assets/figures/day01/mml_linear_system.png)
+
+A matrix is not merely a table of numbers — it is a **linear map** $$f(\mathbf{x}) = \mathbf{A}\mathbf{x}$$. The *column picture* writes $$\mathbf{b} = x_1 \mathbf{a}_1 + x_2 \mathbf{a}_2 + \cdots$$: $$\mathbf{b}$$ must lie in the span of the columns. The *row picture* views each equation as a hyperplane.
+
+### 1.2 Vector spaces, basis, and rank
+
+> A **vector space** $$V$$ is closed under addition and scalar multiplication. A set $$\{\mathbf{v}_1, \ldots, \mathbf{v}_k\}$$ is a **basis** if it is linearly independent and spans $$V$$. The **rank** of $$\mathbf{A}$$ is the dimension of its column space.
+{:.lead}
+
+Key subspaces associated with $$\mathbf{A} \in \mathbb{R}^{m \times n}$$:
+
+- **Column space** $$\mathcal{C}(\mathbf{A}) \subseteq \mathbb{R}^m$$: all reachable outputs $$\mathbf{A}\mathbf{x}$$.
+- **Null space** $$\mathcal{N}(\mathbf{A})$$: all $$\mathbf{x}$$ with $$\mathbf{A}\mathbf{x} = \mathbf{0}$$.
+- **Row space** and **left null space** (orthogonal complements in the appropriate spaces).
+
+The rank–nullity theorem: $$\mathrm{rank}(\mathbf{A}) + \dim \mathcal{N}(\mathbf{A}) = n$$.
+
+![Vector subspace (MML Fig 2.6)](/assets/figures/day01/mml_subspace.png)
+
+In ML, features live in a high-dimensional space; learning often finds a low-dimensional subspace (PCA, autoencoders) or selects a sparse subset of coordinates (Lasso).
+
+## 2. Analytic Geometry
+
+### 2.1 Norms and inner products
+
+> An **inner product** $$\langle \mathbf{x}, \mathbf{y} \rangle$$ satisfies symmetry, linearity, and positive definiteness. The induced **norm** is $$\|\mathbf{x}\| = \sqrt{\langle \mathbf{x}, \mathbf{x} \rangle}$$. For the standard dot product, $$\|\mathbf{x}\|_2 = \sqrt{\sum_i x_i^2}$$.
+{:.lead}
+
+Common norms in machine learning:
+
+$$\|\mathbf{x}\|_1 = \sum_i |x_i|, \qquad \|\mathbf{x}\|_2 = \sqrt{\sum_i x_i^2}, \qquad \|\mathbf{x}\|_\infty = \max_i |x_i|.$$
+
+The **Cauchy–Schwarz inequality** $$|\langle \mathbf{x}, \mathbf{y} \rangle| \leq \|\mathbf{x}\|_2 \|\mathbf{y}\|_2$$ lets us define angles between vectors. Two vectors are **orthogonal** when $$\langle \mathbf{x}, \mathbf{y} \rangle = 0$$.
+
+![Angle between vectors (MML Fig 3.6)](/assets/figures/day01/mml_angle.png)
+
+Why this matters: if two input vectors are close under a chosen norm, we want our predictor to produce similar outputs — a geometric inductive bias.
+
+### 2.2 Projections and least squares
+
+> The **orthogonal projection** of $$\mathbf{y}$$ onto the line spanned by $$\mathbf{x}$$ is $$\hat{\mathbf{y}} = \frac{\mathbf{x}^\top \mathbf{y}}{\mathbf{x}^\top \mathbf{x}} \mathbf{x}$$. More generally, projecting onto $$\mathcal{C}(\mathbf{A})$$ uses $$\mathbf{P} = \mathbf{A}(\mathbf{A}^\top \mathbf{A})^{-1}\mathbf{A}^\top$$.
+{:.lead}
+
+**Ordinary least squares** minimizes $$\|\mathbf{A}\mathbf{w} - \mathbf{y}\|_2^2$$. Geometrically, $$\hat{\mathbf{y}} = \mathbf{A}\hat{\mathbf{w}}$$ is the projection of $$\mathbf{y}$$ onto the column space of $$\mathbf{A}$$. Setting the gradient to zero yields the **normal equations**:
+
+$$\mathbf{A}^\top \mathbf{A} \hat{\mathbf{w}} = \mathbf{A}^\top \mathbf{y}.$$
+
+![Projection onto a subspace (MML Fig 3.11)](/assets/figures/day01/mml_projection.png)
+
+This connects linear algebra (Day 1) directly to regression (Day 2): fitting a linear model is projecting labels onto the span of features.
+
+## 3. Vector Calculus and Matrix Decompositions
+
+### 3.1 Gradients, Jacobians, and the chain rule
+
+> For scalar $$f: \mathbb{R}^n \to \mathbb{R}$$, the **gradient** $$\nabla f(\mathbf{x}) \in \mathbb{R}^n$$ points in the direction of steepest ascent. For $$\mathbf{f}: \mathbb{R}^n \to \mathbb{R}^m$$, the **Jacobian** $$\mathbf{J} \in \mathbb{R}^{m \times n}$$ has entries $$J_{ij} = \partial f_i / \partial x_j$$.
+{:.lead}
+
+Useful identities (memorize these):
+
+$$\nabla_{\mathbf{x}} (\mathbf{a}^\top \mathbf{x}) = \mathbf{a}, \qquad \nabla_{\mathbf{x}} (\mathbf{x}^\top \mathbf{A} \mathbf{x}) = (\mathbf{A} + \mathbf{A}^\top)\mathbf{x}.$$
+
+For a quadratic loss $$L(\mathbf{w}) = \|\mathbf{X}\mathbf{w} - \mathbf{y}\|_2^2$$,
 
 $$\nabla_{\mathbf{w}} L = 2\mathbf{X}^\top(\mathbf{X}\mathbf{w} - \mathbf{y}).$$
 
-Setting $$\nabla_{\mathbf{w}} L = \mathbf{0}$$ recovers the ordinary least-squares solution $$\hat{\mathbf{w}} = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}$$ whenever $$\mathbf{X}^\top\mathbf{X}$$ is invertible.
+![Gradient as the slope of a secant (MML Fig 5.3)](/assets/figures/day01/mml_gradient.png)
 
-![Gradient descent on a quadratic bowl](/assets/figures/day01/pdf0_page005.png)
+The multivariate **chain rule** propagates sensitivities through composed functions — the mathematical content of backpropagation (Section 4).
 
-The **directional derivative** along unit vector $$\mathbf{u}$$ is $$D_{\mathbf{u}} f = \nabla f \cdot \mathbf{u}$$. Steepest descent uses $$\mathbf{u} = -\nabla f / \|\nabla f\|$$.
+### 3.2 Eigendecomposition and SVD
 
-### 1.2 The Jacobian and Hessian
-
-> For $$\mathbf{f}: \mathbb{R}^n \to \mathbb{R}^m$$, the **Jacobian** $$\mathbf{J}_{\mathbf{f}} \in \mathbb{R}^{m \times n}$$ has entries $$[\mathbf{J}_{\mathbf{f}}]_{ij} = \partial f_i / \partial x_j$$. For scalar $$f$$, the **Hessian** $$\mathbf{H} = \nabla^2 f$$ describes local curvature.
+> If $$\mathbf{A}\mathbf{v} = \lambda \mathbf{v}$$, then $$\mathbf{v}$$ is an **eigenvector** with **eigenvalue** $$\lambda$$. For symmetric $$\mathbf{A}$$, $$\mathbf{A} = \mathbf{Q}\boldsymbol{\Lambda}\mathbf{Q}^\top$$. The **SVD** is $$\mathbf{A} = \mathbf{U}\boldsymbol{\Sigma}\mathbf{V}^\top$$ — always exists.
 {:.lead}
 
-For a linear layer $$\mathbf{z} = \mathbf{W}\mathbf{x} + \mathbf{b}$$ with $$\mathbf{W} \in \mathbb{R}^{m \times n}$$, the Jacobian with respect to $$\mathbf{x}$$ is simply $$\mathbf{W}$$. This fact is what makes backpropagation through affine layers trivial.
+The SVD reveals the action of $$\mathbf{A}$$ as rotate–scale–rotate. Truncating to the top-$$k$$ singular values gives the best rank-$$k$$ approximation (Eckart–Young).
 
-Near a critical point $$\mathbf{x}^\*$$, Taylor expansion gives
+**PCA** finds orthogonal directions of maximum variance: eigenvectors of the covariance matrix $$\mathbf{C} = \frac{1}{n}\mathbf{X}^\top \mathbf{X}$$ (after centering).
 
-$$f(\mathbf{x}) \approx f(\mathbf{x}^\*) + \frac{1}{2}(\mathbf{x}-\mathbf{x}^\*)^\top \mathbf{H}(\mathbf{x}^\*)(\mathbf{x}-\mathbf{x}^\*).$$
+![SVD geometry (MML Fig 4.9)](/assets/figures/day01/mml_svd.png)
 
-Positive definiteness of $$\mathbf{H}$$ at $$\mathbf{x}^\*$$ implies a local minimum — a condition optimizers exploit via second-order methods (Newton, L-BFGS).
+Eigenvalues of the Hessian at a critical point classify it as minimum, maximum, or saddle — relevant for understanding neural network loss landscapes.
 
-## 2. The Chain Rule and Computational Graphs
+## 4. Integration and Differentiation
 
-### 2.1 Scalar chain rule
+### 4.1 Integration: expectations and numerical methods
 
-> If $$y = f(u)$$ and $$u = g(x)$$, then $$\frac{dy}{dx} = \frac{dy}{du}\frac{du}{dx}$$. In multivariate form, gradients propagate backward through composed functions.
+> Many ML quantities are **expectations** $$\mathbb{E}[f(X)] = \int f(x) p(x)\,dx$$. When the integral is intractable we use **numerical quadrature** (low dimension) or **Monte Carlo** (high dimension): $$\mathbb{E}[f(X)] \approx \frac{1}{N}\sum_{i=1}^N f(\mathbf{x}^{(i)}).$$
 {:.lead}
 
-Consider a two-layer network with scalar output:
+The NeurIPS 2020 tutorial [*There and Back Again: A Tale of Slopes and Expectations*](https://mml-book.github.io/slopes-expectations.html) treats integration and differentiation as two directions on the same map — expectations require integration; learning requires differentiation.
 
-$$\hat{y} = w_2\,\sigma(w_1 x + b_1) + b_2.$$
+![Slopes and expectations map](/assets/figures/day01/slopes_map.jpg)
 
-Define $$z = w_1 x + b_1$$ and $$a = \sigma(z)$$. Then
+**Deterministic methods** (trapezoidal rule, Simpson's rule, Gauss–Hermite quadrature) excel in low dimensions. **Monte Carlo** error scales as $$O(1/\sqrt{N})$$ independently of dimension — crucial for Bayesian marginalization and variational objectives.
 
-$$\frac{\partial \hat{y}}{\partial w_1} = \frac{\partial \hat{y}}{\partial a}\frac{\partial a}{\partial z}\frac{\partial z}{\partial w_1} = w_2\,\sigma'(z)\,x.$$
+![Unscented transform / sigma points (Modern Integration Methods, Fig 8)](/assets/figures/day01/integ_unscented.png)
 
-![Computational graph for a tiny network](/assets/figures/day01/pdf0_page010.png)
+See also the MML supplementary chapter [*Modern Integration Methods in ML*](https://mml-book.github.io/book/additional_chapters/integration-methods.pdf).
 
-Each edge in the graph stores a local Jacobian; backpropagation is reverse-mode automatic differentiation that multiplies these Jacobians along paths from the loss to each parameter.
+### 4.2 Differentiation: autodiff, adjoints, and gradient estimators
 
-### 2.2 Multivariate chain rule
-
-> If $$\mathbf{y} = \mathbf{f}(\mathbf{u})$$ and $$\mathbf{u} = \mathbf{g}(\mathbf{x})$$, then $$\frac{\partial \mathbf{y}}{\partial \mathbf{x}} = \mathbf{J}_{\mathbf{f}}(\mathbf{u})\,\mathbf{J}_{\mathbf{g}}(\mathbf{x})$$ by matrix multiplication.
+> **Reverse-mode automatic differentiation** computes $$\nabla_{\boldsymbol{\theta}} L$$ for a scalar loss $$L$$ in one backward pass through the computational graph — cost $$O(\text{ops})$$, not $$O(|\boldsymbol{\theta}|)$$ times forward cost.
 {:.lead}
 
-For vector-valued intermediates, the chain rule is a product of Jacobians. Given loss $$L$$ and hidden activation $$\mathbf{h}$$,
+**Forward mode** propagates directional derivatives; **reverse mode** (backprop) is preferred when there is one scalar output and many parameters.
 
-$$\frac{\partial L}{\partial \mathbf{h}} = \left(\frac{\partial L}{\partial \mathbf{z}}\right)^\top \mathbf{J}_{\mathbf{h}}.$$
+When outputs are defined implicitly by $$F(\mathbf{x}, \boldsymbol{\theta}) = \mathbf{0}$$, the **implicit function theorem** gives
 
-In practice frameworks never materialize full Jacobians for large layers; they use **vector-Jacobian products** (VJPs) that cost one forward/backward pass per output dimension batch.
+$$\frac{\partial \mathbf{x}}{\partial \boldsymbol{\theta}} = -\left(\frac{\partial F}{\partial \mathbf{x}}\right)^{-1} \frac{\partial F}{\partial \boldsymbol{\theta}}.$$
 
-The **reverse-mode** trick: one backward pass from a scalar loss costs $$O(\text{ops})$$ regardless of parameter count, whereas forward-mode AD scales with the number of inputs.
+The **method of adjoints** and **Lagrange multipliers** extend this to ODE-constrained and constrained optimization problems.
 
-## 3. Probability Essentials
+**Stochastic gradient estimators** (REINFORCE score-function estimator, reparameterization $$\nabla \mathbb{E}[f(\mathbf{z})]$$ via $$\mathbf{z} = g(\boldsymbol{\epsilon}, \boldsymbol{\theta})$$) let us differentiate through expectations — central to VAEs and policy gradients.
 
-### 3.1 Random variables and expectations
+![Monte Carlo samples across a sequence of distributions (Modern Integration Methods, Fig 6)](/assets/figures/day01/integ_samples.png)
 
-> A **random variable** $$X$$ maps outcomes $$\omega \in \Omega$$ to real values. For continuous $$X$$ with density $$p(x)$$, $$\mathbb{E}[X] = \int x\,p(x)\,dx$$ and $$\mathrm{Var}(X) = \mathbb{E}[(X-\mathbb{E}[X])^2].$$
+## 5. Probability and Distributions
+
+### 5.1 Basics and the Gaussian
+
+> A continuous random vector $$\mathbf{x}$$ with density $$p$$ satisfies $$\mathbb{E}[\mathbf{x}] = \int \mathbf{x}\, p(\mathbf{x})\,d\mathbf{x}$$. The multivariate Gaussian $$\mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma})$$ has density $$p(\mathbf{x}) \propto \exp\big(-\tfrac{1}{2}(\mathbf{x}-\boldsymbol{\mu})^\top \boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol{\mu})\big)$$.
 {:.lead}
 
-Key identities used throughout ML:
+Key Gaussian closure properties:
 
-$$\mathrm{Var}(X) = \mathbb{E}[X^2] - (\mathbb{E}[X])^2, \qquad \mathrm{Cov}(X,Y) = \mathbb{E}[XY] - \mathbb{E}[X]\mathbb{E}[Y].$$
+- Affine transform: $$\mathbf{A}\mathbf{x} + \mathbf{b} \sim \mathcal{N}(\mathbf{A}\boldsymbol{\mu} + \mathbf{b}, \mathbf{A}\boldsymbol{\Sigma}\mathbf{A}^\top)$$.
+- Marginals and conditionals of joint Gaussians are Gaussian.
+- Sum of independent Gaussians is Gaussian.
 
-For multivariate Gaussian $$\mathbf{x} \sim \mathcal{N}(\boldsymbol{\mu}, \boldsymbol{\Sigma})$$,
+![Gaussian distribution (MML Fig 6.7)](/assets/figures/day01/mml_gaussian.png)
 
-$$p(\mathbf{x}) = \frac{1}{(2\pi)^{d/2}|\boldsymbol{\Sigma}|^{1/2}} \exp\!\left(-\tfrac{1}{2}(\mathbf{x}-\boldsymbol{\mu})^\top \boldsymbol{\Sigma}^{-1}(\mathbf{x}-\boldsymbol{\mu})\right).$$
+The Gaussian is the maximum-entropy distribution with fixed mean and covariance — and the limiting distribution of sums (CLT).
 
-![Gaussian contours in 2D](/assets/figures/day01/pdf0_page015.png)
+### 5.2 Conjugacy, change of variables, Jensen, and KL
 
-**Conditional** distributions arise constantly: $$p(\mathbf{x}|y) \propto p(y|\mathbf{x})p(\mathbf{x})$$. Independence means $$p(\mathbf{x},\mathbf{y}) = p(\mathbf{x})p(\mathbf{y}).
-
-### 3.2 Information and KL divergence
-
-> The **Kullback–Leibler divergence** from $$q$$ to $$p$$ is $$D_{\mathrm{KL}}(q\|p) = \mathbb{E}_{\mathbf{x}\sim q}\!\left[\log\frac{q(\mathbf{x})}{p(\mathbf{x})}\right] \geq 0$$, with equality iff $$q = p$$ almost everywhere.
+> A prior is **conjugate** to a likelihood if the posterior belongs to the same parametric family. Under a smooth bijection $$\mathbf{y} = g(\mathbf{x})$$, $$p_Y(\mathbf{y}) = p_X(g^{-1}(\mathbf{y}))\,|\det \mathbf{J}_{g^{-1}}(\mathbf{y})|$$. **Jensen's inequality**: $$f(\mathbb{E}[X]) \leq \mathbb{E}[f(X)]$$ for convex $$f$$.
 {:.lead}
 
-KL divergence is not symmetric but measures how many extra nats are needed to encode samples from $$q$$ using a code optimized for $$p$$.
+**Conjugate pairs** (Beta–Bernoulli, Normal–Normal, Dirichlet–Multinomial) give closed-form Bayesian updates — useful for pedagogy and some models.
 
-For Gaussians $$\mathcal{N}(\boldsymbol{\mu}_1, \boldsymbol{\Sigma}_1)$$ and $$\mathcal{N}(\boldsymbol{\mu}_2, \boldsymbol{\Sigma}_2)$$ in $$d$$ dimensions, a closed form exists and appears in VAEs and diffusion training.
+**Inverse transform sampling**: if $$U \sim \mathrm{Uniform}(0,1)$$, then $$X = F^{-1}(U)$$ has CDF $$F$$. Normalizing flows compose invertible maps with tractable Jacobians.
 
-**Entropy** $$H(p) = -\mathbb{E}_{p}[\log p]$$ quantifies uncertainty. Cross-entropy $$H(p,q) = -\mathbb{E}_{p}[\log q]$$ is the classification loss when $$p$$ is the data distribution and $$q$$ the model.
+**KL divergence** $$D_{\mathrm{KL}}(q\|p) = \mathbb{E}_{\mathbf{x}\sim q}[\log q(\mathbf{x}) - \log p(\mathbf{x})] \geq 0$$ measures how many extra nats are needed to encode samples from $$q$$ using a code optimized for $$p$$. It is not symmetric.
 
-## 4. Maximum Likelihood Estimation
+Jensen's inequality underlies the **evidence lower bound (ELBO)** in variational inference:
 
-### 4.1 Likelihood and log-likelihood
+$$\log p(\mathbf{x}) \geq \mathbb{E}_{q(\mathbf{z})}[\log p(\mathbf{x}|\mathbf{z})] - D_{\mathrm{KL}}(q(\mathbf{z})\|p(\mathbf{z})).$$
 
-> Given i.i.d. data $$\mathcal{D} = \{\mathbf{x}^{(i)}\}_{i=1}^n$$ and parametric model $$p_\theta(\mathbf{x})$$, the **likelihood** is $$\mathcal{L}(\theta) = \prod_i p_\theta(\mathbf{x}^{(i)})$$. **MLE** chooses $$\hat{\theta} = \arg\max_\theta \mathcal{L}(\theta)$$.
+![Conjugate prior example (MML Fig 6.11)](/assets/figures/day01/mml_conjugate.png)
+
+## 6. Differential Equations (ODE & SDE Crash Course)
+
+### 6.1 ODEs: vector fields, trajectories, and solvers
+
+> An **ordinary differential equation** specifies how a state evolves: $$\dot{\mathbf{x}}(t) = \mathbf{v}(\mathbf{x}(t), t).$$ The **vector field** $$\mathbf{v}$$ assigns a velocity at each point; **trajectories** are integral curves following that field.
 {:.lead}
 
-We almost always maximize the log-likelihood (monotone transform):
+Two equivalent views:
 
-$$\ell(\theta) = \sum_{i=1}^n \log p_\theta(\mathbf{x}^{(i)}).$$
+1. **Trajectory**: a curve $$\mathbf{x}(t)$$ through state space.
+2. **Vector field**: an arrow $$\mathbf{v}(\mathbf{x}, t)$$ at every point.
 
-For Gaussian noise regression $$y^{(i)} = \mathbf{w}^\top\mathbf{x}^{(i)} + \epsilon^{(i)}$$ with $$\epsilon^{(i)} \sim \mathcal{N}(0, \sigma^2)$$, MLE of $$\mathbf{w}$$ coincides with minimizing squared error — linking probabilistic modeling to empirical risk minimization.
+For linear $$\dot{x} = ax$$, the solution is $$x(t) = e^{at} x(0)$$ — the **exponential integrator** idea generalizes to matrix systems $$\dot{\mathbf{x}} = \mathbf{A}\mathbf{x}$$.
 
-![Likelihood surface for a Bernoulli parameter](/assets/figures/day01/pdf0_page020.png)
+**Numerical solvers** discretize time with step $$h$$:
 
-### 4.2 Properties and regularization as priors
+| Method | Update | Local error |
+|--------|--------|-------------|
+| Euler | $$\mathbf{x}_{n+1} = \mathbf{x}_n + h\,\mathbf{v}(\mathbf{x}_n, t_n)$$ | $$O(h)$$ |
+| Heun (RK2) | predictor–corrector average | $$O(h^2)$$ |
+| RK4 | four weighted slope evaluations | $$O(h^4)$$ |
 
-> **MAP estimation** maximizes $$p(\theta|\mathcal{D}) \propto p(\mathcal{D}|\theta)p(\theta)$$. An $$\ell_2$$ prior on $$\mathbf{w}$$ yields ridge regression; a Laplace prior yields Lasso.
+![ODE Figure A.1 — left: step-by-step solver updates; right: exact trajectories flowing along the velocity field](/assets/figures/day01/ode_vectorfield.png)
+
+Source: *Diffusion Book* Appendix A (crash course on differential equations), from p. 399.
+
+### 6.2 SDEs and numerical simulation
+
+> A **stochastic differential equation** adds noise: $$d\mathbf{X}_t = \mathbf{f}(\mathbf{X}_t, t)\,dt + \mathbf{g}(\mathbf{X}_t, t)\,d\mathbf{W}_t,$$ where $$\mathbf{W}_t$$ is Brownian motion. **Itô's lemma** governs calculus with $$dW_t^2 = dt$$.
 {:.lead}
 
-Under regularity conditions, MLE is **consistent** ($$\hat{\theta} \to \theta^\*$$ as $$n \to \infty$$) and asymptotically normal:
+SDEs model systems with intrinsic randomness — and the forward process in diffusion models.
 
-$$\sqrt{n}(\hat{\theta} - \theta^\*) \xrightarrow{d} \mathcal{N}(\mathbf{0}, \mathcal{I}^{-1}(\theta^\*)),$$
+**Euler–Maruyama** discretization:
 
-where $$\mathcal{I}$$ is the Fisher information matrix.
+$$\mathbf{X}_{n+1} = \mathbf{X}_n + h\,\mathbf{f}(\mathbf{X}_n, t_n) + \sqrt{h}\,\mathbf{g}(\mathbf{X}_n, t_n)\,\boldsymbol{\xi}_n, \qquad \boldsymbol{\xi}_n \sim \mathcal{N}(\mathbf{0}, \mathbf{I}).$$
 
-Taking gradients of $$\ell(\theta)$$ and setting to zero often has no closed form — we use gradient ascent:
+Higher-order schemes (Milstein) improve strong convergence when diffusion matters.
 
-$$\theta_{t+1} = \theta_t + \eta \nabla_\theta \ell(\theta_t).$$
-
-This connects MLE directly to the optimization algorithms we will implement in the practical.
+In Week 2 we will connect these solvers directly to sampling from diffusion and flow models.
 
 ## Checkpoint summary
 
 Before moving to the practical, confirm you can:
 
-- The gradient $$\nabla f$$ points uphill; descent steps go opposite to it.
-- Backpropagation is the multivariate chain rule applied to a computational graph.
-- MLE turns learning into maximizing $$\sum_i \log p_\theta(x^{(i)})$$.
-- MAP = MLE + log-prior; common priors recover familiar regularizers.
+- Translate linear systems into matrix form and interpret column/null spaces.
+- Compute projections and connect least squares to the normal equations.
+- Apply gradient identities and interpret eigendecomposition / SVD geometrically.
+- Contrast numerical quadrature with Monte Carlo for expectations.
+- Explain reverse-mode AD and when the implicit function theorem applies.
+- State Gaussian closure properties, change-of-variables formula, and Jensen's inequality.
+- Describe ODE vector-field vs trajectory views and compare Euler, Heun, and RK4.
+- Write the Euler–Maruyama update for an SDE.

@@ -26,9 +26,9 @@
 - Train / validation / test splits
 - Generalization: performance on unseen data
 
-== L5 probabili 01
+== Supervised Learning — illustration
 
-#align(center)[#image("/assets/figures/day02/L5_probabili_01.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L5_probabili_01.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Learning Setup — Supervised Learning (source: course materials)]
 
@@ -39,9 +39,9 @@
 - MSE: $L(w) = (1/n) sum_i (y_i - f_w(x_i))^2$
 - Polynomial features and basis expansion
 
-== L5 probabili 02
+== Regression — illustration
 
-#align(center)[#image("/assets/figures/day02/L5_probabili_02.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L5_probabili_02.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Learning Setup — Regression (source: course materials)]
 
@@ -51,9 +51,9 @@
 - Linear classifier: $f_w(x) = w^T x$
 - Decision boundary where $f_w(x) = 0$
 
-== L6 decision  00
+== Classification — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__00.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__00.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Learning Setup — Classification (source: course materials)]
 
@@ -63,9 +63,9 @@
 - Classification: accuracy, precision, recall, F1
 - Confusion matrix and class imbalance
 
-== L6 decision  01
+== Evaluation Metrics — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__01.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__01.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Learning Setup — Evaluation Metrics (source: course materials)]
 
@@ -77,9 +77,9 @@
 - Geometric interpretation: orthogonal residual
 - When $X^T X$ is ill-conditioned
 
-== L6 decision  02
+== Ordinary Least Squares — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__02.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__02.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Linear & Logistic Models — Ordinary Least Squares (source: course materials)]
 
@@ -89,9 +89,9 @@
 - Cross-entropy loss for Bernoulli labels
 - Decision boundary remains linear in feature space
 
-== L6 decision  05
+== Logistic Regression — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__05.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__05.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Linear & Logistic Models — Logistic Regression (source: course materials)]
 
@@ -101,9 +101,9 @@
 - One-vs-rest vs multinomial logistic
 - Cross-entropy over $K$ classes
 
-== L6 decision  06
+== Softmax Multiclass — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__06.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__06.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Linear & Logistic Models — Softmax Multiclass (source: course materials)]
 
@@ -113,9 +113,9 @@
 - MLE chooses $w$ maximizing $product_i p(y_i|x_i, w)$
 - Log-likelihood turns products into sums
 
-== L6 decision  07
+== Probabilistic View — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__07.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__07.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Linear & Logistic Models — Probabilistic View (source: course materials)]
 
@@ -127,9 +127,9 @@
 - Model too flexible for data size
 - Memorization vs learning structure
 
-== L6 decision  08
+== Overfitting — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__08.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__08.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Regularization — Overfitting (source: course materials)]
 
@@ -139,9 +139,9 @@
 - Shrinks weights toward zero
 - Closed form for ridge regression
 
-== L6 decision  09
+== L2 (Ridge) — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__09.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__09.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Regularization — L2 (Ridge) (source: course materials)]
 
@@ -151,9 +151,9 @@
 - Promotes sparsity — feature selection
 - Non-smooth at zero; subgradient methods
 
-== L6 decision  10
+== L1 (Lasso) — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__10.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__10.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Regularization — L1 (Lasso) (source: course materials)]
 
@@ -163,9 +163,9 @@
 - Early stopping as implicit regularization
 - Bias–variance decomposition intuition
 
-== L6 decision  11
+== Model Selection — illustration
 
-#align(center)[#image("/assets/figures/day02/L6_decision__11.png", width: 92%)]
+#align(center)[#image("/assets/figures/day02/L6_decision__11.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Regularization — Model Selection (source: course materials)]
 

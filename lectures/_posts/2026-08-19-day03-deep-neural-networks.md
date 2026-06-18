@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Day 3 - Deep Neural Networks
-image: /assets/img/lessons/day03.png
+image: /assets/img/sampling_space.png
 accent_image: 
   background: url('/assets/img/sampling_space.png') center/cover
   overlay: false
@@ -18,8 +18,6 @@ invert_sidebar: true
 - [Goodfellow, Bengio & Courville — Deep Learning](https://www.deeplearningbook.org/), Ch. 6–8
 - [UCLxDeepMind DL2020 — Lecture 2](https://www.youtube.com/playlist?list=PL4LiN2XjWqV8Z9qZqZqZqZqZqZqZqZqZq)
 - [Karpathy — micrograd](https://github.com/karpathy/micrograd)
-- [Complete reading list for Day 3](/publications/#day-3) (all resources for this lecture)
-
 
 ### [Slides](/assets/slides/day03.pdf)
 

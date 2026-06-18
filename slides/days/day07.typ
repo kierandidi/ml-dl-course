@@ -25,9 +25,9 @@
 - Bijective $f$ with tractable inverse
 - Composition of simple coupling layers
 
-== pdf0 page000
+== Change of Variables — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page000.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_cond_transition.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Normalizing Flows — Change of Variables (source: course materials)]
 
@@ -37,9 +37,9 @@
 - Affine coupling: scale and shift
 - RealNVP, Glow architectures
 
-== pdf0 page002
+== Coupling Layers — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page002.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_cond_vs_marginal.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Normalizing Flows — Coupling Layers (source: course materials)]
 
@@ -49,9 +49,9 @@
 - Jacobian log-determinant cost
 - Exact sampling and density
 
-== pdf0 page004
+== Training Flows — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page004.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_curved_paths.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Normalizing Flows — Training Flows (source: course materials)]
 
@@ -61,9 +61,9 @@
 - Scaling to high-res images is hard
 - Diffusion trades exact likelihood for flexibility
 
-== pdf0 page006
+== Limitations — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page006.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_dsm_trick.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Normalizing Flows — Limitations (source: course materials)]
 
@@ -75,9 +75,9 @@
 - Closed form $q(x_t|x_0) = cal(N)(sqrt(overline(alpha)_t) x_0, (1-overline(alpha)_t) I)$
 - Ends at pure noise
 
-== pdf0 page008
+== Forward Process — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page008.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_ebm_training.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Diffusion Intuition — Forward Process (source: course materials)]
 
@@ -87,9 +87,9 @@
 - $p_theta(x_(t-1)|x_t)$ parameterized by neural net
 - Sampling walks from noise to data
 
-== pdf0 page010
+== Reverse Process — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page010.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_forward_1d.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Diffusion Intuition — Reverse Process (source: course materials)]
 
@@ -99,9 +99,9 @@
 - Simple MSE on $epsilon$ with random $t$
 - Equivalent variants: predict $x_0$ or score
 
-== pdf0 page012
+== DDPM Objective — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page012.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_langevin.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Diffusion Intuition — DDPM Objective (source: course materials)]
 
@@ -111,9 +111,9 @@
 - Affects training stability and sample quality
 - Signal-to-noise ratio view
 
-== pdf0 page014
+== Noise Schedules — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page014.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_ncsn.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Diffusion Intuition — Noise Schedules (source: course materials)]
 
@@ -125,9 +125,9 @@
 - Tweedie's formula links $epsilon$ and score
 - Unifies diffusion training objectives
 
-== pdf0 page016
+== Denoising Score Matching — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page016.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_nf.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Score Matching View — Denoising Score Matching (source: course materials)]
 
@@ -137,9 +137,9 @@
 - Reverse SDE uses score function
 - Day 8 inference details
 
-== pdf0 page018
+== SDE Formulation Preview — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf0_page018.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_param_equiv.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Score Matching View — SDE Formulation Preview (source: course materials)]
 
@@ -149,9 +149,9 @@
 - Guidance scale trades diversity vs fidelity
 - Standard in text-to-image systems
 
-== pdf1 page000
+== Classifier-Free Guidance — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf1_page000.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_reflow.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Score Matching View — Classifier-Free Guidance (source: course materials)]
 
@@ -161,9 +161,9 @@
 - Lower dimension → cheaper training
 - Text encoder provides conditioning
 
-== pdf1 page003
+== Latent Diffusion — illustration
 
-#align(center)[#image("/assets/figures/day07/pdf1_page003.png", width: 92%)]
+#align(center)[#image("/assets/figures/day07/pdm_score_field.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Score Matching View — Latent Diffusion (source: course materials)]
 

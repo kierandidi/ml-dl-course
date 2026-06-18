@@ -25,9 +25,9 @@
 - Fully connected layers ignore spatial layout
 - Parameter sharing across locations
 
-== pdf0 page000
+== Motivation — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page000.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl0_p010.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Convolutions — Motivation (source: course materials)]
 
@@ -37,9 +37,9 @@
 - Output size: $(H - k + 2p)/s + 1$
 - Multiple filters → channel depth
 
-== pdf0 page003
+== 2D Convolution — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page003.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl0_p017.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Convolutions — 2D Convolution (source: course materials)]
 
@@ -49,9 +49,9 @@
 - Stride reduces spatial resolution
 - Receptive field grows with depth
 
-== pdf0 page006
+== Pooling & Stride — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page006.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl0_p019.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Convolutions — Pooling & Stride (source: course materials)]
 
@@ -61,9 +61,9 @@
 - 1×1 conv for channel mixing
 - Depthwise separable conv (MobileNet)
 
-== pdf0 page008
+== CNN Building Blocks — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page008.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl0_p022.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Convolutions — CNN Building Blocks (source: course materials)]
 
@@ -75,9 +75,9 @@
 - ReLU + GPU training breakthrough
 - Data augmentation becomes standard
 
-== pdf0 page009
+== LeNet → AlexNet — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page009.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl0_p025.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Classic Architectures — LeNet → AlexNet (source: course materials)]
 
@@ -87,9 +87,9 @@
 - Multi-scale Inception modules
 - Computational cost vs accuracy
 
-== pdf0 page012
+== VGG & Inception — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page012.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl0_p026.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Classic Architectures — VGG & Inception (source: course materials)]
 
@@ -99,9 +99,9 @@
 - Eases optimization of very deep nets
 - Skip connections and identity paths
 
-== pdf0 page015
+== ResNet — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page015.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl0_p027.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Classic Architectures — ResNet (source: course materials)]
 
@@ -111,9 +111,9 @@
 - ViT hybrid models (Day 5 link)
 - Transfer learning from ImageNet
 
-== pdf0 page016
+== Modern Backbones — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page016.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl1_p008.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Classic Architectures — Modern Backbones (source: course materials)]
 
@@ -125,9 +125,9 @@
 - Mixup / CutMix regularization
 - Test-time augmentation
 
-== pdf0 page018
+== Data Augmentation — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page018.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl1_p075.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training for Vision — Data Augmentation (source: course materials)]
 
@@ -137,9 +137,9 @@
 - Multi-task: detection, segmentation heads
 - Focal loss for hard examples
 
-== pdf0 page021
+== Losses & Heads — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page021.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl1_p099.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training for Vision — Losses & Heads (source: course materials)]
 
@@ -149,9 +149,9 @@
 - Two-stage vs one-stage detectors
 - Feature pyramids (FPN)
 
-== pdf0 page024
+== Object Detection Preview — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page024.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl1_p100.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training for Vision — Object Detection Preview (source: course materials)]
 
@@ -161,9 +161,9 @@
 - U-Net encoder–decoder
 - Dice / IoU losses
 
-== pdf0 page027
+== Segmentation Preview — illustration
 
-#align(center)[#image("/assets/figures/day04/pdf0_page027.png", width: 92%)]
+#align(center)[#image("/assets/figures/day04/ucl1_p103.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training for Vision — Segmentation Preview (source: course materials)]
 

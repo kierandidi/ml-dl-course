@@ -25,9 +25,9 @@
 - Variable length sequences
 - Markov assumptions and history
 
-== L6 LSTM 00
+== Motivation — illustration
 
-#align(center)[#image("/assets/figures/day05/L6_LSTM_00.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl0_p081.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Sequential Data — Motivation (source: course materials)]
 
@@ -37,9 +37,9 @@
 - N-gram language models
 - Need latent state summarizing past
 
-== L6 LSTM 02
+== Fixed-window Baselines — illustration
 
-#align(center)[#image("/assets/figures/day05/L6_LSTM_02.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl0_p082.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Sequential Data — Fixed-window Baselines (source: course materials)]
 
@@ -49,9 +49,9 @@
 - Same weights applied at each time step
 - Unroll graph for BPTT
 
-== L6 LSTM 04
+== RNN Recurrence — illustration
 
-#align(center)[#image("/assets/figures/day05/L6_LSTM_04.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl0_p083.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Sequential Data — RNN Recurrence (source: course materials)]
 
@@ -61,9 +61,9 @@
 - LSTM / GRU gating mechanisms
 - Truncated BPTT for long sequences
 
-== L6 LSTM 06
+== Vanishing Gradients — illustration
 
-#align(center)[#image("/assets/figures/day05/L6_LSTM_06.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl0_p084.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Sequential Data — Vanishing Gradients (source: course materials)]
 
@@ -74,9 +74,9 @@
 - Encoder final state must encode everything
 - Attention reads all encoder states
 
-== L6 LSTM 07
+== Seq2seq Bottleneck — illustration
 
-#align(center)[#image("/assets/figures/day05/L6_LSTM_07.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl0_p085.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Attention — Seq2seq Bottleneck (source: course materials)]
 
@@ -86,9 +86,9 @@
 - Query, Key, Value interpretations
 - Soft alignment weights over positions
 
-== L6 LSTM 09
+== Scaled Dot-Product Attention — illustration
 
-#align(center)[#image("/assets/figures/day05/L6_LSTM_09.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl0_p114.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Attention — Scaled Dot-Product Attention (source: course materials)]
 
@@ -98,9 +98,9 @@
 - Concatenate and project
 - Expressivity vs compute
 
-== L6 LSTM 10
+== Multi-Head Attention — illustration
 
-#align(center)[#image("/assets/figures/day05/L6_LSTM_10.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl0_p125.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Attention — Multi-Head Attention (source: course materials)]
 
@@ -110,9 +110,9 @@
 - Direct long-range links $O(n^2)$
 - Positional information required
 
-== L6 LSTM 11
+== Self-Attention — illustration
 
-#align(center)[#image("/assets/figures/day05/L6_LSTM_11.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl1_p010.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Attention — Self-Attention (source: course materials)]
 
@@ -124,9 +124,9 @@
 - FFN: two linear layers with non-linearity
 - Pre-norm vs post-norm variants
 
-== NLP and RNN 00
+== Encoder Block — illustration
 
-#align(center)[#image("/assets/figures/day05/NLP and RNN_00.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl1_p034.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Transformer Architecture — Encoder Block (source: course materials)]
 
@@ -136,9 +136,9 @@
 - RoPE in modern LLMs (Day 9–10)
 - Relative position bias
 
-== NLP and RNN 01
+== Positional Encoding — illustration
 
-#align(center)[#image("/assets/figures/day05/NLP and RNN_01.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl1_p036.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Transformer Architecture — Positional Encoding (source: course materials)]
 
@@ -148,9 +148,9 @@
 - Cross-attention to encoder (MT)
 - Decoder-only for language modeling
 
-== NLP and RNN 02
+== Decoder & Masking — illustration
 
-#align(center)[#image("/assets/figures/day05/NLP and RNN_02.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl1_p080.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Transformer Architecture — Decoder & Masking (source: course materials)]
 
@@ -160,9 +160,9 @@
 - Motivates sparse / linear attention research
 - KV cache for inference (Day 10)
 
-== NLP and RNN 04
+== Complexity — illustration
 
-#align(center)[#image("/assets/figures/day05/NLP and RNN_04.png", width: 92%)]
+#align(center)[#image("/assets/figures/day05/ucl1_p081.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Transformer Architecture — Complexity (source: course materials)]
 

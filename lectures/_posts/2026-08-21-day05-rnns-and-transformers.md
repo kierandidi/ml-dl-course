@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Day 5 - RNNs and Transformers
-image: /assets/img/lessons/day05.png
+image: /assets/img/sampling_space.png
 accent_image: 
   background: url('/assets/img/sampling_space.png') center/cover
   overlay: false
@@ -18,8 +18,6 @@ invert_sidebar: true
 - [Attention Is All You Need (Vaswani et al.)](https://arxiv.org/abs/1706.03762)
 - [Karpathy — The Unreasonable Effectiveness of RNNs](https://karpathy.github.io/2015/05/21/rnn-effectiveness/)
 - [Illustrated Transformer (Jay Alammar)](https://jalammar.github.io/illustrated-transformer/)
-- [Complete reading list for Day 5](/publications/#day-5) (all resources for this lecture)
-
 
 ### [Slides](/assets/slides/day05.pdf)
 

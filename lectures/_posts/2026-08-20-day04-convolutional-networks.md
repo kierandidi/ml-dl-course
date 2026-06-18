@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Day 4 - Convolutional Networks
-image: /assets/img/lessons/day04.png
+image: /assets/img/sampling_space.png
 accent_image: 
   background: url('/assets/img/sampling_space.png') center/cover
   overlay: false
@@ -18,8 +18,6 @@ invert_sidebar: true
 - [Goodfellow et al. — Deep Learning, Ch. 9](https://www.deeplearningbook.org/contents/convnets.html)
 - [CS231n — Convolutional Neural Networks](https://cs231n.github.io/convolutional-networks/)
 - [He et al. — Deep Residual Learning (ResNet)](https://arxiv.org/abs/1512.03385)
-- [Complete reading list for Day 4](/publications/#day-4) (all resources for this lecture)
-
 
 ### [Slides](/assets/slides/day04.pdf)
 

@@ -25,9 +25,9 @@
 - Need composed non-linear transformations
 - Universal approximation intuition
 
-== L1 introduct 00
+== Limitations of Linear Models — illustration
 
-#align(center)[#image("/assets/figures/day03/L1_introduct_00.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl0_p011.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[From Linear to Deep — Limitations of Linear Models (source: course materials)]
 
@@ -37,9 +37,9 @@
 - Depth vs width tradeoffs
 - Parameter count scales with layer sizes
 
-== L1 introduct 06
+== Layer Composition — illustration
 
-#align(center)[#image("/assets/figures/day03/L1_introduct_06.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl0_p012.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[From Linear to Deep — Layer Composition (source: course materials)]
 
@@ -49,9 +49,9 @@
 - Sigmoid / tanh — saturating, vanishing gradients
 - GELU, SiLU in modern transformers
 
-== L1 introduct 08
+== Activations — illustration
 
-#align(center)[#image("/assets/figures/day03/L1_introduct_08.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl0_p013.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[From Linear to Deep — Activations (source: course materials)]
 
@@ -61,9 +61,9 @@
 - Batching: tensor shape $(N, d)$
 - Numerical stability: log-sum-exp trick
 
-== L5- CNN 00
+== Forward Pass — illustration
 
-#align(center)[#image("/assets/figures/day03/L5- CNN_00.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl0_p053.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[From Linear to Deep — Forward Pass (source: course materials)]
 
@@ -75,9 +75,9 @@
 - Local gradients multiply via chain rule
 - Reverse-mode AD = backprop
 
-== L5- CNN 02
+== Computational Graph — illustration
 
-#align(center)[#image("/assets/figures/day03/L5- CNN_02.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl0_p054.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Backpropagation — Computational Graph (source: course materials)]
 
@@ -87,9 +87,9 @@
 - Softmax + CE: gradient simplifies to $hat(y) - y$
 - Sigmoid + BCE similarly clean
 
-== L5- CNN 03
+== Output Layer Gradients — illustration
 
-#align(center)[#image("/assets/figures/day03/L5- CNN_03.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl0_p055.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Backpropagation — Output Layer Gradients (source: course materials)]
 
@@ -99,9 +99,9 @@
 - Vanishing / exploding gradients in deep nets
 - Skip connections mitigate (ResNet, Day 4+)
 
-== L5- CNN 04
+== Hidden Layer Gradients — illustration
 
-#align(center)[#image("/assets/figures/day03/L5- CNN_04.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl0_p056.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Backpropagation — Hidden Layer Gradients (source: course materials)]
 
@@ -111,9 +111,9 @@
 - Detach, stop_gradient, custom Function
 - Check gradients with finite differences
 
-== L5- CNN 10
+== Implementation Notes — illustration
 
-#align(center)[#image("/assets/figures/day03/L5- CNN_10.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl1_p008.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Backpropagation — Implementation Notes (source: course materials)]
 
@@ -125,9 +125,9 @@
 - Loss averaged over batch
 - Epoch = one pass over training set
 
-== L5- CNN 11
+== Mini-batch SGD — illustration
 
-#align(center)[#image("/assets/figures/day03/L5- CNN_11.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl1_p014.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training Loop — Mini-batch SGD (source: course materials)]
 
@@ -137,9 +137,9 @@
 - $eta_t$ often largest hyperparameter
 - Monitor train vs val loss curves
 
-== pdf0 page000
+== Learning Rate Schedules — illustration
 
-#align(center)[#image("/assets/figures/day03/pdf0_page000.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl1_p020.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training Loop — Learning Rate Schedules (source: course materials)]
 
@@ -149,9 +149,9 @@
 - Bad init → dead ReLUs or blow-up
 - LayerNorm reduces sensitivity (Day 5)
 
-== pdf0 page002
+== Initialization — illustration
 
-#align(center)[#image("/assets/figures/day03/pdf0_page002.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl1_p022.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training Loop — Initialization (source: course materials)]
 
@@ -161,9 +161,9 @@
 - Learnable scale and shift $gamma, beta$
 - Regularization side effect
 
-== pdf0 page004
+== Batch Normalization — illustration
 
-#align(center)[#image("/assets/figures/day03/pdf0_page004.png", width: 92%)]
+#align(center)[#image("/assets/figures/day03/ucl1_p029.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training Loop — Batch Normalization (source: course materials)]
 

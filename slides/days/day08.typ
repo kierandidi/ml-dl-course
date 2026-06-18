@@ -25,9 +25,9 @@
 - Variance-preserving (VP) and VE variants
 - Marginal $p_t(x)$ approaches noise
 
-== pdf0 page015
+== Forward SDE — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page015.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_cfg.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Continuous-Time View — Forward SDE (source: course materials)]
 
@@ -37,9 +37,9 @@
 - Score replaces unknown drift correction
 - Anderson's reverse-time SDE theorem
 
-== pdf0 page018
+== Reverse SDE — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page018.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_ddim_euler.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Continuous-Time View — Reverse SDE (source: course materials)]
 
@@ -49,9 +49,9 @@
 - $d x = [f(x,t) - (1/2) g(t)^2 nabla_x log p_t(x)] d t$
 - Deterministic sampling path
 
-== pdf0 page021
+== Probability Flow ODE — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page021.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_deis.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Continuous-Time View — Probability Flow ODE (source: course materials)]
 
@@ -61,9 +61,9 @@
 - DDIM as non-Markovian deterministic integrator
 - Step count vs quality tradeoff
 
-== pdf0 page024
+== Discretization — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page024.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_flowmap.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Continuous-Time View — Discretization (source: course materials)]
 
@@ -75,9 +75,9 @@
 - $T$ steps — slow at high resolution
 - Stochasticity helps diversity
 
-== pdf0 page025
+== DDPM Sampling — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page025.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_flowmap_semigroup.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Samplers — DDPM Sampling (source: course materials)]
 
@@ -87,9 +87,9 @@
 - eta=0 fully deterministic
 - 10–50 steps often sufficient
 
-== pdf0 page027
+== DDIM — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page027.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_flowmap_timeline.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Samplers — DDIM (source: course materials)]
 
@@ -99,9 +99,9 @@
 - Fewer function evaluations (NFE)
 - Active research area
 
-== pdf0 page030
+== Higher-Order Solvers — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page030.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_guidance.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Samplers — Higher-Order Solvers (source: course materials)]
 
@@ -111,9 +111,9 @@
 - CFG combines cond and uncond score
 - Large guidance → artifacts
 
-== pdf0 page033
+== Guidance at Inference — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page033.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_heun_logsnr.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Samplers — Guidance at Inference (source: course materials)]
 
@@ -125,9 +125,9 @@
 - Respacing pretrained models
 - Distillation for 1–4 step models
 
-== pdf0 page035
+== Scheduler Choice — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page035.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_reverse_sde.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Practical Inference — Scheduler Choice (source: course materials)]
 
@@ -137,9 +137,9 @@
 - VAE decode bottleneck
 - Batch size 1 for interactive apps
 
-== pdf0 page036
+== Memory & Speed — illustration
 
-#align(center)[#image("/assets/figures/day08/pdf0_page036.png", width: 92%)]
+#align(center)[#image("/assets/figures/day08/pdm_score_sde_2d.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Practical Inference — Memory & Speed (source: course materials)]
 
@@ -149,23 +149,11 @@
 - Inpainting with masked regions
 - ControlNet auxiliary conditioning
 
-== pdf0 page039
-
-#align(center)[#image("/assets/figures/day08/pdf0_page039.png", width: 92%)]
-
-#text(size: 14pt, fill: gray)[Practical Inference — Editing & Control (source: course materials)]
-
 == Failure Modes
 
 - Mode averaging at low steps
 - Text neglect with weak guidance
 - Watermark and safety filters
-
-== pdf0 page042
-
-#align(center)[#image("/assets/figures/day08/pdf0_page042.png", width: 92%)]
-
-#text(size: 14pt, fill: gray)[Practical Inference — Failure Modes (source: course materials)]
 
 = Connections & Outlook
 

@@ -2,202 +2,21 @@
 """Generate Week 1 Jekyll lecture posts for the ML & DL course."""
 from __future__ import annotations
 
+import sys
 from datetime import date, timedelta
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from content_day01 import LECTURE as DAY01_LECTURE
+from content_day06 import LECTURE as DAY06_LECTURE
+from diffusion_viz import VIZ, viz_iframe
 
 ROOT = Path(__file__).resolve().parents[1]
 POSTS_DIR = ROOT / "lectures" / "_posts"
 START_DATE = date(2026, 8, 17)
 
 LECTURES = [
-    {
-        "day": 1,
-        "slug": "math-foundations",
-        "title": "Math Foundations",
-        "description": "Gradients, the chain rule, probability, and maximum likelihood estimation.",
-        "reading": [
-            "[Bishop — Pattern Recognition and Machine Learning](https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/), Ch. 1–2",
-            "[Boyd & Vandenberghe — Convex Optimization](https://web.stanford.edu/~boyd/cvxbook/), §2.1–2.3",
-            "[3Blue1Brown — Essence of Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3tZaY)",
-        ],
-        "intro": (
-            "Before we train neural networks we need a shared mathematical language. "
-            "Today we review multivariate calculus, the chain rule, basic probability, "
-            "and maximum likelihood — the workhorse principle behind most learning algorithms."
-        ),
-        "sections": [
-            {
-                "title": "Multivariate Calculus and Gradients",
-                "subsections": [
-                    {
-                        "heading": "Partial derivatives and the gradient",
-                        "definition": (
-                            "For a scalar function $$f: \\mathbb{R}^d \\to \\mathbb{R}$$, the "
-                            "**gradient** is the vector of partial derivatives "
-                            "$$\\nabla f(\\mathbf{x}) = \\left(\\frac{\\partial f}{\\partial x_1}, "
-                            "\\ldots, \\frac{\\partial f}{\\partial x_d}\\right)^\\top.$$ "
-                            "It points in the direction of steepest ascent."
-                        ),
-                        "body": """For a quadratic loss $$L(\\mathbf{w}) = \\|\\mathbf{X}\\mathbf{w} - \\mathbf{y}\\|_2^2$$ with design matrix $$\\mathbf{X} \\in \\mathbb{R}^{n \\times d}$$, expanding gives
-
-$$L(\\mathbf{w}) = \\mathbf{w}^\\top \\mathbf{X}^\\top \\mathbf{X} \\mathbf{w} - 2\\mathbf{y}^\\top \\mathbf{X}\\mathbf{w} + \\mathbf{y}^\\top\\mathbf{y}.$$
-
-Differentiating with respect to $$\\mathbf{w}$$ yields the closed-form gradient
-
-$$\\nabla_{\\mathbf{w}} L = 2\\mathbf{X}^\\top(\\mathbf{X}\\mathbf{w} - \\mathbf{y}).$$
-
-Setting $$\\nabla_{\\mathbf{w}} L = \\mathbf{0}$$ recovers the ordinary least-squares solution $$\\hat{\\mathbf{w}} = (\\mathbf{X}^\\top\\mathbf{X})^{-1}\\mathbf{X}^\\top\\mathbf{y}$$ whenever $$\\mathbf{X}^\\top\\mathbf{X}$$ is invertible.
-
-![Gradient descent on a quadratic bowl](/assets/figures/day01/pdf0_page005.png)
-
-The **directional derivative** along unit vector $$\\mathbf{u}$$ is $$D_{\\mathbf{u}} f = \\nabla f \\cdot \\mathbf{u}$$. Steepest descent uses $$\\mathbf{u} = -\\nabla f / \\|\\nabla f\\|$$.""",
-                    },
-                    {
-                        "heading": "The Jacobian and Hessian",
-                        "definition": (
-                            "For $$\\mathbf{f}: \\mathbb{R}^n \\to \\mathbb{R}^m$$, the **Jacobian** "
-                            "$$\\mathbf{J}_{\\mathbf{f}} \\in \\mathbb{R}^{m \\times n}$$ has entries "
-                            "$$[\\mathbf{J}_{\\mathbf{f}}]_{ij} = \\partial f_i / \\partial x_j$$. "
-                            "For scalar $$f$$, the **Hessian** $$\\mathbf{H} = \\nabla^2 f$$ "
-                            "describes local curvature."
-                        ),
-                        "body": """For a linear layer $$\\mathbf{z} = \\mathbf{W}\\mathbf{x} + \\mathbf{b}$$ with $$\\mathbf{W} \\in \\mathbb{R}^{m \\times n}$$, the Jacobian with respect to $$\\mathbf{x}$$ is simply $$\\mathbf{W}$$. This fact is what makes backpropagation through affine layers trivial.
-
-Near a critical point $$\\mathbf{x}^\\*$$, Taylor expansion gives
-
-$$f(\\mathbf{x}) \\approx f(\\mathbf{x}^\\*) + \\frac{1}{2}(\\mathbf{x}-\\mathbf{x}^\\*)^\\top \\mathbf{H}(\\mathbf{x}^\\*)(\\mathbf{x}-\\mathbf{x}^\\*).$$
-
-Positive definiteness of $$\\mathbf{H}$$ at $$\\mathbf{x}^\\*$$ implies a local minimum — a condition optimizers exploit via second-order methods (Newton, L-BFGS).""",
-                    },
-                ],
-            },
-            {
-                "title": "The Chain Rule and Computational Graphs",
-                "subsections": [
-                    {
-                        "heading": "Scalar chain rule",
-                        "definition": (
-                            "If $$y = f(u)$$ and $$u = g(x)$$, then $$\\frac{dy}{dx} = "
-                            "\\frac{dy}{du}\\frac{du}{dx}$$. In multivariate form, "
-                            "gradients propagate backward through composed functions."
-                        ),
-                        "body": """Consider a two-layer network with scalar output:
-
-$$\\hat{y} = w_2\\,\\sigma(w_1 x + b_1) + b_2.$$
-
-Define $$z = w_1 x + b_1$$ and $$a = \\sigma(z)$$. Then
-
-$$\\frac{\\partial \\hat{y}}{\\partial w_1} = \\frac{\\partial \\hat{y}}{\\partial a}\\frac{\\partial a}{\\partial z}\\frac{\\partial z}{\\partial w_1} = w_2\\,\\sigma'(z)\\,x.$$
-
-![Computational graph for a tiny network](/assets/figures/day01/pdf0_page010.png)
-
-Each edge in the graph stores a local Jacobian; backpropagation is reverse-mode automatic differentiation that multiplies these Jacobians along paths from the loss to each parameter.""",
-                    },
-                    {
-                        "heading": "Multivariate chain rule",
-                        "definition": (
-                            "If $$\\mathbf{y} = \\mathbf{f}(\\mathbf{u})$$ and $$\\mathbf{u} = "
-                            "\\mathbf{g}(\\mathbf{x})$$, then $$\\frac{\\partial \\mathbf{y}}{\\partial "
-                            "\\mathbf{x}} = \\mathbf{J}_{\\mathbf{f}}(\\mathbf{u})\\,"
-                            "\\mathbf{J}_{\\mathbf{g}}(\\mathbf{x})$$ by matrix multiplication."
-                        ),
-                        "body": """For vector-valued intermediates, the chain rule is a product of Jacobians. Given loss $$L$$ and hidden activation $$\\mathbf{h}$$,
-
-$$\\frac{\\partial L}{\\partial \\mathbf{h}} = \\left(\\frac{\\partial L}{\\partial \\mathbf{z}}\\right)^\\top \\mathbf{J}_{\\mathbf{h}}.$$
-
-In practice frameworks never materialize full Jacobians for large layers; they use **vector-Jacobian products** (VJPs) that cost one forward/backward pass per output dimension batch.
-
-The **reverse-mode** trick: one backward pass from a scalar loss costs $$O(\\text{ops})$$ regardless of parameter count, whereas forward-mode AD scales with the number of inputs.""",
-                    },
-                ],
-            },
-            {
-                "title": "Probability Essentials",
-                "subsections": [
-                    {
-                        "heading": "Random variables and expectations",
-                        "definition": (
-                            "A **random variable** $$X$$ maps outcomes $$\\omega \\in \\Omega$$ to "
-                            "real values. For continuous $$X$$ with density $$p(x)$$, "
-                            "$$\\mathbb{E}[X] = \\int x\\,p(x)\\,dx$$ and "
-                            "$$\\mathrm{Var}(X) = \\mathbb{E}[(X-\\mathbb{E}[X])^2].$$"
-                        ),
-                        "body": """Key identities used throughout ML:
-
-$$\\mathrm{Var}(X) = \\mathbb{E}[X^2] - (\\mathbb{E}[X])^2, \\qquad \\mathrm{Cov}(X,Y) = \\mathbb{E}[XY] - \\mathbb{E}[X]\\mathbb{E}[Y].$$
-
-For multivariate Gaussian $$\\mathbf{x} \\sim \\mathcal{N}(\\boldsymbol{\\mu}, \\boldsymbol{\\Sigma})$$,
-
-$$p(\\mathbf{x}) = \\frac{1}{(2\\pi)^{d/2}|\\boldsymbol{\\Sigma}|^{1/2}} \\exp\\!\\left(-\\tfrac{1}{2}(\\mathbf{x}-\\boldsymbol{\\mu})^\\top \\boldsymbol{\\Sigma}^{-1}(\\mathbf{x}-\\boldsymbol{\\mu})\\right).$$
-
-![Gaussian contours in 2D](/assets/figures/day01/pdf0_page015.png)
-
-**Conditional** distributions arise constantly: $$p(\\mathbf{x}|y) \\propto p(y|\\mathbf{x})p(\\mathbf{x})$$. Independence means $$p(\\mathbf{x},\\mathbf{y}) = p(\\mathbf{x})p(\\mathbf{y}).""",
-                    },
-                    {
-                        "heading": "Information and KL divergence",
-                        "definition": (
-                            "The **Kullback–Leibler divergence** from $$q$$ to $$p$$ is "
-                            "$$D_{\\mathrm{KL}}(q\\|p) = \\mathbb{E}_{\\mathbf{x}\\sim q}\\!"
-                            "\\left[\\log\\frac{q(\\mathbf{x})}{p(\\mathbf{x})}\\right] \\geq 0$$, "
-                            "with equality iff $$q = p$$ almost everywhere."
-                        ),
-                        "body": """KL divergence is not symmetric but measures how many extra nats are needed to encode samples from $$q$$ using a code optimized for $$p$$.
-
-For Gaussians $$\\mathcal{N}(\\boldsymbol{\\mu}_1, \\boldsymbol{\\Sigma}_1)$$ and $$\\mathcal{N}(\\boldsymbol{\\mu}_2, \\boldsymbol{\\Sigma}_2)$$ in $$d$$ dimensions, a closed form exists and appears in VAEs and diffusion training.
-
-**Entropy** $$H(p) = -\\mathbb{E}_{p}[\\log p]$$ quantifies uncertainty. Cross-entropy $$H(p,q) = -\\mathbb{E}_{p}[\\log q]$$ is the classification loss when $$p$$ is the data distribution and $$q$$ the model.""",
-                    },
-                ],
-            },
-            {
-                "title": "Maximum Likelihood Estimation",
-                "subsections": [
-                    {
-                        "heading": "Likelihood and log-likelihood",
-                        "definition": (
-                            "Given i.i.d. data $$\\mathcal{D} = \\{\\mathbf{x}^{(i)}\\}_{i=1}^n$$ "
-                            "and parametric model $$p_\\theta(\\mathbf{x})$$, the **likelihood** is "
-                            "$$\\mathcal{L}(\\theta) = \\prod_i p_\\theta(\\mathbf{x}^{(i)})$$. "
-                            "**MLE** chooses $$\\hat{\\theta} = \\arg\\max_\\theta \\mathcal{L}(\\theta)$$."
-                        ),
-                        "body": """We almost always maximize the log-likelihood (monotone transform):
-
-$$\\ell(\\theta) = \\sum_{i=1}^n \\log p_\\theta(\\mathbf{x}^{(i)}).$$
-
-For Gaussian noise regression $$y^{(i)} = \\mathbf{w}^\\top\\mathbf{x}^{(i)} + \\epsilon^{(i)}$$ with $$\\epsilon^{(i)} \\sim \\mathcal{N}(0, \\sigma^2)$$, MLE of $$\\mathbf{w}$$ coincides with minimizing squared error — linking probabilistic modeling to empirical risk minimization.
-
-![Likelihood surface for a Bernoulli parameter](/assets/figures/day01/pdf0_page020.png)""",
-                    },
-                    {
-                        "heading": "Properties and regularization as priors",
-                        "definition": (
-                            "**MAP estimation** maximizes $$p(\\theta|\\mathcal{D}) \\propto "
-                            "p(\\mathcal{D}|\\theta)p(\\theta)$$. An $$\\ell_2$$ prior on $$\\mathbf{w}$$ "
-                            "yields ridge regression; a Laplace prior yields Lasso."
-                        ),
-                        "body": """Under regularity conditions, MLE is **consistent** ($$\\hat{\\theta} \\to \\theta^\\*$$ as $$n \\to \\infty$$) and asymptotically normal:
-
-$$\\sqrt{n}(\\hat{\\theta} - \\theta^\\*) \\xrightarrow{d} \\mathcal{N}(\\mathbf{0}, \\mathcal{I}^{-1}(\\theta^\\*)),$$
-
-where $$\\mathcal{I}$$ is the Fisher information matrix.
-
-Taking gradients of $$\\ell(\\theta)$$ and setting to zero often has no closed form — we use gradient ascent:
-
-$$\\theta_{t+1} = \\theta_t + \\eta \\nabla_\\theta \\ell(\\theta_t).$$
-
-This connects MLE directly to the optimization algorithms we will implement in the practical.""",
-                    },
-                ],
-            },
-        ],
-        "checkpoint": [
-            "The gradient $$\\nabla f$$ points uphill; descent steps go opposite to it.",
-            "Backpropagation is the multivariate chain rule applied to a computational graph.",
-            "MLE turns learning into maximizing $$\\sum_i \\log p_\\theta(x^{(i)})$$.",
-            "MAP = MLE + log-prior; common priors recover familiar regularizers.",
-        ],
-    },
+    DAY01_LECTURE,
     {
         "day": 2,
         "slug": "statistical-learning",
@@ -908,7 +727,22 @@ Positional information: sinusoidal encodings (original Transformer) or **rotary 
             "Autoregressive LMs train with next-token CE; KV cache speeds up generation.",
         ],
     },
+    DAY06_LECTURE,
 ]
+
+
+def expand_viz_markers(text: str) -> str:
+    """Replace ``{{viz:KEY}}`` markers with embedded interactive widgets."""
+    import re
+
+    def repl(m):
+        key = m.group(1).strip()
+        if key not in VIZ:
+            print(f"  ! unknown viz key: {key}")
+            return m.group(0)
+        return "\n" + viz_iframe(key) + "\n"
+
+    return re.sub(r"\{\{viz:([a-z0-9_]+)\}\}", repl, text)
 
 
 def front_matter(day: int, title: str, description: str) -> str:
@@ -990,7 +824,7 @@ def main() -> None:
         post_date = START_DATE + timedelta(days=i)
         filename = f"{post_date.isoformat()}-day{lecture['day']:02d}-{lecture['slug']}.md"
         path = POSTS_DIR / filename
-        content = render_lecture(lecture)
+        content = expand_viz_markers(render_lecture(lecture))
         path.write_text(content, encoding="utf-8")
         line_count = content.count("\n") + 1
         created.append(path)

@@ -25,9 +25,9 @@
 - Causal masking enforces ordering
 - Teacher forcing during training
 
-== pdf0 page000
+== Factorization — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page000.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page000.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Autoregressive LM — Factorization (source: course materials)]
 
@@ -37,9 +37,9 @@
 - Vocabulary size vs sequence length
 - Special tokens: BOS, EOS, PAD
 
-== pdf0 page004
+== Tokenization — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page004.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page004.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Autoregressive LM — Tokenization (source: course materials)]
 
@@ -49,9 +49,9 @@
 - RMSNorm, SwiGLU FFN, RoPE positions
 - Grouped-query attention (GQA)
 
-== pdf0 page008
+== Architecture Choices — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page008.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page008.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Autoregressive LM — Architecture Choices (source: course materials)]
 
@@ -61,9 +61,9 @@
 - Perplexity $PP = exp(H)$
 - Bits-per-byte for comparison across vocabs
 
-== pdf0 page012
+== Loss & Metrics — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page012.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page012.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Autoregressive LM — Loss & Metrics (source: course materials)]
 
@@ -75,9 +75,9 @@
 - Quality heuristics and safety filters
 - Mixture-of-sources ratios matter
 
-== pdf0 page016
+== Data Pipeline — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page016.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page016.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training at Scale — Data Pipeline (source: course materials)]
 
@@ -87,9 +87,9 @@
 - Gradient accumulation for large effective batch
 - Loss spikes: skip step, reduce LR
 
-== pdf0 page020
+== Optimization — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page020.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page020.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training at Scale — Optimization (source: course materials)]
 
@@ -99,9 +99,9 @@
 - Tensor / pipeline / sequence parallel
 - ZeRO optimizer state sharding
 
-== pdf0 page024
+== Distributed Training — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page024.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page024.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training at Scale — Distributed Training (source: course materials)]
 
@@ -111,9 +111,9 @@
 - Resume long runs after failure
 - HF format interoperability
 
-== pdf0 page025
+== Checkpointing — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page025.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page025.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Training at Scale — Checkpointing (source: course materials)]
 
@@ -125,9 +125,9 @@
 - Catastrophic forgetting mitigation
 - LoRA: low-rank adapter updates
 
-== pdf0 page028
+== Supervised Fine-Tuning — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page028.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page028.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Alignment & Fine-tuning — Supervised Fine-Tuning (source: course materials)]
 
@@ -137,9 +137,9 @@
 - PPO fine-tune policy against reward
 - DPO direct preference optimization
 
-== pdf0 page032
+== RLHF Overview — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page032.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page032.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Alignment & Fine-tuning — RLHF Overview (source: course materials)]
 
@@ -149,9 +149,9 @@
 - Human eval for chat quality
 - Contamination concerns
 
-== pdf0 page035
+== Evaluation — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page035.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page035.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Alignment & Fine-tuning — Evaluation (source: course materials)]
 
@@ -161,9 +161,9 @@
 - System prompts and moderation
 - Alignment is ongoing, not solved
 
-== pdf0 page036
+== Safety — illustration
 
-#align(center)[#image("/assets/figures/day09/pdf0_page036.png", width: 92%)]
+#align(center)[#image("/assets/figures/day09/pdf0_page036.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Alignment & Fine-tuning — Safety (source: course materials)]
 

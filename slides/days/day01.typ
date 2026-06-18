@@ -6,197 +6,356 @@
 
 == Welcome
 
-- *Math Foundations* — Linear algebra, calculus, probability, optimization
+- *Math Foundations* — Linear algebra through differential equations — MML Part I
 - 3 hours lecture + practical
 - Slides, notes, and code on the course site
 
 == Outline
 
+- The Mathematical Foundation
 - Linear Algebra
-- Calculus & Optimization
-- Probability
-- Putting It Together
+- Analytic Geometry
+- Vector Calculus & Decompositions
+- Integration & Differentiation
+- Probability & Distributions
+- Differential Equations
+
+= The Mathematical Foundation
+
+== Four Pillars of ML
+
+- Data as vectors; tables of data as matrices (linear algebra)
+- Similarity via norms and inner products (analytic geometry)
+- Structure via matrix decompositions; optimization via gradients (Ch. 4–5)
+- Uncertainty via probability; dynamics via differential equations
+- Source: Deisenroth, Faisal & Ong — *Mathematics for Machine Learning*
+
+== Four Pillars of ML — illustration
+
+#align(center)[#image("/assets/figures/day01/mml_vectors_types.png", width: 80%)]
+
+#text(size: 14pt, fill: gray)[The Mathematical Foundation — Four Pillars of ML (source: course materials)]
+
+== Roadmap for Today
+
+- 1. Linear algebra — equations, matrices, vector spaces
+- 2. Analytic geometry — norms, inner products, projections
+- 3. Vector calculus & matrix decompositions
+- 4. Integration & differentiation (*There and Back Again*)
+- 5. Probability & distributions
+- 6. ODE/SDE crash course (diffusion book appendix)
 
 = Linear Algebra
 
-== Vectors and Matrices
+== From Linear Equations to Matrices
 
-- Scalars, vectors, matrices — shapes and notation
-- Matrix multiply: $(A B)_(i j) = sum_k A_(i k) B_(k j)$
-- Transpose, inverse, rank, and conditioning
-- Geometric view: linear maps rotate, scale, shear
+- System $A x = b$: each row is one linear constraint on unknowns $x in RR^n$
+- Coefficient matrix $A in RR^(m times n)$ encodes all equations at once
+- Solution sets are affine subspaces (when consistent)
+- Matrix-vector product: each output component is an inner product of a row with $x$
 
-== L1 introduct 00
+== From Linear Equations to Matrices — illustration
 
-#align(center)[#image("/assets/figures/day01/L1_introduct_00.png", width: 92%)]
+#align(center)[#image("/assets/figures/day01/mml_linear_system.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Linear Algebra — Vectors and Matrices (source: course materials)]
+#text(size: 14pt, fill: gray)[Linear Algebra — From Linear Equations to Matrices (source: course materials)]
 
-== Eigenvalues & SVD
+== What Is a Matrix?
 
-- Eigen-decomposition: $A v = lambda v$
-- Symmetric PSD matrices and quadratic forms
-- SVD: $A = U Sigma V^T$ — low-rank approximations
-- Principal components as top eigenvectors of covariance
+- A matrix is a linear map $f: RR^n arrow.r RR^m$ written as $y = A x$
+- Columns of $A$ show where basis vectors land — geometric action of the map
+- Composition of maps = matrix multiplication: $(A B) x = A (B x)$
+- Transpose swaps rows/columns; inverse (when it exists) undoes the map
 
-== L1 introduct 03
+== What Is a Matrix? — illustration
 
-#align(center)[#image("/assets/figures/day01/L1_introduct_03.png", width: 92%)]
+#align(center)[#image("/assets/figures/day01/mml_linear_mapping.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Linear Algebra — Eigenvalues & SVD (source: course materials)]
+#text(size: 14pt, fill: gray)[Linear Algebra — What Is a Matrix? (source: course materials)]
 
-== Norms and Projections
+== Vector Spaces
 
-- $L_2$ norm: $||x||_2 = sqrt(sum_i x_i^2)$
-- Orthogonal projection onto a subspace
-- Least squares as minimizing $||A w - y||_2^2$
+- Vector space: closed under addition and scalar multiplication
+- Linear combination: $sum_i alpha_i v_i$; span = all reachable combinations
+- Linear independence: no vector is a combination of the others
+- Basis: minimal spanning set; dimension = number of basis vectors
+- Rank of $A$ = dimension of column space = dim of row space
+
+== Vector Spaces — illustration
+
+#align(center)[#image("/assets/figures/day01/mml_subspace.png", width: 80%)]
+
+#text(size: 14pt, fill: gray)[Linear Algebra — Vector Spaces (source: course materials)]
+
+== Solving & Interpreting $A x = b$
+
+- Gaussian elimination / LU factorization (algorithmic)
+- Column picture: $b$ must lie in span of columns of $A$
+- Row picture: intersection of hyperplanes
+- Null space: all $x$ with $A x = 0$ — directions the map collapses
+
+== Solving & Interpreting $A x = b$ — illustration
+
+#align(center)[#image("/assets/figures/day01/mml_kernel_nullspace.png", width: 80%)]
+
+#text(size: 14pt, fill: gray)[Linear Algebra — Solving & Interpreting $A x = b$ (source: course materials)]
+
+= Analytic Geometry
+
+== Why Similarity Matters
+
+- ML predictors should assign similar outputs to similar inputs
+- Vectors encode objects; we need a numeric notion of 'close' or 'aligned'
+- Norms measure length/magnitude; inner products measure alignment
+- Builds directly on linear-algebra vector operations
+
+== Why Similarity Matters — illustration
+
+#align(center)[#image("/assets/figures/day01/mml_geometry_mindmap.png", width: 80%)]
+
+#text(size: 14pt, fill: gray)[Analytic Geometry — Why Similarity Matters (source: course materials)]
+
+== Norms
+
+- $L_2$ (Euclidean): $||x||_2 = sqrt(sum_i x_i^2)$ — rotation-invariant length
+- $L_1$: $||x||_1 = sum_i |x_i|$ — sparsity-inducing geometry
+- $L_infinity$: $||x||_infinity = max_i |x_i|$
+- Unit ball shapes differ — choice of norm changes regularization (Day 2)
+
+== Norms — illustration
+
+#align(center)[#image("/assets/figures/day01/mml_triangle_ineq.png", width: 80%)]
+
+#text(size: 14pt, fill: gray)[Analytic Geometry — Norms (source: course materials)]
+
+== Inner Product & Angles
+
+- Inner product $chevron.l x, y chevron.r = x^T y$ (standard dot product)
+- Cauchy–Schwarz: $|chevron.l x,y chevron.r| <= ||x||_2 ||y||_2$
+- Angle: $cos theta = chevron.l x,y chevron.r / (||x||_2 ||y||_2)$
+- Orthogonal vectors: $chevron.l x,y chevron.r = 0$
+
+== Inner Product & Angles — illustration
+
+#align(center)[#image("/assets/figures/day01/mml_angle.png", width: 80%)]
+
+#text(size: 14pt, fill: gray)[Analytic Geometry — Inner Product & Angles (source: course materials)]
+
+== Projections
+
+- Orthogonal projection of $y$ onto line spanned by $x$: $hat(y) = (x^T y / x^T x) x$
+- Projection matrix onto column space of $A$: $P = A (A^T A)^(-1) A^T$
+- Least squares: minimize $||A w - y||_2^2$ — project $y$ onto span(columns of $A)$
 - Normal equations: $A^T A w = A^T y$
 
-== L1 introduct 06
+== Projections — illustration
 
-#align(center)[#image("/assets/figures/day01/L1_introduct_06.png", width: 92%)]
+#align(center)[#image("/assets/figures/day01/mml_projection.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Linear Algebra — Norms and Projections (source: course materials)]
+#text(size: 14pt, fill: gray)[Analytic Geometry — Projections (source: course materials)]
 
-== Tensors in ML
+= Vector Calculus & Decompositions
 
-- Batch dimension, channels, spatial axes
-- Einstein summation and broadcasting rules
-- Gradients w.r.t. matrix variables
+== Gradients & Jacobians
 
-== L2 descripti 01
+- Scalar $f(x)$: gradient $nabla f(x) in RR^n$ — direction of steepest ascent
+- Vector $f(x) in RR^m$: Jacobian $J in RR^(m times n)$, $J_(i j) = partial f_i / partial x_j$
+- Matrix-valued functions: treat as stacked scalar functions
+- Chain rule: $nabla_x (g compose f) = J_f^T nabla_g$ (reverse-mode building block)
 
-#align(center)[#image("/assets/figures/day01/L2_descripti_01.png", width: 92%)]
+== Gradients & Jacobians — illustration
 
-#text(size: 14pt, fill: gray)[Linear Algebra — Tensors in ML (source: course materials)]
+#align(center)[#image("/assets/figures/day01/mml_gradient.png", width: 80%)]
 
-= Calculus & Optimization
+#text(size: 14pt, fill: gray)[Vector Calculus & Decompositions — Gradients & Jacobians (source: course materials)]
 
-== Derivatives & Gradients
+== Useful Matrix Derivatives
 
-- Partial derivative: $partial f / partial x_i$
-- Gradient $nabla f(x)$ points uphill; $-nabla f$ is descent
-- Chain rule for composed functions
-- Jacobian $J_(i j) = partial f_i / partial x_j$
+- $nabla_x (a^T x) = a$; $nabla_x (x^T A x) = (A + A^T) x$
+- $nabla_A ||A x - y||_2^2 = 2 (A x - y) x^T$
+- Hessian $H = nabla^2 f$ — second-order curvature for Newton methods
+- These identities appear constantly in backprop and closed-form solutions
 
-== L2 descripti 03
+== Useful Matrix Derivatives — illustration
 
-#align(center)[#image("/assets/figures/day01/L2_descripti_03.png", width: 92%)]
+#align(center)[#image("/assets/figures/day01/mml_taylor.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Calculus & Optimization — Derivatives & Gradients (source: course materials)]
+#text(size: 14pt, fill: gray)[Vector Calculus & Decompositions — Useful Matrix Derivatives (source: course materials)]
 
-== Taylor Approximations
+== Eigendecomposition
 
-- First-order: $f(x + Delta) approx f(x) + nabla f(x)^T Delta$
-- Second-order curvature via Hessian $H$
-- Newton step: $Delta = -H^(-1) nabla f$
+- $A v = lambda v$ — eigenvector direction preserved, scaled by $lambda$
+- Symmetric $A$: real eigenvalues, orthogonal eigenvectors
+- Spectral theorem: $A = Q Lambda Q^T$ — principal axes of quadratic forms
+- Condition number from eigenvalue spread — numerical stability
 
-== L2 descripti 04
+== Eigendecomposition — illustration
 
-#align(center)[#image("/assets/figures/day01/L2_descripti_04.png", width: 92%)]
+#align(center)[#image("/assets/figures/day01/mml_eigen.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Calculus & Optimization — Taylor Approximations (source: course materials)]
+#text(size: 14pt, fill: gray)[Vector Calculus & Decompositions — Eigendecomposition (source: course materials)]
 
-== Convexity
+== SVD & PCA Preview
 
-- Convex set: line segment stays inside
-- Convex function: $f(t x + (1-t) y) <= t f(x) + (1-t) f(y)$
-- Local minima are global for convex problems
-- Examples: linear regression, logistic loss (in w)
+- SVD: $A = U Sigma V^T$ — always exists; singular values on diagonal of $Sigma$
+- Low-rank approximation: keep top-$k$ singular values (Eckart–Young)
+- PCA: eigenvectors of covariance $C = (1/n) X^T X$
+- Connects linear algebra geometry to data compression and denoising
 
-== L2 descripti 05
+== SVD & PCA Preview — illustration
 
-#align(center)[#image("/assets/figures/day01/L2_descripti_05.png", width: 92%)]
+#align(center)[#image("/assets/figures/day01/mml_svd.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Calculus & Optimization — Convexity (source: course materials)]
+#text(size: 14pt, fill: gray)[Vector Calculus & Decompositions — SVD & PCA Preview (source: course materials)]
 
-== Gradient Descent
+= Integration & Differentiation
 
-- Update: $w_(t+1) = w_t - eta nabla L(w_t)$
-- Learning rate $eta$: too large diverges, too small is slow
-- Stochastic GD: noisy but cheap per step
-- Momentum and adaptive methods preview (Day 3)
+== There and Back Again
 
-== L2 descripti 06
+- NeurIPS 2020 tutorial: integration *and* differentiation for ML
+- Integration: expectations, marginalization, Bayesian evidence
+- Differentiation: gradients for optimization, sensitivity analysis
+- Map metaphor: numerical integration swamps, Monte Carlo heights, Backprop Bay…
 
-#align(center)[#image("/assets/figures/day01/L2_descripti_06.png", width: 92%)]
+== There and Back Again — illustration
 
-#text(size: 14pt, fill: gray)[Calculus & Optimization — Gradient Descent (source: course materials)]
+#align(center)[#image("/assets/figures/day01/slopes_map.jpg", width: 80%)]
 
-= Probability
+#text(size: 14pt, fill: gray)[Integration & Differentiation — There and Back Again (source: course materials)]
 
-== Random Variables
+== Integration — Numerical & MC
 
-- PMF / PDF, CDF, expectation $EE[X]$
-- Variance: $"Var"(X) = EE[(X - EE[X])^2]$
-- Common distributions: Gaussian, Bernoulli, categorical
+- Deterministic quadrature: trapezoid, Simpson, Gauss–Hermite
+- Curse of dimensionality motivates Monte Carlo: $EE[f(X)] approx (1/N) sum f(x_i)$
+- MC error $O(1/sqrt(N))$ regardless of dimension (with i.i.d. samples)
+- Importance sampling & variational methods when $f$ is hard to sample
 
-== L2 descripti 08
+== Integration — Numerical & MC — illustration
 
-#align(center)[#image("/assets/figures/day01/L2_descripti_08.png", width: 92%)]
+#align(center)[#image("/assets/figures/day01/integ_unscented.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Probability — Random Variables (source: course materials)]
+#text(size: 14pt, fill: gray)[Integration & Differentiation — Integration — Numerical & MC (source: course materials)]
 
-== Joint & Conditional
+== Differentiation — Autodiff & Backprop
 
-- Joint $p(x, y)$, marginal $p(x) = sum_y p(x, y)$
-- Conditional: $p(y|x) = p(x,y) / p(x)$
-- Independence: $p(x,y) = p(x) p(y)$
+- Forward mode: propagate directional derivatives ($O(n)$ for $n$ inputs)
+- Reverse mode (backprop): one pass from scalar loss ($O("ops")$ for all params)
+- Computational graph stores local Jacobians; chain rule multiplies along paths
+- Frameworks implement vector–Jacobian products (VJPs), not full Jacobians
 
-== L2 descripti 09
+== Differentiation — Autodiff & Backprop — illustration
 
-#align(center)[#image("/assets/figures/day01/L2_descripti_09.png", width: 92%)]
+#align(center)[#image("/assets/figures/day01/mml_forward_pass.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Probability — Joint & Conditional (source: course materials)]
+#text(size: 14pt, fill: gray)[Integration & Differentiation — Differentiation — Autodiff & Backprop (source: course materials)]
 
-== Bayes' Rule
+== Implicit Function & Adjoints
 
-- $p(theta|D) prop p(D|theta) p(theta)$
-- Prior, likelihood, posterior
-- MAP vs full Bayesian inference
+- Implicit Function Theorem: differentiate through $F(x, theta) = 0$ without explicit solve
+- Method of adjoints: efficient gradients for ODE/PDE-constrained objectives
+- Lagrange multipliers: constrained optimization via augmented Lagrangian
+- Stochastic gradient estimators: REINFORCE, reparameterization trick (Day 6–7)
 
-== L2 descripti 10
+== Implicit Function & Adjoints — illustration
 
-#align(center)[#image("/assets/figures/day01/L2_descripti_10.png", width: 92%)]
+#align(center)[#image("/assets/figures/day01/integ_samples.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Probability — Bayes' Rule (source: course materials)]
+#text(size: 14pt, fill: gray)[Integration & Differentiation — Implicit Function & Adjoints (source: course materials)]
 
-== Information Theory Preview
+= Probability & Distributions
 
-- Entropy: $H(p) = -sum_x p(x) log p(x)$
-- Cross-entropy and KL divergence (Day 6)
-- Maximum likelihood = minimize cross-entropy
+== Basics
 
-== pptx0 00
+- PMF (discrete) / PDF (continuous); CDF $F(x) = P(X <= x)$
+- Expectation $EE[X]$, variance $"Var"(X) = EE[(X-EE[X])^2]$
+- Joint, marginal, conditional; independence $p(x,y) = p(x)p(y)$
+- Bayes: $p(theta|D) prop p(D|theta) p(theta)$
 
-#align(center)[#image("/assets/figures/day01/pptx0_00.png", width: 92%)]
+== Basics — illustration
 
-#text(size: 14pt, fill: gray)[Probability — Information Theory Preview (source: course materials)]
+#align(center)[#image("/assets/figures/day01/mml_distributions.png", width: 80%)]
 
-= Putting It Together
+#text(size: 14pt, fill: gray)[Probability & Distributions — Basics (source: course materials)]
 
-== Loss as Expected Risk
+== The Gaussian
 
-- Empirical risk: $hat(R)(w) = (1/n) sum_i ell(y_i, f_w(x_i))$
-- Population risk: $R(w) = EE[ell(Y, f_w(X))]$
-- Bias–variance tradeoff (Day 2)
+- $N(x; mu, Sigma) = (2 pi)^(-d/2) |Sigma|^(-1/2) exp(-1/2 (x-mu)^T Sigma^(-1)(x-mu))$
+- Affine transform: if $x tilde N(mu, Sigma)$ then $A x + b tilde N(A mu + b, A Sigma A^T)$
+- Marginals and conditionals of Gaussians remain Gaussian
+- Central role: CLT, linear-Gaussian models, diffusion noise
 
-== Worked Example: Linear Regression
+== The Gaussian — illustration
 
-- Model: $hat(y) = w^T x + b$
-- MSE loss and closed-form solution
-- Connection to projection and Gauss–Markov
+#align(center)[#image("/assets/figures/day01/mml_gaussian.png", width: 80%)]
 
-== Checklist for the Course
+#text(size: 14pt, fill: gray)[Probability & Distributions — The Gaussian (source: course materials)]
 
-- Comfort with matrix calculus notation
-- Read gradients off simple computational graphs
-- Interpret probabilities as degrees of belief
+== Conjugacy & Change of Variables
+
+- Conjugate prior: posterior same family as prior (e.g. Beta–Bernoulli, Normal–Normal)
+- Change of variables: $p_Y(y) = p_X(g^(-1)(y)) |det J_(g^(-1))(y)|$
+- Inverse transform sampling: $x = F^(-1)(u)$ for $u tilde "Uniform"(0,1)$
+- Normalizing flows stack invertible maps with tractable Jacobians
+
+== Conjugacy & Change of Variables — illustration
+
+#align(center)[#image("/assets/figures/day01/mml_conjugate.png", width: 80%)]
+
+#text(size: 14pt, fill: gray)[Probability & Distributions — Conjugacy & Change of Variables (source: course materials)]
+
+== Jensen & KL Divergence
+
+- Jensen: $f(EE[X]) <= EE[f(X)]$ for convex $f$ (evidence lower bounds)
+- KL divergence: $D_"KL"(q||p) = EE_q[log q/p] >= 0$; not symmetric
+- Cross-entropy $H(p,q) = -EE_p[log q]$ — classification loss
+- Gaussian KL has closed form — used in VAEs and diffusion training
+
+== Jensen & KL Divergence — illustration
+
+#align(center)[#image("/assets/figures/day01/mml_kl_examples.png", width: 80%)]
+
+#text(size: 14pt, fill: gray)[Probability & Distributions — Jensen & KL Divergence (source: course materials)]
+
+= Differential Equations
+
+== ODE Intuition
+
+- ODE: $dot(x)(t) = v(x(t), t)$ — rate of change depends on state
+- Trajectory view: a curve $x(t)$ through state space
+- Vector field view: $v(x,t)$ assigns a velocity at each point
+- Same equation, two perspectives — flows vs integral curves
+
+== ODE Intuition — illustration
+
+#align(center)[#image("/assets/figures/day01/ode_vectorfield.png", width: 80%)]
+
+#text(size: 14pt, fill: gray)[Differential Equations — ODE Intuition (source: course materials)]
+
+== Solving ODEs
+
+- Linear ODE: exponential integrator / integrating factor
+- Example: $dot(x) = a x$ gives $x(t) = e^(a t) x(0)$
+- Existence & uniqueness when $v$ is Lipschitz
+- Autonomous vs time-varying; stability from eigenvalues of $partial v / partial x$
+
+== Numerical ODE Solvers
+
+- Euler: $x_(n+1) = x_n + h v(x_n, t_n)$ — first order, $O(h)$ error
+- Heun (RK2): predictor–corrector — $O(h^2)$ local error
+- Runge–Kutta (RK4): weighted average of slopes — workhorse $O(h^4)$
+- Adaptive step size balances accuracy vs cost (used in neural ODEs, diffusion samplers)
+
+== SDEs & Numerical Solvers
+
+- SDE: $dif X_t = f(X_t,t) dif t + g(X_t,t) dif W_t$ — adds Brownian noise
+- Itô calculus: $dif W_t^2 = dif t$ (quadratic variation)
+- Euler–Maruyama: $X_(n+1) = X_n + h f + sqrt(h) g xi_n$, $xi_n tilde N(0,1)$
+- Foundation for diffusion models (Week 2): forward noising = SDE, reverse = learned drift
 
 == Summary
 
 - Day 1: *Math Foundations*
-- Linear algebra, calculus, probability, optimization
+- Linear algebra through differential equations — MML Part I
 - Questions welcome — practical follows
 
 == Questions?

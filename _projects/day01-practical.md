@@ -20,16 +20,16 @@ links:
 
 ## Figures from lecture materials
 
-![Source illustration — Day 1 (extracted from course PDFs/PPTX)](/assets/figures/day01/L1_introduct_00.png)
+![Source illustration — Day 1 (extracted from course PDFs/PPTX)](/assets/figures/day01/mml_gradient.png)
 *Source illustration — Day 1 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 1 (extracted from course PDFs/PPTX)](/assets/figures/day01/L1_introduct_03.png)
+![Source illustration — Day 1 (extracted from course PDFs/PPTX)](/assets/figures/day01/mml_projection.png)
 *Source illustration — Day 1 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 1 (extracted from course PDFs/PPTX)](/assets/figures/day01/L1_introduct_06.png)
+![Source illustration — Day 1 (extracted from course PDFs/PPTX)](/assets/figures/day01/mml_gaussian.png)
 *Source illustration — Day 1 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 1 (extracted from course PDFs/PPTX)](/assets/figures/day01/L2_descripti_01.png)
+![Source illustration — Day 1 (extracted from course PDFs/PPTX)](/assets/figures/day01/ode_vectorfield.png)
 *Source illustration — Day 1 (extracted from course PDFs/PPTX)*
 
 

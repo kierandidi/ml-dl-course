@@ -2,7 +2,15 @@
 """Generate Touying slide decks for the 10-day ML & DL course."""
 from __future__ import annotations
 
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from content_day01 import FIGURES as DAY01_FIGURES, SLIDES as DAY01_SLIDES
+from content_day06 import FIGURES as DAY06_FIGURES, SLIDES as DAY06_SLIDES
+
+# Days with hand-curated figure lists (aligned one-per-slide, None allowed).
+CURATED_FIGURES = {1: DAY01_FIGURES, 6: DAY06_FIGURES}
 
 ROOT = Path(__file__).resolve().parents[1]
 DAYS_DIR = ROOT / "slides" / "days"
@@ -34,7 +42,40 @@ def fix_typst_math(text: str) -> str:
         ("d bar(w)", "dif overline(w)"),
         (" cdot ", " dot "),
         ("$prod_", "$product_"),
-        ("$softmax(", "$\"softmax\"("),
+        ("$softmax(", '$"softmax"('),
+        (" to RR", " arrow.r RR"),
+        (" to RR^", " arrow.r RR^"),
+        (" sim N", " tilde N"),
+        (" sim ", " tilde "),
+        ("dot(x)", "dot(x)"),  # keep
+        ("dif X", "dif X"),
+        ("dif t", "dif t"),
+        ("dif W", "dif W"),
+        (" in RR", " in RR"),
+        ("max_i", "max_i"),
+        ("sqrt(", "sqrt("),
+        ("langle", "chevron.l"),
+        ("rangle", "chevron.r"),
+        (" circ ", " compose "),
+        ("O(ops)", 'O("ops")'),
+        ("O(h)", "O(h)"),
+        ("O(h^2)", "O(h^2)"),
+        ("O(h^4)", "O(h^4)"),
+        ("O(1/", "O(1/"),
+        ("$EE", "$EE"),
+        ("\"Var\"", '"Var"'),
+        ("\"Uniform\"", '"Uniform"'),
+        ("D_\"KL\"", 'D_"KL"'),
+        ("cos theta", "cos theta"),
+        ("lambda", "lambda"),
+        ("Sigma", "Sigma"),
+        ("mu", "mu"),
+        ("theta", "theta"),
+        ("alpha", "alpha"),
+        ("xi", "xi"),
+        ("det ", "det "),
+        ("log ", "log "),
+        ("exp(", "exp("),
     ]
     for old, new in replacements:
         text = text.replace(old, new)
@@ -44,158 +85,7 @@ def fix_typst_math(text: str) -> str:
 # (title, subtitle fragment, parts)
 # Each part: (section title, [(slide_title, [bullet_or_equation_lines]), ...])
 COURSE: list[tuple[str, str, list[tuple[str, list[tuple[str, list[str]]]]]]] = [
-    (
-        "Math Foundations",
-        "Linear algebra, calculus, probability, optimization",
-        [
-            (
-                "Linear Algebra",
-                [
-                    (
-                        "Vectors and Matrices",
-                        [
-                            "Scalars, vectors, matrices — shapes and notation",
-                            "Matrix multiply: $(A B)_(i j) = sum_k A_(i k) B_(k j)$",
-                            "Transpose, inverse, rank, and conditioning",
-                            "Geometric view: linear maps rotate, scale, shear",
-                        ],
-                    ),
-                    (
-                        "Eigenvalues & SVD",
-                        [
-                            "Eigen-decomposition: $A v = lambda v$",
-                            "Symmetric PSD matrices and quadratic forms",
-                            "SVD: $A = U Sigma V^T$ — low-rank approximations",
-                            "Principal components as top eigenvectors of covariance",
-                        ],
-                    ),
-                    (
-                        "Norms and Projections",
-                        [
-                            "$L_2$ norm: $||x||_2 = sqrt(sum_i x_i^2)$",
-                            "Orthogonal projection onto a subspace",
-                            "Least squares as minimizing $||A w - y||_2^2$",
-                            "Normal equations: $A^T A w = A^T y$",
-                        ],
-                    ),
-                    (
-                        "Tensors in ML",
-                        [
-                            "Batch dimension, channels, spatial axes",
-                            "Einstein summation and broadcasting rules",
-                            "Gradients w.r.t. matrix variables",
-                        ],
-                    ),
-                ],
-            ),
-            (
-                "Calculus & Optimization",
-                [
-                    (
-                        "Derivatives & Gradients",
-                        [
-                            "Partial derivative: $partial f / partial x_i$",
-                            "Gradient $nabla f(x)$ points uphill; $-nabla f$ is descent",
-                            "Chain rule for composed functions",
-                            "Jacobian $J_(i j) = partial f_i / partial x_j$",
-                        ],
-                    ),
-                    (
-                        "Taylor Approximations",
-                        [
-                            "First-order: $f(x + Delta) approx f(x) + nabla f(x)^T Delta$",
-                            "Second-order curvature via Hessian $H$",
-                            "Newton step: $Delta = -H^(-1) nabla f$",
-                        ],
-                    ),
-                    (
-                        "Convexity",
-                        [
-                            "Convex set: line segment stays inside",
-                            "Convex function: $f(t x + (1-t) y) <= t f(x) + (1-t) f(y)$",
-                            "Local minima are global for convex problems",
-                            "Examples: linear regression, logistic loss (in w)",
-                        ],
-                    ),
-                    (
-                        "Gradient Descent",
-                        [
-                            "Update: $w_(t+1) = w_t - eta nabla L(w_t)$",
-                            "Learning rate $eta$: too large diverges, too small is slow",
-                            "Stochastic GD: noisy but cheap per step",
-                            "Momentum and adaptive methods preview (Day 3)",
-                        ],
-                    ),
-                ],
-            ),
-            (
-                "Probability",
-                [
-                    (
-                        "Random Variables",
-                        [
-                            "PMF / PDF, CDF, expectation $EE[X]$",
-                            "Variance: $\"Var\"(X) = EE[(X - EE[X])^2]$",
-                            "Common distributions: Gaussian, Bernoulli, categorical",
-                        ],
-                    ),
-                    (
-                        "Joint & Conditional",
-                        [
-                            "Joint $p(x, y)$, marginal $p(x) = sum_y p(x, y)$",
-                            "Conditional: $p(y|x) = p(x,y) / p(x)$",
-                            "Independence: $p(x,y) = p(x) p(y)$",
-                        ],
-                    ),
-                    (
-                        "Bayes' Rule",
-                        [
-                            "$p(theta|D) propto p(D|theta) p(theta)$",
-                            "Prior, likelihood, posterior",
-                            "MAP vs full Bayesian inference",
-                        ],
-                    ),
-                    (
-                        "Information Theory Preview",
-                        [
-                            "Entropy: $H(p) = -sum_x p(x) log p(x)$",
-                            "Cross-entropy and KL divergence (Day 6)",
-                            "Maximum likelihood = minimize cross-entropy",
-                        ],
-                    ),
-                ],
-            ),
-            (
-                "Putting It Together",
-                [
-                    (
-                        "Loss as Expected Risk",
-                        [
-                            "Empirical risk: $hat(R)(w) = (1/n) sum_i ell(y_i, f_w(x_i))$",
-                            "Population risk: $R(w) = EE[ell(Y, f_w(X))]$",
-                            "Bias–variance tradeoff (Day 2)",
-                        ],
-                    ),
-                    (
-                        "Worked Example: Linear Regression",
-                        [
-                            "Model: $hat(y) = w^T x + b$",
-                            "MSE loss and closed-form solution",
-                            "Connection to projection and Gauss–Markov",
-                        ],
-                    ),
-                    (
-                        "Checklist for the Course",
-                        [
-                            "Comfort with matrix calculus notation",
-                            "Read gradients off simple computational graphs",
-                            "Interpret probabilities as degrees of belief",
-                        ],
-                    ),
-                ],
-            ),
-        ],
-    ),
+    DAY01_SLIDES,
     (
         "Statistical Learning",
         "Regression, classification, regularization",
@@ -1519,6 +1409,10 @@ COURSE: list[tuple[str, str, list[tuple[str, list[tuple[str, list[str]]]]]]] = [
 ]
 
 
+# Use hand-authored decks for upgraded days (override the inline placeholders).
+COURSE[5] = DAY06_SLIDES  # Day 6 — Generative Modeling & DDPM
+
+
 def render_bullets(lines: list[str]) -> str:
     return "\n".join(f"- {typst_escape(fix_typst_math(line))}" for line in lines)
 
@@ -1527,11 +1421,11 @@ def render_slide(title: str, lines: list[str]) -> str:
     return f"== {typst_escape(title)}\n\n{render_bullets(lines)}\n"
 
 
-def render_figure_slide(path: str, caption: str) -> str:
-    name = Path(path).stem.replace("_", " ")
+def render_figure_slide(path: str, caption: str, title: str | None = None) -> str:
+    name = title if title else Path(path).stem.replace("_", " ")
     return (
         f"== {typst_escape(name)}\n\n"
-        f"#align(center)[#image(\"{path}\", width: 92%)]\n\n"
+        f"#align(center)[#image(\"{path}\", width: 80%)]\n\n"
         f"#text(size: 14pt, fill: gray)[{typst_escape(caption)}]\n"
     )
 
@@ -1557,7 +1451,7 @@ def render_day(day: int, title: str, subtitle: str, parts: list) -> str:
         lines.append(f"- {typst_escape(part_title)}")
     lines.append("")
 
-    figures = find_figures(day)
+    figures = CURATED_FIGURES.get(day) or find_figures(day)
     fig_idx = 0
 
     for part_i, (part_title, slides) in enumerate(parts):
@@ -1565,20 +1459,22 @@ def render_day(day: int, title: str, subtitle: str, parts: list) -> str:
         lines.append("")
         for slide_i, (slide_title, bullets) in enumerate(slides):
             lines.append(render_slide(slide_title, bullets))
-            # After every content slide, insert a figure when available (rich visuals)
-            if fig_idx < len(figures):
+            # Insert the curated figure for this slide when one is available.
+            fig = figures[fig_idx] if fig_idx < len(figures) else None
+            fig_idx += 1
+            if fig:
                 cap = f"{part_title} — {slide_title} (source: course materials)"
-                lines.append(render_figure_slide(figures[fig_idx], cap))
-                fig_idx += 1
+                lines.append(render_figure_slide(fig, cap, title=f"{slide_title} — illustration"))
 
-    # Remaining figures in a visual appendix
+    # Remaining figures (only for days using the auto-find list) go in an appendix.
     if fig_idx < len(figures):
-        lines.append("= Additional Figures")
-        lines.append("")
-    while fig_idx < len(figures):
-        cap = f"Day {day} — supplementary illustration"
-        lines.append(render_figure_slide(figures[fig_idx], cap))
-        fig_idx += 1
+        remaining = [f for f in figures[fig_idx:] if f]
+        if remaining:
+            lines.append("= Additional Figures")
+            lines.append("")
+            for fig in remaining:
+                cap = f"Day {day} — supplementary illustration"
+                lines.append(render_figure_slide(fig, cap))
 
     lines.extend(
         [

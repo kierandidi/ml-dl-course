@@ -25,9 +25,9 @@
 - Repeat: forward pass → logits → sample/argmax → append
 - Stop at EOS or max length
 
-== pdf0 page000
+== Autoregressive Decoding — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page000.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page000.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Text Generation Loop — Autoregressive Decoding (source: course materials)]
 
@@ -37,9 +37,9 @@
 - Beam search keeps top-$k$ partial sequences
 - Deterministic but often dull
 
-== pdf0 page002
+== Greedy & Beam Search — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page002.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page002.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Text Generation Loop — Greedy & Beam Search (source: course materials)]
 
@@ -49,9 +49,9 @@
 - Top-$k$ and nucleus (top-$p$) filtering
 - Repetition penalty
 
-== pdf0 page004
+== Sampling Methods — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page004.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page004.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Text Generation Loop — Sampling Methods (source: course materials)]
 
@@ -61,9 +61,9 @@
 - Tokens per second (TPS)
 - Prefill vs decode phases
 
-== pdf0 page005
+== Latency Metrics — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page005.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page005.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Text Generation Loop — Latency Metrics (source: course materials)]
 
@@ -75,9 +75,9 @@
 - At step $t$, past $K,V$ are unchanged
 - Cache avoids $O(t^2)$ redundant work per step
 
-== pdf0 page006
+== Motivation — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page006.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page006.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[KV Cache — Motivation (source: course materials)]
 
@@ -87,9 +87,9 @@
 - Memory $O(L dot H dot T dot d_h)$ grows with context
 - Batching pads to max length in batch
 
-== pdf0 page008
+== Cache Structure — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page008.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page008.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[KV Cache — Cache Structure (source: course materials)]
 
@@ -99,9 +99,9 @@
 - Decode: one token at a time (memory-bandwidth)
 - Continuous batching in serving systems
 
-== pdf0 page010
+== Prefill vs Decode — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page010.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page010.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[KV Cache — Prefill vs Decode (source: course materials)]
 
@@ -111,9 +111,9 @@
 - Reduces cache size with minimal quality loss
 - Standard in modern LLM inference
 
-== pdf0 page012
+== Multi-Query / GQA — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page012.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page012.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[KV Cache — Multi-Query / GQA (source: course materials)]
 
@@ -125,9 +125,9 @@
 - IO-aware — faster on GPU memory hierarchy
 - Training and prefill benefit most
 
-== pdf0 page014
+== FlashAttention — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page014.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page014.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Efficient Attention — FlashAttention (source: course materials)]
 
@@ -137,9 +137,9 @@
 - Reduces fragmentation in batched serving
 - Higher GPU utilization
 
-== pdf0 page016
+== PagedAttention (vLLM) — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page016.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page016.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Efficient Attention — PagedAttention (vLLM) (source: course materials)]
 
@@ -149,9 +149,9 @@
 - Target model verifies in parallel
 - Acceptance rate determines speedup
 
-== pdf0 page018
+== Speculative Decoding — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf0_page018.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf0_page018.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Efficient Attention — Speculative Decoding (source: course materials)]
 
@@ -161,9 +161,9 @@
 - Ring attention for very long sequences
 - Context window vs true reasoning
 
-== pdf1 page000
+== Long Context — illustration
 
-#align(center)[#image("/assets/figures/day10/pdf1_page000.png", width: 92%)]
+#align(center)[#image("/assets/figures/day10/pdf1_page000.png", width: 80%)]
 
 #text(size: 14pt, fill: gray)[Efficient Attention — Long Context (source: course materials)]
 

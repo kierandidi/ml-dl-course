@@ -58,11 +58,11 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 **[Lecture notes](/blog/lectures/2026/08/17/day01-math-foundations/) · [Slides](/assets/slides/day01.pdf) · [Practical](/projects/day01-practical/)**
 
-- [Bishop — PRML](https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/), Ch. 1–2 (probability, linear models)
-- [Boyd & Vandenberghe — Convex Optimization](https://web.stanford.edu/~boyd/cvxbook/), §2.1–2.3 (gradients, convexity)
-- [3Blue1Brown — Essence of Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3tZaY) (geometric intuition)
-- [3Blue1Brown — Essence of Linear Algebra](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3tZaY) (vectors, matrices, transformations)
-- [Prince — UDL](https://udlbook.github.io/udlbook/), Ch. 2–5 (math for deep learning)
+- [Deisenroth, Faisal & Ong — *Mathematics for Machine Learning*](https://mml-book.com) (Ch. 2–6: linear algebra through probability)
+- [Deisenroth & Ong — *There and Back Again: A Tale of Slopes and Expectations*](https://mml-book.github.io/slopes-expectations.html) (NeurIPS 2020 tutorial on integration & differentiation)
+- [Modern Integration Methods in ML](https://mml-book.github.io/book/additional_chapters/integration-methods.pdf) (MML supplementary chapter)
+- [3Blue1Brown — Essence of Linear Algebra](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3tZaY) (geometric intuition)
+- [3Blue1Brown — Essence of Calculus](https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3tZaY) (derivatives and integrals)
 
 ---
 

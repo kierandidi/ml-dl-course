@@ -9,7 +9,20 @@ PROJECTS = ROOT / "_projects"
 FIGURES = ROOT / "assets" / "figures"
 
 
+# Curated figure picks for days with hand-cropped source figures.
+FIGURE_OVERRIDES: dict[int, list[str]] = {
+    1: [
+        "/assets/figures/day01/mml_gradient.png",
+        "/assets/figures/day01/mml_projection.png",
+        "/assets/figures/day01/mml_gaussian.png",
+        "/assets/figures/day01/ode_vectorfield.png",
+    ],
+}
+
+
 def figs(day: int, n: int = 4) -> list[str]:
+    if day in FIGURE_OVERRIDES:
+        return FIGURE_OVERRIDES[day][:n]
     d = FIGURES / f"day{day:02d}"
     if not d.is_dir():
         return []

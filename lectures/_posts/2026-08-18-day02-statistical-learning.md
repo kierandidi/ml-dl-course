@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Day 2 - Statistical Learning
-image: /assets/img/lessons/day02.png
+image: /assets/img/sampling_space.png
 accent_image: 
   background: url('/assets/img/sampling_space.png') center/cover
   overlay: false
@@ -18,8 +18,6 @@ invert_sidebar: true
 - [Hastie, Tibshirani & Friedman — ESL](https://hastie.su.domains/ElemStatLearn/), Ch. 3–4
 - [Murphy — Probabilistic Machine Learning: An Introduction](https://probml.github.io/pml-book/book1.html), Ch. 11
 - [scikit-learn User Guide — Linear Models](https://scikit-learn.org/stable/modules/linear_model.html)
-- [Complete reading list for Day 2](/publications/#day-2) (all resources for this lecture)
-
 
 ### [Slides](/assets/slides/day02.pdf)
 

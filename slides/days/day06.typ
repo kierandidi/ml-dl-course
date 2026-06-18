@@ -1,195 +1,184 @@
 #import "../lib.typ": *
 
-#show: course-theme.with(title: [Generative Modeling], subtitle: [Day 6 | Aug 2026])
+#show: course-theme.with(title: [Generative Modeling & DDPM], subtitle: [Day 6 | Aug 2026])
 
-= Day 6: Generative Modeling
+= Day 6: Generative Modeling & DDPM
 
 == Welcome
 
-- *Generative Modeling* — Likelihoods, KL, ELBO, model families
+- *Generative Modeling & DDPM* — The variational view — from VAEs to diffusion
 - 3 hours lecture + practical
 - Slides, notes, and code on the course site
 
 == Outline
 
-- What Is Generative Modeling?
-- Likelihood & Divergences
-- VAEs & GANs (Context)
-- Building Blocks for Week 2
+- Deep Generative Modeling
+- Variational Autoencoders
+- The Forward (Noising) Process
+- The Reverse (Denoising) Process
+- Training DDPM
 
-= What Is Generative Modeling?
+= Deep Generative Modeling
 
-== Discriminative vs Generative
+== The Generative Goal
 
-- Discriminative: model $p(y|x)$
-- Generative: model $p(x)$ or $p(x|z)$
-- Sample generation, density estimation, editing
+- Map a *simple* distribution (Gaussian noise) to a *complex* one (data)
+- Sample $x tilde p_"data"$ we can only access through examples
+- Diffusion: don't jump noise$arrow.r$data in one step — move in many small steps
+- Forward = corrupt data into noise; reverse = learn to undo it
+- Source: Principles of Diffusion Models, Ch. 1–2
 
-== pdf0 page000
+== The Generative Goal — illustration
 
-#align(center)[#image("/assets/figures/day06/pdf0_page000.png", width: 92%)]
+#align(center)[#image("/assets/figures/day06/pdm_dgm_target.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[What Is Generative Modeling? — Discriminative vs Generative (source: course materials)]
+#text(size: 14pt, fill: gray)[Deep Generative Modeling — The Generative Goal (source: course materials)]
 
-== Explicit vs Implicit
+== Taxonomy of Models
 
-- Explicit likelihood: VAEs, flows, autoregressive
+- Likelihood-based: VAEs, normalizing flows, autoregressive, diffusion
 - Implicit: GANs (no tractable $p(x)$)
-- Tradeoffs: training stability, evaluation
+- Trade-offs: sample quality vs exact likelihood vs sampling speed
+- Diffusion = likelihood-based + high quality, but slow sampling
 
-== pdf0 page002
+== Taxonomy of Models — illustration
 
-#align(center)[#image("/assets/figures/day06/pdf0_page002.png", width: 92%)]
+#align(center)[#image("/assets/figures/day06/pdm_dgm_zoo.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[What Is Generative Modeling? — Explicit vs Implicit (source: course materials)]
+#text(size: 14pt, fill: gray)[Deep Generative Modeling — Taxonomy of Models (source: course materials)]
 
-== Latent Variable Models
+== Latent-Variable Models
 
-- $p(x) = integral p(x|z) p(z) d z$
-- Latent $z$ captures factors of variation
-- Posterior $p(z|x)$ usually intractable
+- Introduce latent $z$: $p_theta (x) = integral p_theta (x|z) p(z) dif z$
+- Prior $p(z) = N(0, I)$ is easy to sample
+- Marginal likelihood is intractable (integral over all $z$)
+- Posterior $p_theta (z|x)$ also intractable $arrow.r$ variational inference
 
-== pdf0 page004
+= Variational Autoencoders
 
-#align(center)[#image("/assets/figures/day06/pdf0_page004.png", width: 92%)]
+== The Evidence Lower Bound
 
-#text(size: 14pt, fill: gray)[What Is Generative Modeling? — Latent Variable Models (source: course materials)]
+- Encoder $q_phi (z|x)$ approximates the true posterior
+- $log p_theta (x) >= EE_(q_phi)[log p_theta (x|z)] - D_"KL"(q_phi (z|x) || p(z))$
+- Reconstruction term + regularization term
+- Gap to $log p(x)$ is exactly $D_"KL"(q_phi (z|x) || p_theta (z|x)) >= 0$
 
-== Model Families Roadmap
+== The Evidence Lower Bound — illustration
 
-- Week 2: flows, diffusion, autoregressive LLMs
-- Each defines different tractability / quality
+#align(center)[#image("/assets/figures/day06/pdm_vae.png", width: 80%)]
 
-== pdf0 page005
+#text(size: 14pt, fill: gray)[Variational Autoencoders — The Evidence Lower Bound (source: course materials)]
 
-#align(center)[#image("/assets/figures/day06/pdf0_page005.png", width: 92%)]
+== Reparameterization Trick
 
-#text(size: 14pt, fill: gray)[What Is Generative Modeling? — Model Families Roadmap (source: course materials)]
+- Sample $z = mu_phi (x) + sigma_phi (x) dot.op epsilon$, $epsilon tilde N(0, I)$
+- Moves randomness off the computation path $arrow.r$ low-variance gradients
+- Backprop flows through $mu_phi$, $sigma_phi$
+- DDPM = a *deep hierarchy* of these latents with a fixed encoder
 
-= Likelihood & Divergences
+= The Forward (Noising) Process
 
-== Maximum Likelihood
+== Unified Forward Rule
 
-- $theta^* = "arg max"_theta sum_i log p_theta(x_i)$
-- Equivalent to minimizing cross-entropy
-- MLE is consistent under mild conditions
+- $x_t = alpha_t x_0 + sigma_t epsilon$, $epsilon tilde N(0, I)$
+- $p(x_t | x_0) = N(x_t; alpha_t x_0, sigma_t^2 I)$
+- $alpha_t$ = signal kept; $sigma_t$ = noise added
+- Signal-to-noise ratio $"SNR"(t) = alpha_t^2 / sigma_t^2$ decreases with $t$
 
-== pdf0 page006
+== Unified Forward Rule — illustration
 
-#align(center)[#image("/assets/figures/day06/pdf0_page006.png", width: 92%)]
+#align(center)[#image("/assets/figures/day06/pdm_ddpm_forward.png", width: 80%)]
 
-#text(size: 14pt, fill: gray)[Likelihood & Divergences — Maximum Likelihood (source: course materials)]
+#text(size: 14pt, fill: gray)[The Forward (Noising) Process — Unified Forward Rule (source: course materials)]
 
-== KL Divergence
+== Closed-Form Marginal
 
-- $D_"KL"(q || p) = EE_q[log q - log p]$
-- Non-negative; zero iff $q = p$
-- Not symmetric — direction matters
+- Step kernel $q(x_t | x_(t-1)) = N(sqrt(1 - beta_t) x_(t-1), beta_t I)$
+- Compose Gaussians: $x_t = sqrt(macron(alpha)_t) x_0 + sqrt(1 - macron(alpha)_t) epsilon$
+- $macron(alpha)_t = product_(s=1)^t (1 - beta_s)$ so $alpha_t = sqrt(macron(alpha)_t)$
+- Sample any $t$ in one shot — no need to simulate the chain
 
-== pdf0 page008
+== Noise Schedules
 
-#align(center)[#image("/assets/figures/day06/pdf0_page008.png", width: 92%)]
+- VP (DDPM/cosine): $alpha_t^2 + sigma_t^2 = 1$
+- VE (EDM): $alpha_t = 1$, $sigma_t = t$
+- Linear interpolation (flow matching): $alpha_t = 1-t$, $sigma_t = t$
+- Interactive — compare schedules on the same image (see notes)
 
-#text(size: 14pt, fill: gray)[Likelihood & Divergences — KL Divergence (source: course materials)]
+== Noise Schedules — illustration
 
-== Forward vs Reverse KL
+#align(center)[#image("/assets/figures/day06/pdm_ddpm_overview.png", width: 80%)]
 
-- Forward KL: mode-covering (mean-field)
-- Reverse KL: mode-seeking
-- VAE uses reverse KL to approximate posterior
+#text(size: 14pt, fill: gray)[The Forward (Noising) Process — Noise Schedules (source: course materials)]
 
-== pdf0 page010
+= The Reverse (Denoising) Process
 
-#align(center)[#image("/assets/figures/day06/pdf0_page010.png", width: 92%)]
+== Reverse as Denoising
 
-#text(size: 14pt, fill: gray)[Likelihood & Divergences — Forward vs Reverse KL (source: course materials)]
+- Start at $x_T tilde N(0, I)$, walk back to data
+- Learn $p_theta (x_(t-1) | x_t)$ — one denoising step
+- Oracle reverse kernel $p(x_(t-1)|x_t)$ is intractable...
+- ...but $q(x_(t-1) | x_t, x_0)$ *is* Gaussian (condition on $x_0$)
 
-== Evidence Lower Bound
+== Reverse as Denoising — illustration
 
-- $log p(x) >= EE_(q(z|x))[log p(x|z)] - D_"KL"(q(z|x) || p(z))$
-- ELBO tight when $q = p(z|x)$
-- Reparameterization trick for gradients
+#align(center)[#image("/assets/figures/day06/pdm_ddpm_reverse.png", width: 80%)]
 
-== pdf0 page012
+#text(size: 14pt, fill: gray)[The Reverse (Denoising) Process — Reverse as Denoising (source: course materials)]
 
-#align(center)[#image("/assets/figures/day06/pdf0_page012.png", width: 92%)]
+== The True Posterior
 
-#text(size: 14pt, fill: gray)[Likelihood & Divergences — Evidence Lower Bound (source: course materials)]
+- $q(x_(t-1) | x_t, x_0) = N(macron(mu)_t (x_t, x_0), macron(beta)_t I)$
+- $macron(mu)_t = (sqrt(macron(alpha)_(t-1)) beta_t)/(1 - macron(alpha)_t) x_0 + (sqrt(1-beta_t)(1 - macron(alpha)_(t-1)))/(1 - macron(alpha)_t) x_t$
+- $macron(beta)_t = (1 - macron(alpha)_(t-1))/(1 - macron(alpha)_t) beta_t$
+- Conditioning trick: the secret sauce that makes training tractable
 
-= VAEs & GANs (Context)
+== The True Posterior — illustration
 
-== Variational Autoencoder
+#align(center)[#image("/assets/figures/day06/pdm_ddpm_conditioning.png", width: 80%)]
 
-- Encoder $q_phi(z|x)$, decoder $p_theta(x|z)$
-- Train by maximizing ELBO
-- Blurry samples — Gaussian assumption
+#text(size: 14pt, fill: gray)[The Reverse (Denoising) Process — The True Posterior (source: course materials)]
 
-== pdf0 page014
+== Parameterizing the Reverse Step
 
-#align(center)[#image("/assets/figures/day06/pdf0_page014.png", width: 92%)]
+- Match $p_theta (x_(t-1)|x_t) = N(mu_theta (x_t, t), macron(beta)_t I)$ to the posterior
+- Predict $x_0$, the noise $epsilon$, or the velocity $v$ — equivalent
+- $epsilon$-prediction: $mu_theta$ written via $epsilon_theta (x_t, t)$
+- Network sees $(x_t, t)$ only — never the true $x_0$
 
-#text(size: 14pt, fill: gray)[VAEs & GANs (Context) — Variational Autoencoder (source: course materials)]
+= Training DDPM
 
-== GAN Objective
+== Variational Bound to Simple Loss
 
-- Min-max game: generator vs discriminator
-- No explicit likelihood
-- Mode collapse and training instability
+- ELBO over the chain = $L_T + sum_t L_(t-1) + L_0$
+- Each $L_(t-1) = D_"KL"(q(x_(t-1)|x_t,x_0) || p_theta (x_(t-1)|x_t))$
+- KL of two Gaussians = weighted $||macron(mu)_t - mu_theta||^2$
+- Substitute $epsilon$-parameterization $arrow.r$ clean noise-prediction loss
 
-== pdf0 page015
+== The $epsilon$-Prediction Objective
 
-#align(center)[#image("/assets/figures/day06/pdf0_page015.png", width: 92%)]
+- $L_"simple" = EE_(t, x_0, epsilon)[ ||epsilon - epsilon_theta (x_t, t)||^2 ]$
+- $x_t = sqrt(macron(alpha)_t) x_0 + sqrt(1 - macron(alpha)_t) epsilon$
+- Drops the awkward per-$t$ weights — works better in practice
+- Tweedie links $epsilon$ to the score: $nabla log p_t (x_t) = -epsilon_theta / sigma_t$ (Day 7)
 
-#text(size: 14pt, fill: gray)[VAEs & GANs (Context) — GAN Objective (source: course materials)]
+== Sampling: Denoise then Re-noise
 
-== Evaluation Challenges
+- From $x_t$: predict $epsilon_theta$, estimate $hat(x)_0$, jump to posterior mean
+- Add a little fresh noise (except at the last step)
+- Repeat $T arrow.r 0$ — this is ancestral sampling
+- Day 8: do this in far fewer steps with ODE/SDE solvers
 
-- FID, IS for images; human eval for text
-- Likelihood can misalign with sample quality
-- Coverage vs fidelity
+== Sampling: Denoise then Re-noise — illustration
 
-== pdf0 page016
+#align(center)[#image("/assets/figures/day06/pdm_denoise_renoise.png", width: 80%)]
 
-#align(center)[#image("/assets/figures/day06/pdf0_page016.png", width: 92%)]
-
-#text(size: 14pt, fill: gray)[VAEs & GANs (Context) — Evaluation Challenges (source: course materials)]
-
-== Modern Landscape
-
-- Diffusion dominates image generation
-- Autoregressive dominates language
-- Hybrid and unified models emerging
-
-== pdf0 page018
-
-#align(center)[#image("/assets/figures/day06/pdf0_page018.png", width: 92%)]
-
-#text(size: 14pt, fill: gray)[VAEs & GANs (Context) — Modern Landscape (source: course materials)]
-
-= Building Blocks for Week 2
-
-== Score Functions
-
-- Score: $nabla_x log p(x)$
-- Score matching and denoising connections
-- Foundation for diffusion (Days 7–8)
-
-== Normalizing Flows Preview
-
-- Invertible maps with tractable Jacobian
-- $log p(x) = log p(z) + log |det partial f / partial z|$
-- Day 7 training details
-
-== Autoregressive Factorization
-
-- $log p(x) = sum_t log p(x_t | x_(<t))$
-- Causal masks enforce ordering
-- GPT family (Days 9–10)
+#text(size: 14pt, fill: gray)[Training DDPM — Sampling: Denoise then Re-noise (source: course materials)]
 
 == Summary
 
-- Day 6: *Generative Modeling*
-- Likelihoods, KL, ELBO, model families
+- Day 6: *Generative Modeling & DDPM*
+- The variational view — from VAEs to diffusion
 - Questions welcome — practical follows
 
 == Questions?
