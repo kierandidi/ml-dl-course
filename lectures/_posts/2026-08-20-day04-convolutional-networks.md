@@ -108,14 +108,14 @@ Real images have **channels** (RGB has 3), so inputs and outputs are *tensors* o
 > For input width $$W$$, kernel size $$K$$, padding $$P$$, and stride $$S$$, the output width is $$O = \left\lfloor\dfrac{W - K + 2P}{S}\right\rfloor + 1,$$ and a conv layer has $$K^2 C_{\text{in}} C_{\text{out}}$$ weights, **independent of image size**.
 {:.lead}
 
-**Output size.** Pad the input on each side by $$P$$, giving effective width $$W+2P$$. The kernel's left edge can sit at positions $$0,S,2S,\dots$$ as long as the whole kernel fits, i.e. up to $$W+2P-K$$. The number of such positions is $$\big\lfloor (W+2P-K)/S\big\rfloor + 1$$, which is the formula above (the same holds for height).
+**Output size.** Pad the input on each side by $$P$$, giving effective width $$\textcolor{teal}{W+2P}$$. The kernel's left edge can sit at positions $$0,S,2S,\dots$$ as long as the whole kernel fits, i.e. up to $$\textcolor{teal}{W+2P}-\textcolor{purple}{K}$$. The number of such positions is $$\big\lfloor (\textcolor{teal}{W+2P}-\textcolor{purple}{K})/S\big\rfloor + 1$$, which is the formula above (the same holds for height).
 
 - **"Valid" padding** ($$P=0$$) shrinks the map by $$K-1$$ each layer.
 - **"Same" padding** with $$S=1$$ uses $$P=(K-1)/2$$ to keep the spatial size fixed — the usual choice for $$3\times3$$ kernels ($$P=1$$).
 
 *Worked example.* Input $$32\times32$$, $$K=3$$, $$P=1$$, $$S=1$$: $$O=\lfloor(32-3+2)/1\rfloor+1 = 32$$ (size preserved). With $$S=2$$: $$O=\lfloor(32-3+2)/2\rfloor+1 = 16$$ (halved).
 
-**Parameter count.** A conv filter is $$K\times K\times C_{\text{in}}$$, and there are $$C_{\text{out}}$$ of them, so the layer has $$K^2 C_{\text{in}} C_{\text{out}}$$ weights. Crucially this does **not** depend on $$W$$ or $$H$$ — the same kernel is reused at every location. Compare a fully-connected layer between two $$32\times32\times64$$ tensors: $$(32^2\cdot64)^2\approx4.3\times10^9$$ weights, versus a $$3\times3$$ conv with $$3^2\cdot64\cdot64\approx3.7\times10^4$$ — five orders of magnitude fewer.
+**Parameter count.** A conv filter is $$K\times K\times C_{\text{in}}$$, and there are $$C_{\text{out}}$$ of them, so the layer has $$K^2 C_{\text{in}} C_{\text{out}}$$ weights. Crucially this does **not** depend on $$W$$ or $$H$$ — the same kernel is reused at every location. Compare a fully-connected layer between two $$32\times32\times64$$ tensors: $$\textcolor{purple}{(32^2\cdot64)^2\approx4.3\times10^9}$$ weights, versus a $$3\times3$$ conv with $$\textcolor{teal}{3^2\cdot64\cdot64\approx3.7\times10^4}$$ — five orders of magnitude fewer.
 
 ### 2.4 Stride, padding, dilation, and variants
 
@@ -164,7 +164,7 @@ Regularization in CNNs leans less on dropout (weight sharing already constrains 
 
 Each stride-1 convolution with kernel $$K$$ lets a unit see $$K-1$$ more input pixels than a unit in the layer below (the kernel reaches $$(K-1)/2$$ further on each side). Adding one such layer therefore increases the receptive field by $$K-1$$:
 
-$$\text{RF}_{\ell} = \text{RF}_{\ell-1} + (K-1),\qquad \text{RF}_0 = 1 \;\Rightarrow\; \text{RF}_L = 1 + L(K-1).$$
+$$\text{RF}_{\ell} = \text{RF}_{\ell-1} + \textcolor{teal}{(K-1)},\qquad \text{RF}_0 = 1 \;\Rightarrow\; \text{RF}_L = 1 + \textcolor{purple}{L}\,\textcolor{teal}{(K-1)}.$$
 
 *Example.* Ten $$3\times3$$ conv layers give $$\text{RF}=1+10\cdot2 = 21$$ — still small relative to a $$224\times224$$ image, which is why downsampling matters.
 
