@@ -30,7 +30,7 @@ FIGURES = [
     "/assets/figures/day01/mml_distributions.png",       # Basics
     "/assets/figures/day01/mml_gaussian.png",            # The Gaussian
     "/assets/figures/day01/mml_conjugate.png",           # Conjugacy & Change of Variables
-    "/assets/figures/day01/mml_kl_examples.png",         # Jensen & KL Divergence
+    None,                                                # Jensen & KL Divergence (no apt MML figure)
     # Differential Equations
     "/assets/figures/day01/ode_vectorfield.png",         # ODE Intuition
     None,                                                # Solving ODEs

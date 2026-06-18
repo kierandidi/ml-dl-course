@@ -310,12 +310,6 @@
 - Cross-entropy $H(p,q) = -EE_p[log q]$ — classification loss
 - Gaussian KL has closed form — used in VAEs and diffusion training
 
-== Jensen & KL Divergence — illustration
-
-#align(center)[#image("/assets/figures/day01/mml_kl_examples.png", width: 80%)]
-
-#text(size: 14pt, fill: gray)[Probability & Distributions — Jensen & KL Divergence (source: course materials)]
-
 = Differential Equations
 
 == ODE Intuition

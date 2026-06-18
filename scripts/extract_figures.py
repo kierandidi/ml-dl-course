@@ -11,6 +11,12 @@ try:
 except ImportError:
     fitz = None
 
+try:
+    from PIL import Image, ImageChops
+except ImportError:
+    Image = None
+    ImageChops = None
+
 ROOT = Path(__file__).resolve().parents[1]
 MATERIALS = ROOT.parent
 COURSE_MATERIAL = ROOT / "material"
@@ -40,8 +46,18 @@ DAY01_MML_FIGURES = [
     ("6.4", 194, "mml_distributions"),
     ("6.7", 202, "mml_gaussian"),
     ("6.11", 212, "mml_conjugate"),
-    ("6.10", 211, "mml_kl_examples"),
 ]
+
+# Explicit plot-region overrides (x0, y0, x1, y1 in PDF points) for MML figures
+# whose automatic cluster detection is unreliable (background fills, multi-panel
+# layouts, or diagrams made of many tiny strokes). Verified visually.
+MML_PLOT_BOX = {
+    "2.1": (115, 575, 372, 688),   # types of vectors (bottom panels near caption)
+    "4.6": (110, 124, 380, 200),   # eigenvalue area interpretation (two small panels)
+    "5.3": (160, 124, 300, 262),   # average incline / secant slope
+    "5.8": (140, 122, 418, 185),   # forward-pass NN diagram (thin wide row)
+    "6.4": (115, 255, 348, 508),   # mean/mode/median over a contour density
+}
 # (figure_no, pdf_page, output_name) — cropped via largest cluster
 DAY01_INTEG_FIGURES = [
     ("8", 18, "integ_unscented"),
@@ -181,30 +197,154 @@ def _save_crop(page, box, dest, zoom=3):
     return True
 
 
-def crop_mml_figure(page, fig_id):
-    """Crop a margin-captioned MML figure (caption aligned to figure top)."""
+def _text_line_rects(page, min_width=0.0):
+    """All text-line bounding boxes, optionally filtered to 'wide' body lines."""
+    out = []
+    for b in page.get_text("dict")["blocks"]:
+        if "lines" not in b:
+            continue
+        for l in b["lines"]:
+            r = fitz.Rect(l["bbox"])
+            if r.width >= min_width:
+                out.append(r)
+    return out
+
+
+def _figure_graphic_rects(page):
+    """Graphic rects with body-text artefacts removed.
+
+    Drops (a) drawings that sit *inside* a text line (fraction bars, inline
+    math glyphs rendered as paths) and (b) large fills/clip rects that span two
+    or more *wide* body-text lines (page backgrounds), which otherwise merge the
+    whole text column into the figure cluster.
+    """
+    pr = page.rect
+    all_lines = _text_line_rects(page)
+    wide_lines = _text_line_rects(page, min_width=140)
+    cand = []
+    for d in page.get_drawings():
+        r = fitz.Rect(d["rect"]) & pr
+        if r.width > 1 and r.height > 1:
+            cand.append(r)
+    for i in page.get_image_info():
+        r = fitz.Rect(i["bbox"]) & pr
+        if r.width > 1 and r.height > 1:
+            cand.append(r)
+    out = []
+    for r in cand:
+        ra = r.get_area()
+        if ra <= 0:
+            continue
+        if any((r & t).is_valid and (r & t).get_area() > 0.55 * ra for t in all_lines):
+            continue  # inline glyph / fraction bar inside a text line
+        wide_hits = sum(
+            1
+            for t in wide_lines
+            if (r & t).is_valid and (r & t).get_area() > 0.5 * t.get_area()
+        )
+        if wide_hits >= 2:
+            continue  # background / clip rect spanning body text
+        out.append(r)
+    return out
+
+
+def _cluster_amax(rects, gap=16):
+    """Cluster rects (proximity merge); track the max single-element area."""
+    cs = []
+    for r in sorted(rects, key=lambda r: (r.y0, r.x0)):
+        hit = None
+        for c in cs:
+            bb = c["bb"]
+            if fitz.Rect(bb.x0 - gap, bb.y0 - gap, bb.x1 + gap, bb.y1 + gap).intersects(r):
+                hit = c
+                break
+        if hit:
+            hit["bb"] |= r
+            hit["amax"] = max(hit["amax"], r.get_area())
+        else:
+            cs.append({"bb": fitz.Rect(r), "amax": r.get_area()})
+    changed = True
+    while changed:
+        changed = False
+        for i in range(len(cs)):
+            for j in range(i + 1, len(cs)):
+                a, b = cs[i]["bb"], cs[j]["bb"]
+                if fitz.Rect(a.x0 - gap, a.y0 - gap, a.x1 + gap, a.y1 + gap).intersects(b):
+                    cs[i]["bb"] = a | b
+                    cs[i]["amax"] = max(cs[i]["amax"], cs[j]["amax"])
+                    cs.pop(j)
+                    changed = True
+                    break
+            if changed:
+                break
+    return cs
+
+
+def _render_pil(page, box, scale=3.5):
+    box = fitz.Rect(box) & page.rect
+    pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), clip=box)
+    return Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+
+
+def _pil_trim(img, pad=10, thresh=8):
+    """Crop surrounding whitespace from a rendered PIL image."""
+    bg = Image.new("RGB", img.size, (255, 255, 255))
+    diff = ImageChops.difference(img, bg).convert("L").point(
+        lambda p: 255 if p > thresh else 0
+    )
+    bb = diff.getbbox()
+    if not bb:
+        return img
+    l, t, r, b = bb
+    return img.crop(
+        (max(0, l - pad), max(0, t - pad), min(img.width, r + pad), min(img.height, b + pad))
+    )
+
+
+def crop_mml_figure_image(page, fig_id):
+    """Return a clean PIL image of an MML figure (plot + margin caption).
+
+    The MML book uses margin captions placed beside the figure. We render the
+    figure (plot) region and the caption block *separately* — auto-trimming
+    whitespace on each — then compose them side-by-side. This guarantees the
+    full figure is visible and avoids sweeping in adjacent body text.
+    """
     import re
 
+    if Image is None:
+        return None
     cap = _caption_rect(page, rf"Figure {re.escape(fig_id)}\b")
-    grs = _graphic_rects(page)
-    if cap is None or not grs:
+    if cap is None:
         return None
-    ylo, yhi = cap.y0 - 40, cap.y1 + 50
-    band = [r for r in grs if (min(r.y1, yhi) - max(r.y0, ylo)) > 0]
-    if not band:
-        return None
-    box = fitz.Rect(band[0])
-    for r in band[1:]:
-        box |= r
-    box |= cap
-    box.y0 = max(box.y0, ylo)
-    box.y1 = min(box.y1, yhi)
-    box &= page.rect
-    box.x0 -= 8
-    box.y0 -= 8
-    box.x1 += 8
-    box.y1 += 8
-    return box
+
+    box = MML_PLOT_BOX.get(fig_id)
+    if box is not None:
+        plot_box = fitz.Rect(box)
+    else:
+        clusters = _cluster_amax(_figure_graphic_rects(page), gap=16)
+        if not clusters:
+            return None
+
+        def score(c):
+            bb = c["bb"]
+            v_overlap = max(0, min(bb.y1, cap.y1) - max(bb.y0, cap.y0))
+            return (v_overlap > 0, c["amax"], bb.get_area())
+
+        plot_box = max(clusters, key=score)["bb"]
+
+    plot_img = _pil_trim(_render_pil(page, plot_box))
+    cap_img = _pil_trim(_render_pil(page, cap))
+    cap_left = cap.x0 < plot_box.x0
+    gap = 44
+    h = max(plot_img.height, cap_img.height)
+    out = Image.new("RGB", (plot_img.width + gap + cap_img.width, h), (255, 255, 255))
+    if cap_left:
+        out.paste(cap_img, (0, 0))
+        out.paste(plot_img, (cap_img.width + gap, 0))
+    else:
+        out.paste(plot_img, (0, 0))
+        out.paste(cap_img, (plot_img.width + gap, 0))
+    return out
 
 
 def crop_cluster_figure(page, regex):
@@ -363,8 +503,9 @@ def extract_day01_materials() -> None:
         doc = fitz.open(mml)
         ok = 0
         for fig_id, pno, name in DAY01_MML_FIGURES:
-            box = crop_mml_figure(doc[pno], fig_id)
-            if box and _save_crop(doc[pno], box, day_dir / f"{name}.png"):
+            img = crop_mml_figure_image(doc[pno], fig_id)
+            if img is not None and img.width > 20 and img.height > 20:
+                img.save(str(day_dir / f"{name}.png"))
                 ok += 1
             else:
                 print(f"  ! MML Fig {fig_id} (p{pno}) crop failed")
