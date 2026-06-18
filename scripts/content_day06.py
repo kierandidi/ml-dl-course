@@ -22,19 +22,26 @@ FIGURES = [
     None,                                              # Latent-variable models
     # VAEs
     "/assets/figures/day06/pdm_vae.png",               # The ELBO
+    None,                                              # Derivation: ELBO in three lines
     None,                                              # Reparameterization trick
     # Forward process
     "/assets/figures/day06/pdm_ddpm_forward.png",      # Unified forward rule
     None,                                              # Closed-form marginal
+    None,                                              # Derivation: compose the Gaussians
     "/assets/figures/day06/pdm_ddpm_overview.png",     # Noise schedules
     # Reverse process
     "/assets/figures/day06/pdm_ddpm_reverse.png",      # Reverse as denoising
     "/assets/figures/day06/pdm_ddpm_conditioning.png", # The true posterior
+    None,                                              # Derivation: Gaussian posterior
     None,                                              # Parameterizing reverse
     # Training
     None,                                              # Variational bound -> simple loss
+    None,                                              # Derivation: KL -> noise prediction
     None,                                              # epsilon-prediction objective
     "/assets/figures/day06/pdm_denoise_renoise.png",   # Denoise-then-renoise sampling
+    # Outlook: from DDPM to SDEs (figures from the SDE course)
+    "/assets/figures/day06/sde_song_diffusion.png",    # Forward/reverse as SDEs
+    "/assets/figures/day06/sde_euler_maruyama.png",    # Euler-Maruyama simulation
 ]
 
 SLIDES = (
@@ -87,6 +94,17 @@ SLIDES = (
                     ],
                 ),
                 (
+                    "Derivation: ELBO in Three Lines",
+                    [
+                        "Start: $log p_theta (x) = log integral p_theta (x,z) dif z$",
+                        "Multiply & divide by $q_phi$: $= log EE_(q_phi)[p_theta (x,z) \\/ q_phi (z|x)]$",
+                        "Jensen ($log$ concave): $>= EE_(q_phi)[log (p_theta (x,z) \\/ q_phi (z|x))]$",
+                        "Split the log: $= EE_(q_phi)[log p_theta (x|z)] - D_\"KL\"(q_phi || p(z))$",
+                        "Exact gap: $log p(x) - \"ELBO\" = D_\"KL\"(q_phi (z|x) || p_theta (z|x)) >= 0$",
+                        "Same algebra reused for the diffusion ELBO below",
+                    ],
+                ),
+                (
                     "Reparameterization Trick",
                     [
                         "Sample $z = mu_phi (x) + sigma_phi (x) dot.op epsilon$, $epsilon tilde N(0, I)$",
@@ -116,6 +134,17 @@ SLIDES = (
                         "Compose Gaussians: $x_t = sqrt(macron(alpha)_t) x_0 + sqrt(1 - macron(alpha)_t) epsilon$",
                         "$macron(alpha)_t = product_(s=1)^t (1 - beta_s)$ so $alpha_t = sqrt(macron(alpha)_t)$",
                         "Sample any $t$ in one shot — no need to simulate the chain",
+                    ],
+                ),
+                (
+                    "Derivation: Compose the Gaussians",
+                    [
+                        "Write $a_t = 1 - beta_t$, so $x_t = sqrt(a_t) x_(t-1) + sqrt(1-a_t) epsilon_t$",
+                        "Substitute one step into the next (telescoping)",
+                        "Two independent Gaussians add $arrow.r$ variances add",
+                        "$a_t (1 - a_(t-1)) + (1 - a_t) = 1 - a_t a_(t-1)$",
+                        "Iterate to $x_0$: $x_t = sqrt(macron(alpha)_t) x_0 + sqrt(1 - macron(alpha)_t) epsilon$",
+                        "VP schedule: $alpha_t^2 + sigma_t^2 = 1$",
                     ],
                 ),
                 (
@@ -151,6 +180,16 @@ SLIDES = (
                     ],
                 ),
                 (
+                    "Derivation: Gaussian Posterior",
+                    [
+                        "Bayes: $q(x_(t-1)|x_t,x_0) prop q(x_t|x_(t-1)) q(x_(t-1)|x_0)$",
+                        "Both factors Gaussian $arrow.r$ collect quadratic & linear terms in $x_(t-1)$",
+                        "Precision: $1\\/macron(beta)_t = a_t\\/beta_t + 1\\/(1 - macron(alpha)_(t-1))$",
+                        "Variance: $macron(beta)_t = (1 - macron(alpha)_(t-1))\\/(1 - macron(alpha)_t) beta_t$",
+                        "Mean: $macron(mu)_t = (sqrt(macron(alpha)_(t-1)) beta_t)\\/(1-macron(alpha)_t) x_0 + (sqrt(a_t)(1-macron(alpha)_(t-1)))\\/(1-macron(alpha)_t) x_t$",
+                    ],
+                ),
+                (
                     "Parameterizing the Reverse Step",
                     [
                         "Match $p_theta (x_(t-1)|x_t) = N(mu_theta (x_t, t), macron(beta)_t I)$ to the posterior",
@@ -174,21 +213,60 @@ SLIDES = (
                     ],
                 ),
                 (
+                    "Derivation: KL to Noise Prediction",
+                    [
+                        "Same-covariance Gaussians: $L_(t-1) = 1\\/(2 macron(beta)_t) ||macron(mu)_t - mu_theta||^2$",
+                        "Estimate $hat(x)_0 = (x_t - sqrt(1-macron(alpha)_t) epsilon_theta)\\/sqrt(macron(alpha)_t)$",
+                        "Substitute into $macron(mu)_t$ and $mu_theta$",
+                        "Prefactors $1\\/sqrt(a_t)$ and $x_t$ cancel — only noises remain",
+                        "$L_(t-1) prop ||epsilon - epsilon_theta (x_t,t)||^2$",
+                        "Set the weight to 1 $arrow.r L_\"simple\"$ (up-weights hard, high-noise steps)",
+                    ],
+                ),
+                (
                     "The $epsilon$-Prediction Objective",
                     [
                         "$L_\"simple\" = EE_(t, x_0, epsilon)[ ||epsilon - epsilon_theta (x_t, t)||^2 ]$",
                         "$x_t = sqrt(macron(alpha)_t) x_0 + sqrt(1 - macron(alpha)_t) epsilon$",
                         "Drops the awkward per-$t$ weights — works better in practice",
-                        "Tweedie links $epsilon$ to the score: $nabla log p_t (x_t) = -epsilon_theta / sigma_t$ (Day 7)",
+                        "Tweedie links $epsilon$ to the score: $nabla log p_t (x_t) = -epsilon_theta \\/ sigma_t$ (Day 7)",
                     ],
                 ),
                 (
                     "Sampling: Denoise then Re-noise",
                     [
                         "From $x_t$: predict $epsilon_theta$, estimate $hat(x)_0$, jump to posterior mean",
-                        "Add a little fresh noise (except at the last step)",
+                        "$x_(t-1) = 1\\/sqrt(a_t) (x_t - beta_t\\/sqrt(1-macron(alpha)_t) epsilon_theta) + sqrt(macron(beta)_t) z$",
+                        "Add a little fresh noise $z tilde N(0,I)$ (except at the last step)",
                         "Repeat $T arrow.r 0$ — this is ancestral sampling",
                         "Day 8: do this in far fewer steps with ODE/SDE solvers",
+                    ],
+                ),
+            ],
+        ),
+        (
+            "From DDPM to SDEs (Outlook)",
+            [
+                (
+                    "Forward & Reverse as SDEs",
+                    [
+                        "Take the step size to zero: the chain becomes a continuous-time SDE",
+                        "Forward: $dif x = f(x,t) dif t + g(t) dif w$ (drift + Brownian noise)",
+                        "Reverse: $dif x = [f - g^2 nabla log p_t (x)] dif t + g dif macron(w)$",
+                        "The score $nabla log p_t (x)$ replaces the unknown reverse drift",
+                        "Probability-flow ODE shares the same marginals (deterministic sampling)",
+                        "DDPM is the discretized variance-preserving SDE — full derivations in the SDE course",
+                    ],
+                ),
+                (
+                    "Simulating SDEs: Euler-Maruyama",
+                    [
+                        "Discretize $[t_0, t]$ into steps of size $Delta t$",
+                        "Brownian increment $Delta beta(t_k) tilde N(0, Delta t I)$",
+                        "$x_(k+1) = x_k + b(x_k,t_k) Delta t + sigma(x_k,t_k) Delta beta(t_k)$",
+                        "Noise enters at scale $sqrt(Delta t)$ since $\"Var\" = Delta t$",
+                        "DDPM ancestral sampling = the VP special case of this scheme",
+                        "Reference: SDE course (Brownian motion, time reversal, Girsanov)",
                     ],
                 ),
             ],
@@ -212,6 +290,7 @@ LECTURE = {
         "[Ho, Jain & Abbeel — *Denoising Diffusion Probabilistic Models* (DDPM)](https://arxiv.org/abs/2006.11239)",
         "[Kingma & Welling — *Auto-Encoding Variational Bayes* (VAE)](https://arxiv.org/abs/1312.6114)",
         "[Interactive companion & teaching guide](https://the-principles-of-diffusion-models.github.io/)",
+        "[Generative Modelling with SDEs — course notes (Brownian motion, Euler–Maruyama, time reversal, Girsanov)](https://kierandidi.github.io/) for the continuous-time derivations previewed at the end",
     ],
     "intro": (
         "Week 2 turns to **generative modeling**: instead of predicting a label from an input, "
@@ -507,7 +586,19 @@ This is **ancestral sampling** down the Markov chain — accurate but slow ($$T$
 
 {{viz:cov_2d_map}}
 
-In Day 7 we make the time continuous (score SDE and flow matching); in Day 8 we replace these $$T$$ tiny stochastic steps with a handful of ODE/SDE solver steps.""",
+**Outlook — the continuous-time (SDE) view.** Letting the step size go to zero turns the discrete chain into a **stochastic differential equation**. The forward and reverse processes become
+
+$$\\textcolor{blue}{\\underbrace{\\mathrm{d}\\boldsymbol{x} = \\boldsymbol{f}(\\boldsymbol{x},t)\\,\\mathrm{d}t + g(t)\\,\\mathrm{d}\\boldsymbol{w}}_{\\text{forward (noising)}}}, \\qquad \\textcolor{purple}{\\underbrace{\\mathrm{d}\\boldsymbol{x} = \\big[\\boldsymbol{f}(\\boldsymbol{x},t) - g(t)^2\\,\\nabla_{\\boldsymbol{x}}\\log p_t(\\boldsymbol{x})\\big]\\mathrm{d}t + g(t)\\,\\mathrm{d}\\bar{\\boldsymbol{w}}}_{\\text{reverse (denoising)}}},$$
+
+where the **score** $$\\nabla_{\\boldsymbol{x}}\\log p_t(\\boldsymbol{x})$$ plays the role our $$\\boldsymbol{\\epsilon}_\\theta$$ learned. DDPM is exactly the discretization of the variance-preserving case of this SDE.
+
+![Forward and reverse diffusion as SDEs, with the shared probability-flow ODE (Song et al., 2020; via the SDE course)](/assets/figures/day06/sde_song_diffusion.png)
+
+To *simulate* such an SDE we use the simplest stochastic solver, **Euler–Maruyama** — the stochastic analogue of Euler's method from Day 1, with the noise entering at scale $$\\sqrt{\\Delta t}$$ (because a Brownian increment has variance $$\\Delta t$$):
+
+![The Euler–Maruyama discretization of an SDE (SDE course)](/assets/figures/day06/sde_euler_maruyama.png)
+
+The full continuous-time derivations — Brownian motion, Itô calculus, the time-reversal formula, and Girsanov's theorem — are developed step by step in the companion [SDE course notes](https://kierandidi.github.io/). In **Day 7** we make this score/SDE view precise (score matching, flow matching); in **Day 8** we replace the $$T$$ tiny stochastic steps with a handful of ODE/SDE solver steps.""",
                 },
             ],
         },

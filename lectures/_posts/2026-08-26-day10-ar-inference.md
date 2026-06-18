@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Day 10 - Autoregressive Inference
-image: /assets/img/lessons/day10.png
+image: /assets/img/sampling_space.png
 accent_image: 
   background: url('/assets/img/sampling_space.png') center/cover
   overlay: false
@@ -22,8 +22,6 @@ invert_sidebar: true
 - [Attention Is All You Need](https://arxiv.org/abs/1706.03762) — §3 (complexity)
 - [Holtzman et al. — The Curious Case of Neural Text Degeneration](https://arxiv.org/abs/1904.09751)
 - [Gordić — KV cache discussion](https://www.aleksagordic.com/blog/transformer)
-- [Complete reading list for Day 10](/publications/#day-10) (all resources for this lecture)
-
 
 * toc
 {:toc}

@@ -15,29 +15,33 @@ from __future__ import annotations
 BASE = "https://the-principles-of-diffusion-models.github.io/assets"
 
 # key -> (title, html_file, iframe_height_px, day)
+# Heights are generous on purpose: the widgets are hosted cross-origin, so the
+# page cannot measure their content height to auto-resize. We size each iframe
+# tall enough that the whole interactive (title + controls + canvas) is visible
+# without an inner scrollbar.
 VIZ: dict[str, tuple[str, str, int, int]] = {
     # Day 6 — forward process, DDPM, change of variables
-    "noise_schedule_explorer": ("Noise Schedule Explorer", "noise_schedule_explorer.html", 820, 6),
-    "ddpm_conditional_trick": ("DDPM Conditional Trick", "ddpm_conditional_trick.html", 580, 6),
-    "cov_2d_map": ("Change-of-Variable 2D Map", "cov_2d_map.html", 640, 6),
+    "noise_schedule_explorer": ("Noise Schedule Explorer", "noise_schedule_explorer.html", 860, 6),
+    "ddpm_conditional_trick": ("DDPM Conditional Trick", "ddpm_conditional_trick.html", 860, 6),
+    "cov_2d_map": ("Change-of-Variable 2D Map", "cov_2d_map.html", 780, 6),
     # Day 7 — score / SDE / flow matching
-    "score_landscape": ("Score Landscape", "score_landscape.html", 580, 7),
-    "score_global_vs_local": ("Global vs Local View of the Score", "score_global_vs_local.html", 580, 7),
-    "denoising_score_matching": ("Denoising Score Matching", "denoising_score_matching.html", 820, 7),
-    "score_sde_three_dynamics": ("Three Dynamics: Forward SDE, Reverse SDE, PF-ODE", "score_sde_three_dynamics.html", 580, 7),
-    "ddpm_prediction_equiv": ("DDPM Prediction Equivalences", "ddpm_prediction_equiv.html", 580, 7),
-    "four_predictions": ("Four Prediction Parameterizations", "four_predictions.html", 580, 7),
+    "score_landscape": ("Score Landscape", "score_landscape.html", 760, 7),
+    "score_global_vs_local": ("Global vs Local View of the Score", "score_global_vs_local.html", 760, 7),
+    "denoising_score_matching": ("Denoising Score Matching", "denoising_score_matching.html", 860, 7),
+    "score_sde_three_dynamics": ("Three Dynamics: Forward SDE, Reverse SDE, PF-ODE", "score_sde_three_dynamics.html", 780, 7),
+    "ddpm_prediction_equiv": ("DDPM Prediction Equivalences", "ddpm_prediction_equiv.html", 760, 7),
+    "four_predictions": ("Four Prediction Parameterizations", "four_predictions.html", 800, 7),
     "conditional_vs_marginal_velocity": (
         "Conditional vs Marginal Velocity Fields",
         "conditional_vs_marginal_flow_matching_velocity.html",
-        820,
+        860,
         7,
     ),
-    "conditional_vs_marginal_paths": ("Conditional vs Marginal Paths", "conditional_vs_marginal_paths.html", 620, 7),
+    "conditional_vs_marginal_paths": ("Conditional vs Marginal Paths", "conditional_vs_marginal_paths.html", 780, 7),
     # Day 8 — solvers, Fokker–Planck, flow maps
-    "euler_vs_heun_solver": ("Euler vs Heun Solver", "euler_vs_heun_solver.html", 560, 8),
-    "fokker_planck": ("Fokker–Planck Equation", "fokker_planck.html", 640, 8),
-    "flow_map_models": ("Flow Map Models Comparison", "flow_map_models.html", 640, 8),
+    "euler_vs_heun_solver": ("Euler vs Heun Solver", "euler_vs_heun_solver.html", 760, 8),
+    "fokker_planck": ("Fokker–Planck Equation", "fokker_planck.html", 780, 8),
+    "flow_map_models": ("Flow Map Models Comparison", "flow_map_models.html", 780, 8),
 }
 
 

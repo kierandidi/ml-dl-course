@@ -1,196 +1,244 @@
 #import "../lib.typ": *
 
-#show: course-theme.with(title: [Training Flow & Diffusion Models], subtitle: [Day 7 | Aug 2026])
+#show: course-theme.with(title: [Score, SDEs & Flow Matching], subtitle: [Day 7 | Aug 2026])
 
-= Day 7: Training Flow & Diffusion Models
+= Day 7: Score, SDEs & Flow Matching
 
 == Welcome
 
-- *Training Flow & Diffusion Models* — Continuous transforms and denoising objectives
+- *Score, SDEs & Flow Matching* — The continuous-time view of diffusion
 - 3 hours lecture + practical
 - Slides, notes, and code on the course site
 
 == Outline
 
-- Normalizing Flows
-- Diffusion Intuition
-- Score Matching View
-- Training Practice
+- The Score Function
+- Learning the Score
+- Sampling with the Score
+- The Continuous-Time View
+- Flow Matching
+- One Model, Many Views
 
-= Normalizing Flows
+= 1 · The Score Function
 
-== Change of Variables
+== 1.1  What Is the Score?
 
-- $p_X(x) = p_Z(f^(-1)(x)) |det J_(f^(-1))(x)|$
-- Bijective $f$ with tractable inverse
-- Composition of simple coupling layers
+- Score = gradient of log-density: $s(x) = nabla_x log p(x)$
+- A *vector field* pointing toward higher probability
+- Day 6 learned to denoise; today we learn this field
+- Knowing the score is enough to *sample* (Langevin, SDE, ODE)
+- Source: Principles of Diffusion Models, Ch. 3–6
 
-== Change of Variables — illustration
+== 1.1  What Is the Score?
 
-#align(center)[#image("/assets/figures/day07/pdm_cond_transition.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_score_field.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Normalizing Flows — Change of Variables (source: course materials)]
+== 1.2  Energy-Based Models
 
-== Coupling Layers
+- Write $p_theta (x) = e^(-E_theta (x)) \\/ Z_theta$
+- Normalizer $Z_theta = integral e^(-E_theta (x)) dif x$ is intractable
+- Max-likelihood needs $nabla_theta log Z_theta$ — hard
+- Idea: model the *score* and sidestep $Z$ entirely
+- Flexible energy, but sampling needs MCMC
 
-- Split dimensions; transform one part conditioned on other
-- Affine coupling: scale and shift
-- RealNVP, Glow architectures
+== 1.2  Energy-Based Models
 
-== Coupling Layers — illustration
+#align(center + horizon)[#image("/assets/figures/day07/pdm_ebm_training.png", width: 92%, height: 82%, fit: "contain")]
 
-#align(center)[#image("/assets/figures/day07/pdm_cond_vs_marginal.png", width: 80%)]
+== 1.3  Why the Score Avoids the Normalizer
 
-#text(size: 14pt, fill: gray)[Normalizing Flows — Coupling Layers (source: course materials)]
+- $log p_theta (x) = -E_theta (x) - log Z_theta$
+- $Z_theta$ does not depend on $x$
+- $arrow.r nabla_x log p_theta (x) = -nabla_x E_theta (x)$
+- The intractable constant *vanishes* under $nabla_x$
+- Learn the shape of $p$, not its normalization
 
-== Training Flows
+= 2 · Learning the Score
 
-- Maximize log-likelihood directly
-- Jacobian log-determinant cost
-- Exact sampling and density
+== 2.1  Score Matching
 
-== Training Flows — illustration
+- Fit $s_theta (x) approx nabla_x log p_"data" (x)$
+- Naive loss needs the unknown true score
+- Hyvärinen: integrate by parts to remove it
+- $J = EE[1/2 \\|s_theta\\|^2 + "tr"(nabla_x s_theta)]$
+- Trace (Jacobian) term is costly in high dimension
 
-#align(center)[#image("/assets/figures/day07/pdm_curved_paths.png", width: 80%)]
+== 2.1  Score Matching
 
-#text(size: 14pt, fill: gray)[Normalizing Flows — Training Flows (source: course materials)]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_score_matching.png", width: 92%, height: 82%, fit: "contain")]
 
-== Limitations
+== 2.2  Derivation: Implicit Score Matching
 
-- Architectural constraints for invertibility
-- Scaling to high-res images is hard
-- Diffusion trades exact likelihood for flexibility
+- Start: $1/2 EE_(p)\\|s_theta (x) - nabla log p(x)\\|^2$
+- Expand the square; the cross term has $nabla log p$
+- $EE_p [s_theta^T nabla log p] = EE_p[-nabla dot.op s_theta]$ (parts)
+- Uses $p nabla log p = nabla p$ and vanishing boundary
+- Leaves a loss in $s_theta$ alone (+ const)
 
-== Limitations — illustration
+== 2.3  Denoising Score Matching
 
-#align(center)[#image("/assets/figures/day07/pdm_dsm_trick.png", width: 80%)]
+- Add noise: $x_t = x_0 + sigma epsilon$, learn the *noisy* score
+- Key identity: $nabla_(x_t) log p(x_t | x_0) = -(x_t - x_0)\\/sigma^2$
+- Target is known in closed form $arrow.r$ no Jacobian trace
+- $J_"DSM" = EE\\|s_theta (x_t) + (x_t - x_0)\\/sigma^2\\|^2$
+- Score matching $=$ denoising — the Day 6 connection
 
-#text(size: 14pt, fill: gray)[Normalizing Flows — Limitations (source: course materials)]
+== 2.3  Denoising Score Matching
 
-= Diffusion Intuition
+#align(center + horizon)[#image("/assets/figures/day07/pdm_dsm_trick.png", width: 92%, height: 82%, fit: "contain")]
 
-== Forward Process
+== 2.4  Multiple Noise Scales (NCSN)
 
-- Gradually add Gaussian noise: $q(x_t|x_(t-1))$
-- Closed form $q(x_t|x_0) = cal(N)(sqrt(overline(alpha)_t) x_0, (1-overline(alpha)_t) I)$
-- Ends at pure noise
+- One noise level can't cover all of space
+- Low noise: accurate near data, empty regions unseen
+- High noise: fills space but blurs detail
+- Train *one* network conditioned on noise level $sigma$
+- Anneal from high to low noise when sampling
 
-== Forward Process — illustration
+== 2.4  Multiple Noise Scales (NCSN)
 
-#align(center)[#image("/assets/figures/day07/pdm_ebm_training.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_ncsn.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Diffusion Intuition — Forward Process (source: course materials)]
+= 3 · Sampling with the Score
 
-== Reverse Process
+== 3.1  Langevin Dynamics
 
-- Learn to denoise step by step
-- $p_theta(x_(t-1)|x_t)$ parameterized by neural net
-- Sampling walks from noise to data
+- Walk uphill in log-density, plus noise:
+- $x_(k+1) = x_k + tau s_theta (x_k) + sqrt(2 tau) z_k$
+- Stationary distribution is exactly $p(x)$
+- Drift toward data + noise to explore
+- Anneal $sigma$ (NCSN) for fast, stable mixing
 
-== Reverse Process — illustration
+== 3.1  Langevin Dynamics
 
-#align(center)[#image("/assets/figures/day07/pdm_forward_1d.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_langevin.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Diffusion Intuition — Reverse Process (source: course materials)]
+= 4 · The Continuous-Time View
 
-== DDPM Objective
+== 4.1  The Forward SDE
 
-- Predict noise $epsilon$ added at step $t$
-- Simple MSE on $epsilon$ with random $t$
-- Equivalent variants: predict $x_0$ or score
+- Let steps $arrow.r$ 0: the noising chain becomes an SDE
+- $dif x = f(x,t) dif t + g(t) dif w$ (drift + diffusion)
+- VP-SDE corresponds to DDPM; VE-SDE to NCSN
+- Marginal stays $p_t (x_t|x_0) = N(alpha_t x_0, sigma_t^2 I)$
+- A whole *family* of distributions $p_t$, indexed by time
 
-== DDPM Objective — illustration
+== 4.1  The Forward SDE
 
-#align(center)[#image("/assets/figures/day07/pdm_langevin.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_forward_1d.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Diffusion Intuition — DDPM Objective (source: course materials)]
+== 4.2  The Time-Dependent Score
 
-== Noise Schedules
+- Now the score depends on time: $s(x,t) = nabla_x log p_t (x)$
+- One network $s_theta (x, t)$ for all noise levels
+- Smoothed at high $t$ (easy), sharp at low $t$ (hard)
+- This is exactly the NCSN idea, in continuous time
+- Trained by denoising score matching at each $t$
 
-- Linear, cosine $overline(alpha)_t$ schedules
-- Affects training stability and sample quality
-- Signal-to-noise ratio view
+== 4.2  The Time-Dependent Score
 
-== Noise Schedules — illustration
+#align(center + horizon)[#image("/assets/figures/day07/pdm_score_landscape.png", width: 92%, height: 82%, fit: "contain")]
 
-#align(center)[#image("/assets/figures/day07/pdm_ncsn.png", width: 80%)]
+== 4.3  Reverse SDE & Probability-Flow ODE
 
-#text(size: 14pt, fill: gray)[Diffusion Intuition — Noise Schedules (source: course materials)]
+- Reverse SDE (Anderson): run time backward using the score
+- $dif x = [f - g^2 nabla log p_t] dif t + g dif macron(w)$
+- Probability-flow ODE: *same marginals*, no noise
+- $dif x = [f - 1/2 g^2 nabla log p_t] dif t$
+- SDE = stochastic sampler; ODE = deterministic + likelihood
 
-= Score Matching View
+== 4.3  Reverse SDE & Probability-Flow ODE
 
-== Denoising Score Matching
+#align(center + horizon)[#image("/assets/figures/day07/pdm_three_dynamics.png", width: 92%, height: 82%, fit: "contain")]
 
-- Learn $s_theta(x_t, t) approx nabla_(x_t) log p(x_t)$
-- Tweedie's formula links $epsilon$ and score
-- Unifies diffusion training objectives
+== 4.4  Derivation: The DSM Objective
 
-== Denoising Score Matching — illustration
+- Want $s_theta (x,t) approx nabla log p_t (x)$ (marginal)
+- Marginal score = $EE[ nabla log p_t (x_t | x_0) | x_t]$
+- So regress on the *conditional* score (known Gaussian)
+- $nabla log p_t (x_t|x_0) = -(x_t - alpha_t x_0)\\/sigma_t^2 = -epsilon\\/sigma_t$
+- $arrow.r$ predicting the score $=$ predicting the noise
 
-#align(center)[#image("/assets/figures/day07/pdm_nf.png", width: 80%)]
+= 5 · Flow Matching
 
-#text(size: 14pt, fill: gray)[Score Matching View — Denoising Score Matching (source: course materials)]
+== 5.1  Continuous Normalizing Flows
 
-== SDE Formulation Preview
+- Transport noise to data along an ODE: $dif x = v_theta (x,t) dif t$
+- $v$ = a *velocity field* moving samples in time
+- Density evolves by the continuity equation
+- Old way (CNF): expensive max-likelihood training
+- Flow matching: regress $v$ directly, simulation-free
 
-- Forward SDE adds noise continuously
-- Reverse SDE uses score function
-- Day 8 inference details
+== 5.1  Continuous Normalizing Flows
 
-== SDE Formulation Preview — illustration
+#align(center + horizon)[#image("/assets/figures/day07/pdm_nf.png", width: 92%, height: 82%, fit: "contain")]
 
-#align(center)[#image("/assets/figures/day07/pdm_param_equiv.png", width: 80%)]
+== 5.2  Conditional Flow Matching
 
-#text(size: 14pt, fill: gray)[Score Matching View — SDE Formulation Preview (source: course materials)]
+- Pick a simple per-sample path, e.g. $x_t = (1-t) x_0 + t x_1$
+- Its velocity is known: $u_t (x | x_1) = x_1 - x_0$
+- Regress $v_theta (x_t, t)$ onto this conditional velocity
+- $J_"CFM" = EE\\|v_theta (x_t, t) - u_t (x|x_1)\\|^2$
+- No simulation, no divergence term — just regression
 
-== Classifier-Free Guidance
+== 5.2  Conditional Flow Matching
 
-- Train conditional model with dropped labels
-- Guidance scale trades diversity vs fidelity
-- Standard in text-to-image systems
+#align(center + horizon)[#image("/assets/figures/day07/pdm_cond_transition.png", width: 92%, height: 82%, fit: "contain")]
 
-== Classifier-Free Guidance — illustration
+== 5.3  Conditional vs Marginal Velocity
 
-#align(center)[#image("/assets/figures/day07/pdm_reflow.png", width: 80%)]
+- Many conditional paths overlap at a point $x_t$
+- Marginal velocity = average of conditionals through $x_t$
+- $v(x,t) = EE[u_t (x | x_1) | x_t = x]$
+- CFM and marginal FM share the *same* gradient
+- So regressing conditionals learns the marginal field
 
-#text(size: 14pt, fill: gray)[Score Matching View — Classifier-Free Guidance (source: course materials)]
+== 5.3  Conditional vs Marginal Velocity
 
-== Latent Diffusion
+#align(center + horizon)[#image("/assets/figures/day07/pdm_cond_vs_marginal.png", width: 92%, height: 82%, fit: "contain")]
 
-- Diffuse in VAE latent space (Stable Diffusion)
-- Lower dimension → cheaper training
-- Text encoder provides conditioning
+== 5.4  Rectified Flow & Reflow
 
-== Latent Diffusion — illustration
+- Linear interpolation $arrow.r$ straight conditional paths
+- But *marginal* trajectories can still be curved
+- Curved paths need many ODE steps to integrate
+- Reflow: retrain on (noise, sample) pairs $arrow.r$ straighter
+- Straighter flow $arrow.r$ fewer steps, even one-step
 
-#align(center)[#image("/assets/figures/day07/pdm_score_field.png", width: 80%)]
+== 5.4  Rectified Flow & Reflow
 
-#text(size: 14pt, fill: gray)[Score Matching View — Latent Diffusion (source: course materials)]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_curved_paths.png", width: 92%, height: 82%, fit: "contain")]
 
-= Training Practice
+= 6 · One Model, Many Views
 
-== Network Architecture
+== 6.1  Four Equivalent Parameterizations
 
-- U-Net with time embedding $t$
-- Attention at lower resolutions
-- GroupNorm + SiLU activations
+- Predict noise $epsilon$, data $x_0$, score $s$, or velocity $v$
+- All related by the forward rule $x_t = alpha_t x_0 + sigma_t epsilon$
+- $s = -epsilon \\/ sigma_t$ (score $=$ scaled noise)
+- $v = alpha'_t x_0 + sigma'_t epsilon$ (flow-matching velocity)
+- Same network, different target — pick for stability
 
-== Compute & Data
+== 6.1  Four Equivalent Parameterizations
 
-- Large-scale image-text pairs
-- Mixed precision and EMA weights
-- Checkpointing long runs
+#align(center + horizon)[#image("/assets/figures/day07/pdm_param_equiv.png", width: 92%, height: 82%, fit: "contain")]
 
-== Monitoring
+== 6.2  The Unified Picture
 
-- Loss per noise level
-- Periodic sample grids
-- FID on small val set
+- Variational (DDPM), score-SDE, and flow matching coincide
+- All learn the same time-indexed field over $p_t$
+- Sample with: ancestral, Langevin, reverse SDE, or ODE
+- Score $arrow.l.r$ noise $arrow.l.r$ velocity are interchangeable
+- Day 8: guidance, fast solvers, and few-step sampling
+
+== 6.2  The Unified Picture
+
+#align(center + horizon)[#image("/assets/figures/day07/pdm_unified.png", width: 92%, height: 82%, fit: "contain")]
 
 == Summary
 
-- Day 7: *Training Flow & Diffusion Models*
-- Continuous transforms and denoising objectives
+- Day 7: *Score, SDEs & Flow Matching*
+- The continuous-time view of diffusion
 - Questions welcome — practical follows
 
 == Questions?

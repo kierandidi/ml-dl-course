@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Day 9 - Autoregressive Language Models
-image: /assets/img/lessons/day09.png
+image: /assets/img/sampling_space.png
 accent_image: 
   background: url('/assets/img/sampling_space.png') center/cover
   overlay: false
@@ -22,8 +22,6 @@ invert_sidebar: true
 - [Vaswani et al. — Attention Is All You Need](https://arxiv.org/abs/1706.03762)
 - [Gordić — Inside the Transformer: The Life of a Token](https://www.aleksagordic.com/blog/transformer)
 - [Su et al. — RoFormer / RoPE](https://arxiv.org/abs/2104.09864)
-- [Complete reading list for Day 9](/publications/#day-9) (all resources for this lecture)
-
 
 * toc
 {:toc}

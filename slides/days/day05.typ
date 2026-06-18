@@ -1,195 +1,181 @@
 #import "../lib.typ": *
 
-#show: course-theme.with(title: [Sequence Models], subtitle: [Day 5 | Aug 2026])
+#show: course-theme.with(title: [Sequence Models & Transformers], subtitle: [Day 5 | Aug 2026])
 
-= Day 5: Sequence Models
+= Day 5: Sequence Models & Transformers
 
 == Welcome
 
-- *Sequence Models* — RNNs, attention, and Transformers
+- *Sequence Models & Transformers* — From recurrence to attention
 - 3 hours lecture + practical
 - Slides, notes, and code on the course site
 
 == Outline
 
-- Sequential Data
+- Sequence Modeling
+- Recurrent Neural Networks
+- Sequence to Sequence
 - Attention
-- Transformer Architecture
-- Applications & Scaling
+- The Transformer
 
-= Sequential Data
+= 1 · Sequence Modeling
 
-== Motivation
+== 1.1  Why Sequences are Different
 
-- Text, speech, time series — ordered inputs
-- Variable length sequences
-- Markov assumptions and history
+- Inputs/outputs have *variable length*: text, audio, time series
+- Order matters: 'dog bites man' $!=$ 'man bites dog'
+- Long-range dependencies span many steps
+- Need parameter sharing *across positions in time*
+- Two ideas today: recurrence, then attention
 
-== Motivation — illustration
+== 1.2  Autoregressive Factorization
 
-#align(center)[#image("/assets/figures/day05/ucl0_p081.png", width: 80%)]
+- Any joint factorizes by the chain rule of probability:
+- $p(x) = product_(i=1)^n p(x_i | x_1, dots.h, x_(i-1))$
+- Model each conditional with a shared network
+- Train by next-token prediction (max likelihood)
+- Generate by sampling one token at a time
 
-#text(size: 14pt, fill: gray)[Sequential Data — Motivation (source: course materials)]
+== 1.2  Autoregressive Factorization
 
-== Fixed-window Baselines
+#align(center + horizon)[#image("/assets/figures/day05/rnn_pixelrnn.png", width: 92%, height: 82%, fit: "contain")]
 
-- Bag-of-words loses order
-- N-gram language models
-- Need latent state summarizing past
+== 1.3  Sharing Across Time
 
-== Fixed-window Baselines — illustration
+- Reuse the *same* weights at every time step
+- Like CNNs share across space, RNNs share across time
+- Handles arbitrary length with a fixed parameter count
+- A hidden state carries a summary of the past
+- Output head: softmax over the vocabulary
 
-#align(center)[#image("/assets/figures/day05/ucl0_p082.png", width: 80%)]
+= 2 · Recurrent Neural Networks
 
-#text(size: 14pt, fill: gray)[Sequential Data — Fixed-window Baselines (source: course materials)]
+== 2.1  The RNN Recurrence
 
-== RNN Recurrence
+- State update: $h_t = tanh(W_h h_(t-1) + W_x x_t + b)$
+- Prediction: $y_t = "softmax"(W_y h_t)$
+- $h_t$ is a running summary of $x_1, dots.h, x_t$
+- Same $W_h, W_x, W_y$ shared over all $t$
+- Unroll in time $arrow.r$ a deep feedforward net
 
-- $h_t = sigma(W_h h_(t-1) + W_x x_t + b)$
-- Same weights applied at each time step
-- Unroll graph for BPTT
+== 2.1  The RNN Recurrence
 
-== RNN Recurrence — illustration
+#align(center + horizon)[#image("/assets/figures/day05/rnn_unrolled.png", width: 92%, height: 82%, fit: "contain")]
 
-#align(center)[#image("/assets/figures/day05/ucl0_p083.png", width: 80%)]
+== 2.2  Backprop Through Time
 
-#text(size: 14pt, fill: gray)[Sequential Data — RNN Recurrence (source: course materials)]
+- Unroll the recurrence, then apply backprop
+- Gradient at step $t$ sums contributions from all later steps
+- Involves products of Jacobians $product (partial h_(k))/(partial h_(k-1))$
+- Truncate BPTT for very long sequences
+- Cost grows with sequence length; steps are sequential
 
-== Vanishing Gradients
+== 2.3  Vanishing Gradients & LSTM/GRU
 
-- Long-range dependencies are hard
-- LSTM / GRU gating mechanisms
-- Truncated BPTT for long sequences
+- Repeated Jacobian products $arrow.r$ gradients vanish/explode
+- Plain RNNs forget long-range context
+- LSTM: a *cell state* with additive updates + gates
+- Gates (forget/input/output) control information flow
+- GRU: a lighter gated variant; clip to tame explosions
 
-== Vanishing Gradients — illustration
+= 3 · Sequence to Sequence
 
-#align(center)[#image("/assets/figures/day05/ucl0_p084.png", width: 80%)]
+== 3.1  Encoder-Decoder
 
-#text(size: 14pt, fill: gray)[Sequential Data — Vanishing Gradients (source: course materials)]
+- Encoder RNN reads the source into a context vector
+- Decoder RNN generates the target, token by token
+- Enabled end-to-end neural machine translation
+- Closed much of the gap to human-quality translation
+- One architecture for translation, summarization, dialogue
 
-= Attention
+== 3.1  Encoder-Decoder
 
-== Seq2seq Bottleneck
+#align(center + horizon)[#image("/assets/figures/day05/seq2seq_nmt.png", width: 92%, height: 82%, fit: "contain")]
 
-- Encoder final state must encode everything
-- Attention reads all encoder states
+== 3.2  The Bottleneck Problem
 
-== Seq2seq Bottleneck — illustration
+- All source information squeezed into *one* fixed vector
+- Long sentences overflow the bottleneck $arrow.r$ quality drops
+- Decoder can't 'look back' at specific source words
+- Fix: let the decoder attend to *all* encoder states
+- This is attention — the bridge to Transformers
 
-#align(center)[#image("/assets/figures/day05/ucl0_p085.png", width: 80%)]
+= 4 · Attention
 
-#text(size: 14pt, fill: gray)[Attention — Seq2seq Bottleneck (source: course materials)]
+== 4.1  Alignment: a Soft Lookup
 
-== Scaled Dot-Product Attention
+- At each output step, learn which inputs to focus on
+- Alignment matrix = soft correspondence input$arrow.l.r$output
+- Differentiable 'soft' lookup, trained end-to-end
+- No fixed bottleneck: direct access to every source state
+- Interpretable: the weights show what the model used
 
-- $"Attention"(Q,K,V) = "softmax"(Q K^T / sqrt(d_k)) V$
-- Query, Key, Value interpretations
-- Soft alignment weights over positions
+== 4.1  Alignment: a Soft Lookup
 
-== Scaled Dot-Product Attention — illustration
+#align(center + horizon)[#image("/assets/figures/day05/attn_alignment.png", width: 92%, height: 82%, fit: "contain")]
 
-#align(center)[#image("/assets/figures/day05/ucl0_p114.png", width: 80%)]
+== 4.2  Content-Based Addressing
 
-#text(size: 14pt, fill: gray)[Attention — Scaled Dot-Product Attention (source: course materials)]
+- A query $q$ is compared to each key $k_j$ by a similarity
+- Normalize similarities with a softmax $arrow.r$ weights $a_j$
+- Output = weighted sum of values: $sum_j a_j v_j$
+- $a_j = "softmax"_j (q dot.op k_j)$
+- Query/key/value: the vocabulary of attention
 
-== Multi-Head Attention
+== 4.2  Content-Based Addressing
 
-- Parallel heads in subspaces
-- Concatenate and project
-- Expressivity vs compute
+#align(center + horizon)[#image("/assets/figures/day05/attn_content.png", width: 92%, height: 82%, fit: "contain")]
 
-== Multi-Head Attention — illustration
+== 4.3  Derivation: Scaled Dot-Product Attention
 
-#align(center)[#image("/assets/figures/day05/ucl0_p125.png", width: 80%)]
+- Stack queries, keys, values into $Q, K, V$
+- Scores $S = Q K^T$ (all query-key dot products)
+- Scale by $sqrt(d_k)$ to keep softmax gradients healthy
+- $"Attention"(Q,K,V) = "softmax"(Q K^T \\/ sqrt(d_k)) V$
+- Full derivation of the scaling in the notes
 
-#text(size: 14pt, fill: gray)[Attention — Multi-Head Attention (source: course materials)]
+= 5 · The Transformer
 
-== Self-Attention
+== 5.1  Self-Attention
 
-- Q, K, V from same sequence
-- Direct long-range links $O(n^2)$
-- Positional information required
+- Each token attends to *every* token in the sequence
+- $Q, K, V$ are all linear projections of the *same* input
+- Captures long-range dependencies in *one* step
+- Fully parallel over positions (unlike RNNs)
+- Attention maps are interpretable alignments
 
-== Self-Attention — illustration
+== 5.1  Self-Attention
 
-#align(center)[#image("/assets/figures/day05/ucl1_p010.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day05/attn_implicit.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Attention — Self-Attention (source: course materials)]
+== 5.2  Multi-Head Attention
 
-= Transformer Architecture
+- Run $h$ attention heads in parallel on projected subspaces
+- Each head learns a different relation (syntax, coref, ...)
+- Concatenate heads, then project: $W_O [h_1, dots.h, h_n]$
+- More expressive than a single attention at the same cost
+- Heads attend to different positions simultaneously
 
-== Encoder Block
+== 5.3  Positional Encoding & the Block
 
-- MHA → Add&Norm → FFN → Add&Norm
-- FFN: two linear layers with non-linearity
-- Pre-norm vs post-norm variants
+- Attention is permutation-equivariant $arrow.r$ inject position
+- Sinusoidal or learned positional encodings added to inputs
+- Block: (multi-head attn $arrow.r$ MLP), each with residual + LayerNorm
+- Decoder uses *masked* self-attention (no peeking ahead)
+- Stack $N$ blocks; same template for encoder & decoder
 
-== Encoder Block — illustration
+== 5.4  Why Transformers Won
 
-#align(center)[#image("/assets/figures/day05/ucl1_p034.png", width: 80%)]
-
-#text(size: 14pt, fill: gray)[Transformer Architecture — Encoder Block (source: course materials)]
-
-== Positional Encoding
-
-- Sinusoidal or learned position embeddings
-- RoPE in modern LLMs (Day 9–10)
-- Relative position bias
-
-== Positional Encoding — illustration
-
-#align(center)[#image("/assets/figures/day05/ucl1_p036.png", width: 80%)]
-
-#text(size: 14pt, fill: gray)[Transformer Architecture — Positional Encoding (source: course materials)]
-
-== Decoder & Masking
-
-- Causal mask: token $t$ sees $<= t$ only
-- Cross-attention to encoder (MT)
-- Decoder-only for language modeling
-
-== Decoder & Masking — illustration
-
-#align(center)[#image("/assets/figures/day05/ucl1_p080.png", width: 80%)]
-
-#text(size: 14pt, fill: gray)[Transformer Architecture — Decoder & Masking (source: course materials)]
-
-== Complexity
-
-- Self-attention: $O(n^2 d)$ time and memory
-- Motivates sparse / linear attention research
-- KV cache for inference (Day 10)
-
-== Complexity — illustration
-
-#align(center)[#image("/assets/figures/day05/ucl1_p081.png", width: 80%)]
-
-#text(size: 14pt, fill: gray)[Transformer Architecture — Complexity (source: course materials)]
-
-= Applications & Scaling
-
-== Language Modeling
-
-- Next-token prediction objective
-- Perplexity metric: $exp(-(1/N) sum log p)$
-- BPE / SentencePiece tokenization
-
-== Pre-training + Fine-tuning
-
-- Self-supervised pretrain on large corpus
-- Supervised fine-tune on downstream task
-- Instruction tuning and RLHF preview
-
-== Scaling Laws
-
-- Loss improves predictably with compute/data/params
-- Chinchilla-optimal token budgets
-- Emergent capabilities (debated)
+- Parallel training: no sequential recurrence
+- Constant path length between any two tokens
+- Scales with data and compute — the basis of LLMs
+- One architecture for text, vision (ViT), audio, proteins
+- Day 9-10: pretraining and large language models
 
 == Summary
 
-- Day 5: *Sequence Models*
-- RNNs, attention, and Transformers
+- Day 5: *Sequence Models & Transformers*
+- From recurrence to attention
 - Questions welcome — practical follows
 
 == Questions?

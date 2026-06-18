@@ -48,7 +48,7 @@ The **true risk** (population loss) is $$R(f) = \mathbb{E}_{(\mathbf{x},y)}[\ell
 
 For an estimator $$\hat{f}$$ at input $$\mathbf{x}$$,
 
-$$\mathbb{E}[(y - \hat{f}(\mathbf{x}))^2] = \underbrace{(\mathbb{E}[\hat{f}(\mathbf{x})] - f^\*(\mathbf{x}))^2}_{\text{bias}^2} + \underbrace{\mathrm{Var}(\hat{f}(\mathbf{x}))}_{\text{variance}} + \underbrace{\sigma^2}_{\text{noise}}.$$
+$$\mathbb{E}[(y - \hat{f}(\mathbf{x}))^2] = \underbrace{(\mathbb{E}[\hat{f}(\mathbf{x})] - f^*(\mathbf{x}))^2}_{\text{bias}^2} + \underbrace{\mathrm{Var}(\hat{f}(\mathbf{x}))}_{\text{variance}} + \underbrace{\sigma^2}_{\text{noise}}.$$
 
 Complex models reduce bias but increase variance. **Model selection** (cross-validation, validation sets) estimates out-of-sample performance without peeking at the test set.
 
@@ -56,12 +56,12 @@ Complex models reduce bias but increase variance. **Model selection** (cross-val
 
 ### 2.1 Linear regression
 
-> **Linear regression** models $$\mathbb{E}[y|\mathbf{x}] = \mathbf{w}^\top\mathbf{x} + b$$. Under Gaussian noise, OLS minimizes mean squared error.
+> **Linear regression** models $$\mathbb{E}[y\vert \mathbf{x}] = \mathbf{w}^\top\mathbf{x} + b$$. Under Gaussian noise, OLS minimizes mean squared error.
 {:.lead}
 
 Vectorized training loss:
 
-$$L(\mathbf{w}) = \frac{1}{2n}\|\mathbf{X}\mathbf{w} - \mathbf{y}\|_2^2.$$
+$$L(\mathbf{w}) = \frac{1}{2n}\Vert \mathbf{X}\mathbf{w} - \mathbf{y}\Vert _2^2.$$
 
 Gradient descent update with learning rate $$\eta$$:
 
@@ -73,7 +73,7 @@ $$\mathbf{w} \leftarrow \mathbf{w} - \frac{\eta}{n}\mathbf{X}^\top(\mathbf{X}\ma
 
 ### 2.2 Logistic regression
 
-> For binary labels $$y \in \{0,1\}$$, **logistic regression** models $$p(y=1|\mathbf{x}) = \sigma(\mathbf{w}^\top\mathbf{x} + b)$$ where $$\sigma(z) = 1/(1+e^{-z})$$.
+> For binary labels $$y \in \{0,1\}$$, **logistic regression** models $$p(y=1\vert \mathbf{x}) = \sigma(\mathbf{w}^\top\mathbf{x} + b)$$ where $$\sigma(z) = 1/(1+e^{-z})$$.
 {:.lead}
 
 Cross-entropy loss for one example:
@@ -84,7 +84,7 @@ The gradient has the elegant form $$\nabla_{\mathbf{w}} \ell = (\hat{p} - y)\mat
 
 Multiclass **softmax regression** uses
 
-$$p(y=k|\mathbf{x}) = \frac{e^{\mathbf{w}_k^\top \mathbf{x}}}{\sum_j e^{\mathbf{w}_j^\top \mathbf{x}}}.$$
+$$p(y=k\vert \mathbf{x}) = \frac{e^{\mathbf{w}_k^\top \mathbf{x}}}{\sum_j e^{\mathbf{w}_j^\top \mathbf{x}}}.$$
 
 This is the output layer of most classifiers.
 
@@ -103,7 +103,7 @@ For imbalanced data, accuracy is misleading; prefer PR-AUC or balanced metrics.
 
 ![ROC and precision-recall curves](/assets/figures/day02/pdf0_page015.png)
 
-**Bayes optimal classifier** chooses $$\hat{y} = \arg\max_k p(y=k|\mathbf{x})$$, minimizing 0–1 loss. Logistic regression approximates this when the model is well-specified.
+**Bayes optimal classifier** chooses $$\hat{y} = \arg\max_k p(y=k\vert \mathbf{x})$$, minimizing 0–1 loss. Logistic regression approximates this when the model is well-specified.
 
 ### 3.2 Loss functions and surrogates
 
@@ -118,13 +118,13 @@ $$\ell_{\mathrm{hinge}} = \max(0, 1 - y\, f(\mathbf{x})), \quad y \in \{-1,+1\}.
 
 Expected cost under asymmetric misclassification costs $$C_{ij}$$:
 
-$$R = \sum_{i,j} C_{ij}\, p(y=j|\mathbf{x})\, \mathbb{1}[\hat{y}=i].$$
+$$R = \sum_{i,j} C_{ij}\, p(y=j\vert \mathbf{x})\, \mathbf{1}[\hat{y}=i].$$
 
 ## 4. Regularization and Model Selection
 
 ### 4.1 Ridge, Lasso, and elastic net
 
-> **Ridge** ($$\ell_2$$) penalizes $$\lambda\|\mathbf{w}\|_2^2$; **Lasso** ($$\ell_1$$) penalizes $$\lambda\|\mathbf{w}\|_1$ and induces sparsity. **Elastic net** combines both.
+> **Ridge** ($$\ell_2$$) penalizes $$\lambda\Vert \mathbf{w}\Vert _2^2$$; **Lasso** ($$\ell_1$$) penalizes $$\lambda\Vert \mathbf{w}\Vert _1$$ and induces sparsity. **Elastic net** combines both.
 {:.lead}
 
 Ridge closed form (when invertible):
@@ -146,7 +146,7 @@ Average validation score:
 
 $$\mathrm{CV}(\lambda) = \frac{1}{k}\sum_{j=1}^k \hat{R}_{\mathrm{val}}^{(j)}(\lambda).$$
 
-Choose $$\lambda^\* = \arg\min \mathrm{CV}(\lambda)$$, then optionally refit on all training data.
+Choose $$\lambda^* = \arg\min \mathrm{CV}(\lambda)$$, then optionally refit on all training data.
 
 **Nested CV** separates hyperparameter tuning from performance estimation to avoid optimistic bias.
 

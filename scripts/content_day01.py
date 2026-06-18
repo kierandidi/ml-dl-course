@@ -85,8 +85,10 @@ SLIDES = (
                     [
                         "A matrix is a linear map $f: RR^n to RR^m$ written as $y = A x$",
                         "Columns of $A$ show where basis vectors land — geometric action of the map",
+                        "Row picture: each equation a hyperplane; column picture: $b$ in span of columns",
                         "Composition of maps = matrix multiplication: $(A B) x = A (B x)$",
                         "Transpose swaps rows/columns; inverse (when it exists) undoes the map",
+                        "Data lives here too: $n$ examples × $d$ features form $X in RR^(n times d)$",
                     ],
                 ),
                 (
@@ -135,18 +137,21 @@ SLIDES = (
                     "Inner Product & Angles",
                     [
                         "Inner product $langle x, y rangle = x^T y$ (standard dot product)",
-                        "Cauchy–Schwarz: $|langle x,y rangle| <= ||x||_2 ||y||_2$",
-                        "Angle: $cos theta = langle x,y rangle / (||x||_2 ||y||_2)$",
-                        "Orthogonal vectors: $langle x,y rangle = 0$",
+                        "Cauchy–Schwarz: $|langle x,y rangle| <= ||x||_2 ||y||_2$ keeps $cos theta in [-1,1]$",
+                        "Angle: $cos theta = langle x,y rangle / (||x||_2 ||y||_2)$ — this is cosine similarity",
+                        "Example: $(1,0)$ and $(1,1)$ give $cos theta = 1/sqrt(2)$, so $theta = 45 degree$",
+                        "Orthogonal vectors: $langle x,y rangle = 0$ (no shared direction)",
                     ],
                 ),
                 (
                     "Projections",
                     [
-                        "Orthogonal projection of $y$ onto line spanned by $x$: $hat(y) = (x^T y / x^T x) x$",
+                        "Idea: keep the part of $y$ along $x$, discard the orthogonal remainder",
+                        "Derivation: residual $y - hat(y) perp x$ forces $hat(y) = (x^T y / x^T x) x$",
+                        "Example: project $(2,3)$ onto $(1,0)$ gives $(2,0)$; residual $(0,3) perp (1,0)$",
                         "Projection matrix onto column space of $A$: $P = A (A^T A)^(-1) A^T$",
-                        "Least squares: minimize $||A w - y||_2^2$ — project $y$ onto span(columns of $A)$",
-                        "Normal equations: $A^T A w = A^T y$",
+                        "Least squares: minimize $||A w - y||_2^2$ — project $y$ onto span(columns of $A$)",
+                        "Normal equations: $A^T A w = A^T y$ (residual $perp$ every column)",
                     ],
                 ),
             ],
@@ -356,15 +361,26 @@ LECTURE = {
                         "$$\\mathbf{b} \\in \\mathbb{R}^m$$. Each row of $$\\mathbf{A}$$ "
                         "defines one hyperplane; solutions lie at their intersection."
                     ),
-                    "body": """Consider two equations in two unknowns:
+                    "body": """**Why this matters.** Almost everything in machine learning starts here: a dataset of $$n$$ examples with $$d$$ features each is just a matrix $$\\mathbf{X} \\in \\mathbb{R}^{n \\times d}$$, a linear model is a matrix–vector product, and "fitting" the model means solving (or approximately solving) a linear system. Getting fluent with the two pictures below pays off for the rest of the course.
+
+Consider two equations in two unknowns:
 
 $$\\begin{aligned} a_{11} x_1 + a_{12} x_2 &= b_1 \\\\ a_{21} x_1 + a_{22} x_2 &= b_2 \\end{aligned}$$
 
-Stacking coefficients gives $$\\mathbf{A} = \\begin{pmatrix} a_{11} & a_{12} \\\\ a_{21} & a_{22} \\end{pmatrix}$$, so one matrix–vector multiply encodes the entire system. This is the bridge from high-school algebra to the language of machine learning, where a dataset of $$n$$ examples each with $$d$$ features is stored as $$\\mathbf{X} \\in \\mathbb{R}^{n \\times d}$$.
+Stacking the coefficients into a matrix lets one matrix–vector multiply encode the *entire* system:
+
+$$\\underbrace{\\begin{pmatrix} a_{11} & a_{12} \\\\ a_{21} & a_{22} \\end{pmatrix}}_{\\mathbf{A}} \\underbrace{\\begin{pmatrix} x_1 \\\\ x_2 \\end{pmatrix}}_{\\mathbf{x}} = \\underbrace{\\begin{pmatrix} b_1 \\\\ b_2 \\end{pmatrix}}_{\\mathbf{b}}.$$
 
 ![Linear systems and matrix view (MML Fig 2.3)](/assets/figures/day01/mml_linear_system.png)
 
-A matrix is not merely a table of numbers — it is a **linear map** $$f(\\mathbf{x}) = \\mathbf{A}\\mathbf{x}$$. The *column picture* writes $$\\mathbf{b} = x_1 \\mathbf{a}_1 + x_2 \\mathbf{a}_2 + \\cdots$$: $$\\mathbf{b}$$ must lie in the span of the columns. The *row picture* views each equation as a hyperplane.""",
+A matrix is not merely a table of numbers — it is a **linear map** $$f(\\mathbf{x}) = \\mathbf{A}\\mathbf{x}$$. There are two complementary ways to read $$\\mathbf{A}\\mathbf{x} = \\mathbf{b}$$:
+
+- **Row picture.** Each row $$\\mathbf{a}_i^\\top \\mathbf{x} = b_i$$ is one hyperplane; the solution is where all hyperplanes intersect.
+- **Column picture.** Write $$\\mathbf{b} = x_1 \\mathbf{a}_1 + x_2 \\mathbf{a}_2 + \\cdots$$ — we are asking *which combination of the columns reproduces* $$\\mathbf{b}$$. A solution exists iff $$\\mathbf{b}$$ lies in the span of the columns.
+
+**Worked example.** Solve
+$$\\begin{aligned} 2x_1 + x_2 &= 5 \\\\ x_1 - x_2 &= 1 \\end{aligned}$$
+Adding the equations eliminates $$x_2$$: $$3x_1 = 6 \\Rightarrow x_1 = 2$$, then $$x_2 = 5 - 2x_1 = 1$$. In the column picture, $$\\mathbf{b} = (5,1)^\\top = 2\\,(2,1)^\\top + 1\\,(1,-1)^\\top$$ — exactly the columns of $$\\mathbf{A}$$ weighted by the solution. The same elimination, applied systematically, is **Gaussian elimination** / **LU factorization**, the algorithm libraries use under the hood.""",
                 },
                 {
                     "heading": "Vector spaces, basis, and rank",
@@ -374,17 +390,20 @@ A matrix is not merely a table of numbers — it is a **linear map** $$f(\\mathb
                         "linearly independent and spans $$V$$. The **rank** of $$\\mathbf{A}$$ is the "
                         "dimension of its column space."
                     ),
-                    "body": """Key subspaces associated with $$\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$$:
+                    "body": """**Why this matters.** "Dimension", "rank" and "null space" tell you *how much independent information* a matrix carries. A rank-deficient feature matrix means redundant features (collinearity), an unstable least-squares fit, and directions the model simply cannot see. PCA, autoencoders and low-rank adapters (LoRA) all exploit the fact that real data lives near a low-dimensional subspace.
 
-- **Column space** $$\\mathcal{C}(\\mathbf{A}) \\subseteq \\mathbb{R}^m$$: all reachable outputs $$\\mathbf{A}\\mathbf{x}$$.
-- **Null space** $$\\mathcal{N}(\\mathbf{A})$$: all $$\\mathbf{x}$$ with $$\\mathbf{A}\\mathbf{x} = \\mathbf{0}$$.
-- **Row space** and **left null space** (orthogonal complements in the appropriate spaces).
+A set $$\\{\\mathbf{v}_1, \\ldots, \\mathbf{v}_k\\}$$ is **linearly independent** if $$\\sum_i \\alpha_i \\mathbf{v}_i = \\mathbf{0}$$ forces all $$\\alpha_i = 0$$. A **basis** is a linearly independent set that spans the space; its size is the **dimension**. The key subspaces of $$\\mathbf{A} \\in \\mathbb{R}^{m \\times n}$$ are:
 
-The rank–nullity theorem: $$\\mathrm{rank}(\\mathbf{A}) + \\dim \\mathcal{N}(\\mathbf{A}) = n$$.
+- **Column space** $$\\mathcal{C}(\\mathbf{A}) \\subseteq \\mathbb{R}^m$$: all reachable outputs $$\\mathbf{A}\\mathbf{x}$$. Its dimension is the **rank**.
+- **Null space** $$\\mathcal{N}(\\mathbf{A}) \\subseteq \\mathbb{R}^n$$: all $$\\mathbf{x}$$ with $$\\mathbf{A}\\mathbf{x} = \\mathbf{0}$$ — directions the map collapses.
+
+These are tied together by the **rank–nullity theorem**:
+
+$$\\mathrm{rank}(\\mathbf{A}) + \\dim \\mathcal{N}(\\mathbf{A}) = n.$$
 
 ![Vector subspace (MML Fig 2.6)](/assets/figures/day01/mml_subspace.png)
 
-In ML, features live in a high-dimensional space; learning often finds a low-dimensional subspace (PCA, autoencoders) or selects a sparse subset of coordinates (Lasso).""",
+**Worked example.** Take $$\\mathbf{A} = \\begin{pmatrix} 1 & 2 \\\\ 2 & 4 \\end{pmatrix}$$. The second row is twice the first, so there is only **one** independent row: $$\\mathrm{rank}(\\mathbf{A}) = 1$$. By rank–nullity the null space has dimension $$2 - 1 = 1$$; indeed $$\\mathbf{A}(2,-1)^\\top = \\mathbf{0}$$, so $$\\mathcal{N}(\\mathbf{A}) = \\mathrm{span}\\{(2,-1)^\\top\\}$$. Because $$\\mathbf{A}$$ is rank-deficient it is **not invertible** — a warning sign that, as a feature matrix, its columns are collinear.""",
                 },
             ],
         },
@@ -399,15 +418,21 @@ In ML, features live in a high-dimensional space; learning often finds a low-dim
                         "$$\\|\\mathbf{x}\\| = \\sqrt{\\langle \\mathbf{x}, \\mathbf{x} \\rangle}$$. "
                         "For the standard dot product, $$\\|\\mathbf{x}\\|_2 = \\sqrt{\\sum_i x_i^2}$$."
                     ),
-                    "body": """Common norms in machine learning:
+                    "body": """**Why this matters.** A norm is how we measure "how big" an error or weight vector is, and an inner product is how we measure "how aligned" two vectors are. The loss we minimize, the regularizer we add, and the cosine similarity behind retrieval and embeddings are all built from these two objects. Choosing a different norm literally changes the geometry of learning.
+
+Common norms in machine learning:
 
 $$\\|\\mathbf{x}\\|_1 = \\sum_i |x_i|, \\qquad \\|\\mathbf{x}\\|_2 = \\sqrt{\\sum_i x_i^2}, \\qquad \\|\\mathbf{x}\\|_\\infty = \\max_i |x_i|.$$
 
-The **Cauchy–Schwarz inequality** $$|\\langle \\mathbf{x}, \\mathbf{y} \\rangle| \\leq \\|\\mathbf{x}\\|_2 \\|\\mathbf{y}\\|_2$$ lets us define angles between vectors. Two vectors are **orthogonal** when $$\\langle \\mathbf{x}, \\mathbf{y} \\rangle = 0$$.
+The $$\\ell_2$$ norm is rotation-invariant (Euclidean length); the $$\\ell_1$$ norm has a "diamond" unit ball whose corners sit on the axes, which is *why* $$\\ell_1$$ regularization produces sparse solutions (Day 2). The inner product induces the $$\\ell_2$$ norm via $$\\|\\mathbf{x}\\|_2 = \\sqrt{\\langle \\mathbf{x},\\mathbf{x}\\rangle}$$.
+
+The **Cauchy–Schwarz inequality** $$|\\langle \\mathbf{x}, \\mathbf{y} \\rangle| \\leq \\|\\mathbf{x}\\|_2 \\|\\mathbf{y}\\|_2$$ guarantees the ratio below lands in $$[-1,1]$$, so it can define an **angle**:
+
+$$\\cos\\theta = \\frac{\\langle \\mathbf{x}, \\mathbf{y}\\rangle}{\\|\\mathbf{x}\\|_2\\,\\|\\mathbf{y}\\|_2}, \\qquad \\text{orthogonal} \\iff \\langle \\mathbf{x}, \\mathbf{y}\\rangle = 0.$$
 
 ![Angle between vectors (MML Fig 3.6)](/assets/figures/day01/mml_angle.png)
 
-Why this matters: if two input vectors are close under a chosen norm, we want our predictor to produce similar outputs — a geometric inductive bias.""",
+**Worked example.** For $$\\mathbf{x} = (1,0)^\\top$$ and $$\\mathbf{y} = (1,1)^\\top$$: $$\\langle \\mathbf{x},\\mathbf{y}\\rangle = 1$$, $$\\|\\mathbf{x}\\|_2 = 1$$, $$\\|\\mathbf{y}\\|_2 = \\sqrt{2}$$, so $$\\cos\\theta = 1/\\sqrt{2}$$ and $$\\theta = 45^\\circ$$. This is exactly the "cosine similarity" used to compare text/image embeddings — it ignores magnitude and measures direction.""",
                 },
                 {
                     "heading": "Projections and least squares",
@@ -417,13 +442,25 @@ Why this matters: if two input vectors are close under a chosen norm, we want ou
                         "More generally, projecting onto $$\\mathcal{C}(\\mathbf{A})$$ uses "
                         "$$\\mathbf{P} = \\mathbf{A}(\\mathbf{A}^\\top \\mathbf{A})^{-1}\\mathbf{A}^\\top$$."
                     ),
-                    "body": """**Ordinary least squares** minimizes $$\\|\\mathbf{A}\\mathbf{w} - \\mathbf{y}\\|_2^2$$. Geometrically, $$\\hat{\\mathbf{y}} = \\mathbf{A}\\hat{\\mathbf{w}}$$ is the projection of $$\\mathbf{y}$$ onto the column space of $$\\mathbf{A}$$. Setting the gradient to zero yields the **normal equations**:
+                    "body": """**Why this matters.** Projection is the geometric heart of regression, PCA, and the "subtract the part you can already explain" trick that appears everywhere (Gram–Schmidt, residuals, Krylov solvers). If you understand one worked projection, ordinary least squares becomes obvious.
 
-$$\\mathbf{A}^\\top \\mathbf{A} \\hat{\\mathbf{w}} = \\mathbf{A}^\\top \\mathbf{y}.$$
+**Deriving the projection onto a line.** We want the multiple $$\\alpha\\mathbf{x}$$ of $$\\mathbf{x}$$ closest to $$\\mathbf{y}$$. The residual $$\\mathbf{y} - \\alpha\\mathbf{x}$$ must be **orthogonal** to $$\\mathbf{x}$$:
+
+$$\\langle \\mathbf{y} - \\alpha\\mathbf{x}, \\mathbf{x}\\rangle = 0 \\;\\Longrightarrow\\; \\alpha = \\frac{\\mathbf{x}^\\top \\mathbf{y}}{\\mathbf{x}^\\top \\mathbf{x}}, \\qquad \\hat{\\mathbf{y}} = \\frac{\\mathbf{x}^\\top \\mathbf{y}}{\\mathbf{x}^\\top \\mathbf{x}}\\,\\mathbf{x}.$$
+
+**Worked example (compute a projection).** Project $$\\mathbf{y} = (2,3)^\\top$$ onto $$\\mathbf{x} = (1,0)^\\top$$:
+
+$$\\alpha = \\frac{\\mathbf{x}^\\top\\mathbf{y}}{\\mathbf{x}^\\top\\mathbf{x}} = \\frac{2}{1} = 2, \\qquad \\hat{\\mathbf{y}} = 2\\,(1,0)^\\top = (2,0)^\\top.$$
+
+The residual $$\\mathbf{y} - \\hat{\\mathbf{y}} = (0,3)^\\top$$ is indeed orthogonal to $$\\mathbf{x}$$ — we kept the component of $$\\mathbf{y}$$ along $$\\mathbf{x}$$ and discarded the rest.
 
 ![Projection onto a subspace (MML Fig 3.11)](/assets/figures/day01/mml_projection.png)
 
-This connects linear algebra (Day 1) directly to regression (Day 2): fitting a linear model is projecting labels onto the span of features.""",
+**From a line to a subspace.** Projecting onto the column space of $$\\mathbf{A}$$ uses $$\\mathbf{P} = \\mathbf{A}(\\mathbf{A}^\\top \\mathbf{A})^{-1}\\mathbf{A}^\\top$$. **Ordinary least squares** minimizes $$\\|\\mathbf{A}\\mathbf{w} - \\mathbf{y}\\|_2^2$$; the same orthogonality condition ("residual $$\\perp$$ every column") gives the **normal equations**
+
+$$\\mathbf{A}^\\top \\mathbf{A} \\hat{\\mathbf{w}} = \\mathbf{A}^\\top \\mathbf{y}, \\qquad \\hat{\\mathbf{y}} = \\mathbf{A}\\hat{\\mathbf{w}} = \\mathbf{P}\\mathbf{y}.$$
+
+So fitting a linear model *is* projecting the labels onto the span of the features — the bridge from linear algebra (Day 1) to regression (Day 2).""",
                 },
             ],
         },
@@ -439,17 +476,23 @@ This connects linear algebra (Day 1) directly to regression (Day 2): fitting a l
                         "**Jacobian** $$\\mathbf{J} \\in \\mathbb{R}^{m \\times n}$$ has entries "
                         "$$J_{ij} = \\partial f_i / \\partial x_j$$."
                     ),
-                    "body": """Useful identities (memorize these):
+                    "body": """**Why this matters.** Training is optimization, and optimization runs on gradients. Every parameter update — SGD, Adam, the backward pass of a transformer — is the multivariate chain rule applied at scale. The handful of identities below let you derive closed-form solutions and sanity-check autodiff.
+
+Useful identities (worth memorizing):
 
 $$\\nabla_{\\mathbf{x}} (\\mathbf{a}^\\top \\mathbf{x}) = \\mathbf{a}, \\qquad \\nabla_{\\mathbf{x}} (\\mathbf{x}^\\top \\mathbf{A} \\mathbf{x}) = (\\mathbf{A} + \\mathbf{A}^\\top)\\mathbf{x}.$$
 
-For a quadratic loss $$L(\\mathbf{w}) = \\|\\mathbf{X}\\mathbf{w} - \\mathbf{y}\\|_2^2$$,
+**Derivation for least squares.** Expand $$L(\\mathbf{w}) = \\|\\mathbf{X}\\mathbf{w} - \\mathbf{y}\\|_2^2 = \\mathbf{w}^\\top\\mathbf{X}^\\top\\mathbf{X}\\mathbf{w} - 2\\mathbf{y}^\\top\\mathbf{X}\\mathbf{w} + \\mathbf{y}^\\top\\mathbf{y}$$. Applying the two identities term by term,
 
-$$\\nabla_{\\mathbf{w}} L = 2\\mathbf{X}^\\top(\\mathbf{X}\\mathbf{w} - \\mathbf{y}).$$
+$$\\nabla_{\\mathbf{w}} L = \\underbrace{2\\mathbf{X}^\\top\\mathbf{X}\\mathbf{w}}_{\\text{from } \\mathbf{w}^\\top\\mathbf{X}^\\top\\mathbf{X}\\mathbf{w}} - \\underbrace{2\\mathbf{X}^\\top\\mathbf{y}}_{\\text{from } -2\\mathbf{y}^\\top\\mathbf{X}\\mathbf{w}} = 2\\mathbf{X}^\\top(\\mathbf{X}\\mathbf{w} - \\mathbf{y}).$$
+
+Setting this to $$\\mathbf{0}$$ recovers the normal equations from the previous section — calculus and geometry agree.
 
 ![Gradient as the slope of a secant (MML Fig 5.3)](/assets/figures/day01/mml_gradient.png)
 
-The multivariate **chain rule** propagates sensitivities through composed functions — the mathematical content of backpropagation (Section 4).""",
+**Chain rule = backprop.** For $$\\mathbf{f}: \\mathbb{R}^n \\to \\mathbb{R}^m$$ the **Jacobian** $$\\mathbf{J}$$ has $$J_{ij} = \\partial f_i/\\partial x_j$$, and for a composition $$g \\circ \\mathbf{f}$$,
+$$\\nabla_{\\mathbf{x}} (g\\circ \\mathbf{f}) = \\mathbf{J}_{\\mathbf{f}}^\\top\\, \\nabla g.$$
+Reverse-mode autodiff just multiplies these Jacobian-transposes from the loss backward — the content of Section 4 and Day 3.""",
                 },
                 {
                     "heading": "Eigendecomposition and SVD",
@@ -460,13 +503,17 @@ The multivariate **chain rule** propagates sensitivities through composed functi
                         "The **SVD** is $$\\mathbf{A} = \\mathbf{U}\\boldsymbol{\\Sigma}\\mathbf{V}^\\top$$ "
                         "— always exists."
                     ),
-                    "body": """The SVD reveals the action of $$\\mathbf{A}$$ as rotate–scale–rotate. Truncating to the top-$$k$$ singular values gives the best rank-$$k$$ approximation (Eckart–Young).
+                    "body": """**Why this matters.** Decompositions turn an opaque matrix into interpretable pieces: principal axes (PCA), compression (low-rank approximation), conditioning (numerical stability), and the curvature of loss landscapes (Hessian eigenvalues). They are the workhorse behind dimensionality reduction and many "why did training blow up?" diagnoses.
 
-**PCA** finds orthogonal directions of maximum variance: eigenvectors of the covariance matrix $$\\mathbf{C} = \\frac{1}{n}\\mathbf{X}^\\top \\mathbf{X}$$ (after centering).
+**Eigen-intuition.** $$\\mathbf{A}\\mathbf{v} = \\lambda\\mathbf{v}$$ says $$\\mathbf{v}$$ is a direction the map only *stretches* (by $$\\lambda$$), not rotates. For symmetric $$\\mathbf{A}$$ the spectral theorem gives orthonormal eigenvectors, $$\\mathbf{A} = \\mathbf{Q}\\boldsymbol{\\Lambda}\\mathbf{Q}^\\top$$ — the principal axes of the quadratic form $$\\mathbf{x}^\\top\\mathbf{A}\\mathbf{x}$$.
+
+**Worked example.** For $$\\mathbf{A} = \\begin{pmatrix} 2 & 0 \\\\ 0 & 3 \\end{pmatrix}$$ the eigenpairs are $$(\\lambda_1=2,\\,\\mathbf{e}_1)$$ and $$(\\lambda_2=3,\\,\\mathbf{e}_2)$$: the unit circle maps to an ellipse with semi-axes $$2$$ and $$3$$. The **condition number** $$\\kappa = \\lambda_{\\max}/\\lambda_{\\min} = 3/2$$ controls how much errors are amplified when solving $$\\mathbf{A}\\mathbf{x}=\\mathbf{b}$$.
+
+The **SVD** $$\\mathbf{A} = \\mathbf{U}\\boldsymbol{\\Sigma}\\mathbf{V}^\\top$$ always exists and reads as *rotate ($$\\mathbf{V}^\\top$$) → scale ($$\\boldsymbol{\\Sigma}$$) → rotate ($$\\mathbf{U}$$)*. Truncating to the top-$$k$$ singular values gives the best rank-$$k$$ approximation (**Eckart–Young**) — the math behind image/embedding compression.
 
 ![SVD geometry (MML Fig 4.9)](/assets/figures/day01/mml_svd.png)
 
-Eigenvalues of the Hessian at a critical point classify it as minimum, maximum, or saddle — relevant for understanding neural network loss landscapes.""",
+**PCA** is SVD applied to centered data: the principal directions are eigenvectors of the covariance $$\\mathbf{C} = \\frac{1}{n}\\mathbf{X}^\\top \\mathbf{X}$$, and the eigenvalues are the variance captured along each axis. At a critical point of a loss, the sign pattern of the Hessian's eigenvalues classifies it as a minimum, maximum, or **saddle** — the dominant feature of high-dimensional neural loss landscapes.""",
                 },
             ],
         },
@@ -481,11 +528,15 @@ Eigenvalues of the Hessian at a critical point classify it as minimum, maximum, 
                         "or **Monte Carlo** (high dimension): "
                         "$$\\mathbb{E}[f(X)] \\approx \\frac{1}{N}\\sum_{i=1}^N f(\\mathbf{x}^{(i)}).$$"
                     ),
-                    "body": """The NeurIPS 2020 tutorial [*There and Back Again: A Tale of Slopes and Expectations*](https://mml-book.github.io/slopes-expectations.html) treats integration and differentiation as two directions on the same map — expectations require integration; learning requires differentiation.
+                    "body": """**Why this matters.** A huge fraction of ML quantities are integrals in disguise: a marginal likelihood $$p(\\mathbf{x}) = \\int p(\\mathbf{x}\\mid\\mathbf{z})p(\\mathbf{z})\\,d\\mathbf{z}$$, an expected reward, the normalizing constant of a posterior. The NeurIPS 2020 tutorial [*There and Back Again: A Tale of Slopes and Expectations*](https://mml-book.github.io/slopes-expectations.html) frames integration and differentiation as two directions on the same map — expectations require integration; learning requires differentiation.
 
 ![Slopes and expectations map](/assets/figures/day01/slopes_map.jpg)
 
-**Deterministic methods** (trapezoidal rule, Simpson's rule, Gauss–Hermite quadrature) excel in low dimensions. **Monte Carlo** error scales as $$O(1/\\sqrt{N})$$ independently of dimension — crucial for Bayesian marginalization and variational objectives.
+**Deterministic quadrature** approximates $$\\int_a^b f(x)\\,dx$$ by a weighted sum of evaluations. The trapezoidal rule on $$N$$ points has error $$O(N^{-2})$$ in **1D**, but a tensor grid needs $$N^d$$ points in $$d$$ dimensions — the **curse of dimensionality**.
+
+**Monte Carlo** sidesteps this. With $$\\mathbf{x}^{(i)} \\sim p$$,
+$$\\mathbb{E}_p[f] \\approx \\hat\\mu_N = \\frac{1}{N}\\sum_{i=1}^N f(\\mathbf{x}^{(i)}), \\qquad \\mathrm{Var}(\\hat\\mu_N) = \\frac{\\mathrm{Var}(f)}{N}.$$
+So the standard error is $$O(1/\\sqrt{N})$$ **regardless of dimension** — the reason MC dominates high-dimensional Bayesian and variational computation. **Importance sampling** reweights samples from an easier proposal $$q$$: $$\\mathbb{E}_p[f] = \\mathbb{E}_q[f\\,p/q]$$.
 
 ![Unscented transform / sigma points (Modern Integration Methods, Fig 8)](/assets/figures/day01/integ_unscented.png)
 
@@ -499,15 +550,22 @@ See also the MML supplementary chapter [*Modern Integration Methods in ML*](http
                         "through the computational graph — cost $$O(\\text{ops})$$, not $$O(|\\boldsymbol{\\theta}|)$$ "
                         "times forward cost."
                     ),
-                    "body": """**Forward mode** propagates directional derivatives; **reverse mode** (backprop) is preferred when there is one scalar output and many parameters.
+                    "body": """**Why this matters.** Autodiff is what makes deep learning practical: you write the forward computation, and the framework returns exact gradients for millions of parameters at the cost of roughly one extra forward pass. Knowing *which* mode to use, and how to differentiate through solvers and samplers, is what separates "it trains" from "it trains efficiently".
 
-When outputs are defined implicitly by $$F(\\mathbf{x}, \\boldsymbol{\\theta}) = \\mathbf{0}$$, the **implicit function theorem** gives
+**Two modes.** For $$\\mathbf{f}: \\mathbb{R}^n \\to \\mathbb{R}^m$$ built from elementary ops with local Jacobians:
+
+- **Forward mode** pushes a direction forward, costing one pass per *input* — good when $$n \\ll m$$.
+- **Reverse mode (backprop)** pulls the gradient back from the output, costing one pass per *output* — ideal for ML where $$m=1$$ (a scalar loss) and $$n = |\\boldsymbol{\\theta}|$$ is huge.
+
+**Tiny worked example.** Let $$y = \\sin(w x)$$ with the graph $$u = wx \\to y=\\sin u$$. Reverse mode seeds $$\\bar y = 1$$, then $$\\bar u = \\cos u$$, then $$\\bar w = \\bar u\\, x = x\\cos(wx)$$ — exactly $$\\partial y/\\partial w$$, obtained by multiplying local derivatives along the path. Frameworks implement these as **vector–Jacobian products**, never forming full Jacobians.
+
+**Differentiating through a solver.** When the output is defined *implicitly* by $$F(\\mathbf{x}, \\boldsymbol{\\theta}) = \\mathbf{0}$$, the **implicit function theorem** avoids unrolling:
 
 $$\\frac{\\partial \\mathbf{x}}{\\partial \\boldsymbol{\\theta}} = -\\left(\\frac{\\partial F}{\\partial \\mathbf{x}}\\right)^{-1} \\frac{\\partial F}{\\partial \\boldsymbol{\\theta}}.$$
 
-The **method of adjoints** and **Lagrange multipliers** extend this to ODE-constrained and constrained optimization problems.
+The **method of adjoints** (and Lagrange multipliers) applies the same idea to ODE-/constraint-defined objectives — the backbone of neural ODEs.
 
-**Stochastic gradient estimators** (REINFORCE score-function estimator, reparameterization $$\\nabla \\mathbb{E}[f(\\mathbf{z})]$$ via $$\\mathbf{z} = g(\\boldsymbol{\\epsilon}, \\boldsymbol{\\theta})$$) let us differentiate through expectations — central to VAEs and policy gradients.
+**Differentiating through randomness.** To get $$\\nabla_{\\boldsymbol\\theta}\\mathbb{E}[f(\\mathbf{z})]$$ we use either the **score-function/REINFORCE** estimator $$\\mathbb{E}[f(\\mathbf{z})\\,\\nabla_{\\boldsymbol\\theta}\\log p_{\\boldsymbol\\theta}(\\mathbf{z})]$$, or the lower-variance **reparameterization** $$\\mathbf{z} = g(\\boldsymbol{\\epsilon}, \\boldsymbol{\\theta})$$ with $$\\boldsymbol\\epsilon$$ noise — central to VAEs (Day 6) and policy gradients.
 
 ![Monte Carlo samples across a sequence of distributions (Modern Integration Methods, Fig 6)](/assets/figures/day01/integ_samples.png)""",
                 },
@@ -526,15 +584,23 @@ The **method of adjoints** and **Lagrange multipliers** extend this to ODE-const
                         "$$p(\\mathbf{x}) \\propto \\exp\\big(-\\tfrac{1}{2}(\\mathbf{x}-\\boldsymbol{\\mu})^\\top "
                         "\\boldsymbol{\\Sigma}^{-1}(\\mathbf{x}-\\boldsymbol{\\mu})\\big)$$."
                     ),
-                    "body": """Key Gaussian closure properties:
+                    "body": """**Why this matters.** The Gaussian is the single most important distribution in ML: it is the noise model in least squares, the prior/posterior in linear-Gaussian models, the latent prior in VAEs, and the noise injected at every step of a diffusion model. Its closure properties make otherwise-intractable computations exact.
 
-- Affine transform: $$\\mathbf{A}\\mathbf{x} + \\mathbf{b} \\sim \\mathcal{N}(\\mathbf{A}\\boldsymbol{\\mu} + \\mathbf{b}, \\mathbf{A}\\boldsymbol{\\Sigma}\\mathbf{A}^\\top)$$.
-- Marginals and conditionals of joint Gaussians are Gaussian.
-- Sum of independent Gaussians is Gaussian.
+A continuous random vector has mean $$\\mathbb{E}[\\mathbf{x}] = \\int \\mathbf{x}\\,p(\\mathbf{x})\\,d\\mathbf{x}$$ and covariance $$\\boldsymbol\\Sigma = \\mathbb{E}[(\\mathbf{x}-\\boldsymbol\\mu)(\\mathbf{x}-\\boldsymbol\\mu)^\\top]$$. The multivariate Gaussian density is
+
+$$\\mathcal{N}(\\mathbf{x};\\boldsymbol\\mu,\\boldsymbol\\Sigma) = (2\\pi)^{-d/2}\\,|\\boldsymbol\\Sigma|^{-1/2}\\exp\\!\\Big(-\\tfrac{1}{2}(\\mathbf{x}-\\boldsymbol\\mu)^\\top\\boldsymbol\\Sigma^{-1}(\\mathbf{x}-\\boldsymbol\\mu)\\Big).$$
+
+Key **closure** properties (each keeps you inside the Gaussian family):
+
+- **Affine maps:** $$\\mathbf{A}\\mathbf{x} + \\mathbf{b} \\sim \\mathcal{N}(\\mathbf{A}\\boldsymbol{\\mu} + \\mathbf{b},\\, \\mathbf{A}\\boldsymbol{\\Sigma}\\mathbf{A}^\\top)$$.
+- **Marginals and conditionals** of a joint Gaussian are Gaussian.
+- **Sums** of independent Gaussians are Gaussian.
+
+**Worked example (the diffusion forward step).** If $$\\mathbf{x}_0$$ is data and $$\\boldsymbol\\epsilon \\sim \\mathcal{N}(\\mathbf{0},\\mathbf{I})$$, then $$\\mathbf{x}_t = \\sqrt{\\bar\\alpha_t}\\,\\mathbf{x}_0 + \\sqrt{1-\\bar\\alpha_t}\\,\\boldsymbol\\epsilon$$ is an affine map of a Gaussian, so $$\\mathbf{x}_t \\mid \\mathbf{x}_0 \\sim \\mathcal{N}(\\sqrt{\\bar\\alpha_t}\\,\\mathbf{x}_0,\\,(1-\\bar\\alpha_t)\\mathbf{I})$$ in closed form — this is exactly the trick that makes diffusion training cheap (Day 6).
 
 ![Gaussian distribution (MML Fig 6.7)](/assets/figures/day01/mml_gaussian.png)
 
-The Gaussian is the maximum-entropy distribution with fixed mean and covariance — and the limiting distribution of sums (CLT).""",
+The Gaussian is also the **maximum-entropy** distribution with fixed mean and covariance, and the limiting distribution of normalized sums (**CLT**) — two reasons it shows up "by default".""",
                 },
                 {
                     "heading": "Conjugacy, change of variables, Jensen, and KL",
@@ -544,15 +610,24 @@ The Gaussian is the maximum-entropy distribution with fixed mean and covariance 
                         "$$p_Y(\\mathbf{y}) = p_X(g^{-1}(\\mathbf{y}))\\,|\\det \\mathbf{J}_{g^{-1}}(\\mathbf{y})|$$. "
                         "**Jensen's inequality**: $$f(\\mathbb{E}[X]) \\leq \\mathbb{E}[f(X)]$$ for convex $$f$$."
                     ),
-                    "body": """**Conjugate pairs** (Beta–Bernoulli, Normal–Normal, Dirichlet–Multinomial) give closed-form Bayesian updates — useful for pedagogy and some models.
+                    "body": """**Why this matters.** These four ideas are the toolkit of probabilistic ML: conjugacy gives closed-form Bayesian updates, change-of-variables powers normalizing flows, Jensen's inequality produces the ELBO, and KL divergence is the loss that trains VAEs and diffusion models.
 
-**Inverse transform sampling**: if $$U \\sim \\mathrm{Uniform}(0,1)$$, then $$X = F^{-1}(U)$$ has CDF $$F$$. Normalizing flows compose invertible maps with tractable Jacobians.
+**Conjugate pairs** (Beta–Bernoulli, Normal–Normal, Dirichlet–Multinomial) keep the posterior in the prior's family. For example, with a $$\\mathrm{Beta}(a,b)$$ prior and $$k$$ successes in $$n$$ Bernoulli trials, the posterior is simply $$\\mathrm{Beta}(a+k,\\,b+n-k)$$ — updating beliefs is just adding counts.
 
-**KL divergence** $$D_{\\mathrm{KL}}(q\\|p) = \\mathbb{E}_{\\mathbf{x}\\sim q}[\\log q(\\mathbf{x}) - \\log p(\\mathbf{x})] \\geq 0$$ measures how many extra nats are needed to encode samples from $$q$$ using a code optimized for $$p$$. It is not symmetric.
+**Change of variables.** Under a smooth bijection $$\\mathbf{y} = g(\\mathbf{x})$$, densities transform by the Jacobian:
+$$p_Y(\\mathbf{y}) = p_X(g^{-1}(\\mathbf{y}))\\,\\big|\\det \\mathbf{J}_{g^{-1}}(\\mathbf{y})\\big|.$$
+The special 1D case gives **inverse transform sampling**: if $$U \\sim \\mathrm{Uniform}(0,1)$$ then $$X = F^{-1}(U)$$ has CDF $$F$$. Normalizing flows stack many invertible maps with tractable Jacobians (Day 7).
 
-Jensen's inequality underlies the **evidence lower bound (ELBO)** in variational inference:
+**KL divergence** measures the cost (in nats) of using $$p$$ to encode samples from $$q$$:
+$$D_{\\mathrm{KL}}(q\\,\\|\\,p) = \\mathbb{E}_{\\mathbf{x}\\sim q}\\!\\big[\\log q(\\mathbf{x}) - \\log p(\\mathbf{x})\\big] \\geq 0,$$
+with equality iff $$q=p$$ (a direct consequence of **Jensen's inequality** applied to the convex $$-\\log$$). It is **not symmetric**: forward KL is mode-covering, reverse KL is mode-seeking.
 
-$$\\log p(\\mathbf{x}) \\geq \\mathbb{E}_{q(\\mathbf{z})}[\\log p(\\mathbf{x}|\\mathbf{z})] - D_{\\mathrm{KL}}(q(\\mathbf{z})\\|p(\\mathbf{z})).$$
+**Worked example (Gaussian KL).** For two 1D Gaussians,
+$$D_{\\mathrm{KL}}\\big(\\mathcal{N}(\\mu_1,\\sigma_1^2)\\,\\|\\,\\mathcal{N}(\\mu_2,\\sigma_2^2)\\big) = \\log\\frac{\\sigma_2}{\\sigma_1} + \\frac{\\sigma_1^2 + (\\mu_1-\\mu_2)^2}{2\\sigma_2^2} - \\frac12.$$
+Against a standard normal ($$\\mu_2=0,\\sigma_2=1$$) this reduces to $$\\tfrac12(\\sigma_1^2 + \\mu_1^2 - 1 - \\log\\sigma_1^2)$$ — the exact KL term in the VAE objective.
+
+Finally, Jensen's inequality yields the **evidence lower bound (ELBO)**:
+$$\\log p(\\mathbf{x}) \\geq \\mathbb{E}_{q(\\mathbf{z})}[\\log p(\\mathbf{x}\\mid\\mathbf{z})] - D_{\\mathrm{KL}}(q(\\mathbf{z})\\,\\|\\,p(\\mathbf{z})).$$
 
 ![Conjugate prior example (MML Fig 6.11)](/assets/figures/day01/mml_conjugate.png)""",
                 },
@@ -569,20 +644,28 @@ $$\\log p(\\mathbf{x}) \\geq \\mathbb{E}_{q(\\mathbf{z})}[\\log p(\\mathbf{x}|\\
                         "The **vector field** $$\\mathbf{v}$$ assigns a velocity at each point; "
                         "**trajectories** are integral curves following that field."
                     ),
-                    "body": """Two equivalent views:
+                    "body": """**Why this matters.** Continuous-time dynamics are the modern language of generative modeling: neural ODEs, probability-flow ODEs, and the deterministic samplers of diffusion/flow models are all "integrate a learned vector field". The numerical solvers below are *literally* the samplers you will run in Week 2.
 
-1. **Trajectory**: a curve $$\\mathbf{x}(t)$$ through state space.
-2. **Vector field**: an arrow $$\\mathbf{v}(\\mathbf{x}, t)$$ at every point.
+Two equivalent views of $$\\dot{\\mathbf{x}}(t) = \\mathbf{v}(\\mathbf{x}(t), t)$$:
 
-For linear $$\\dot{x} = ax$$, the solution is $$x(t) = e^{at} x(0)$$ — the **exponential integrator** idea generalizes to matrix systems $$\\dot{\\mathbf{x}} = \\mathbf{A}\\mathbf{x}$$.
+1. **Trajectory** — a single curve $$\\mathbf{x}(t)$$ threading through state space.
+2. **Vector field** — an arrow $$\\mathbf{v}(\\mathbf{x},t)$$ at *every* point; trajectories are its integral curves.
 
-**Numerical solvers** discretize time with step $$h$$:
+**Exact solution by integrating factor.** For the scalar linear ODE $$\\dot x = a x$$, rewrite as $$\\dot x - a x = 0$$ and multiply by $$e^{-at}$$:
+$$\\tfrac{d}{dt}\\big(e^{-at}x\\big) = e^{-at}(\\dot x - a x) = 0 \\;\\Rightarrow\\; e^{-at}x = \\text{const} \\;\\Rightarrow\\; x(t) = e^{at}x(0).$$
+The same **matrix exponential** $$\\mathbf{x}(t) = e^{\\mathbf{A}t}\\mathbf{x}(0)$$ solves $$\\dot{\\mathbf{x}} = \\mathbf{A}\\mathbf{x}$$; the sign of $$a$$ (or the real parts of the eigenvalues of $$\\mathbf{A}$$) decides stability. Existence and uniqueness hold whenever $$\\mathbf{v}$$ is **Lipschitz** (Picard–Lindelöf).
+
+**Numerical solvers** discretize time with step $$h$$ — trading accuracy for function evaluations:
 
 | Method | Update | Local error |
 |--------|--------|-------------|
-| Euler | $$\\mathbf{x}_{n+1} = \\mathbf{x}_n + h\\,\\mathbf{v}(\\mathbf{x}_n, t_n)$$ | $$O(h)$$ |
-| Heun (RK2) | predictor–corrector average | $$O(h^2)$$ |
-| RK4 | four weighted slope evaluations | $$O(h^4)$$ |
+| Euler | $$\\mathbf{x}_{n+1} = \\mathbf{x}_n + h\\,\\mathbf{v}(\\mathbf{x}_n, t_n)$$ | $$O(h^2)$$ |
+| Heun (RK2) | predictor $$\\tilde{\\mathbf{x}} = \\mathbf{x}_n + h\\mathbf{v}_n$$, then average $$\\tfrac{h}{2}(\\mathbf{v}_n + \\mathbf{v}(\\tilde{\\mathbf{x}}, t_{n+1}))$$ | $$O(h^3)$$ |
+| RK4 | weighted average of four slope evaluations | $$O(h^5)$$ |
+
+(The orders above are *local* per-step errors; the *global* errors are one power of $$h$$ lower, i.e. Euler is first-order overall.)
+
+**Worked Euler step.** For $$\\dot x = x$$, $$x(0)=1$$, $$h=0.5$$: one Euler step gives $$x_1 = 1 + 0.5\\cdot 1 = 1.5$$, versus the exact $$e^{0.5}\\approx 1.649$$. Halving $$h$$ roughly halves the error — the hallmark of a first-order method.
 
 ![ODE Figure A.1 — left: step-by-step solver updates; right: exact trajectories flowing along the velocity field](/assets/figures/day01/ode_vectorfield.png)
 
@@ -596,15 +679,19 @@ Source: *Diffusion Book* Appendix A (crash course on differential equations), fr
                         "where $$\\mathbf{W}_t$$ is Brownian motion. "
                         "**Itô's lemma** governs calculus with $$dW_t^2 = dt$$."
                     ),
-                    "body": """SDEs model systems with intrinsic randomness — and the forward process in diffusion models.
+                    "body": """**Why this matters.** The *forward* (noising) process of a diffusion model is an SDE, and the *reverse* (generation) process is another SDE driven by the learned score. Understanding the Euler–Maruyama step here is understanding the diffusion sampler you will implement in Week 2.
 
-**Euler–Maruyama** discretization:
+An SDE adds a noise term to an ODE: $$d\\mathbf{X}_t = \\underbrace{\\mathbf{f}(\\mathbf{X}_t,t)\\,dt}_{\\text{drift}} + \\underbrace{\\mathbf{g}(\\mathbf{X}_t,t)\\,d\\mathbf{W}_t}_{\\text{diffusion}}$$, where $$\\mathbf{W}_t$$ is **Brownian motion**: independent Gaussian increments with $$\\mathbf{W}_{t+h}-\\mathbf{W}_t \\sim \\mathcal{N}(\\mathbf{0},h\\mathbf{I})$$.
+
+**Why the $$\\sqrt{h}$$ appears.** Because the increment has variance $$h$$, its *standard deviation* scales like $$\\sqrt{h}$$, not $$h$$. This is the defining feature of stochastic calculus and the reason **Itô's lemma** keeps the second-order term: $$dW_t^2 = dt$$.
+
+**Euler–Maruyama** discretization (the SDE analogue of Euler):
 
 $$\\mathbf{X}_{n+1} = \\mathbf{X}_n + h\\,\\mathbf{f}(\\mathbf{X}_n, t_n) + \\sqrt{h}\\,\\mathbf{g}(\\mathbf{X}_n, t_n)\\,\\boldsymbol{\\xi}_n, \\qquad \\boldsymbol{\\xi}_n \\sim \\mathcal{N}(\\mathbf{0}, \\mathbf{I}).$$
 
-Higher-order schemes (Milstein) improve strong convergence when diffusion matters.
+**Worked example (Ornstein–Uhlenbeck).** For $$dX_t = -X_t\\,dt + dW_t$$ with $$X_0=0$$, $$h=0.1$$: one step draws $$\\xi_0\\sim\\mathcal{N}(0,1)$$ and sets $$X_1 = 0 + 0.1\\cdot(-0) + \\sqrt{0.1}\\,\\xi_0 = 0.316\\,\\xi_0$$. Repeating, the process relaxes toward its stationary $$\\mathcal{N}(0,\\tfrac12)$$ — a mean-reverting noise process, exactly the structure of the variance-preserving diffusion forward SDE.
 
-In Week 2 we will connect these solvers directly to sampling from diffusion and flow models.""",
+Higher-order schemes (Milstein) improve strong convergence when the diffusion term varies with state. In Week 2 we connect these solvers directly to sampling from diffusion and flow models (Days 6–8).""",
                 },
             ],
         },

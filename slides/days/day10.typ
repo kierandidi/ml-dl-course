@@ -17,171 +17,147 @@
 - Efficient Attention
 - Serving & Systems
 
-= Text Generation Loop
+= 1 · Text Generation Loop
 
-== Autoregressive Decoding
+== 1.1  Autoregressive Decoding
 
 - Start from prompt tokens
 - Repeat: forward pass → logits → sample/argmax → append
 - Stop at EOS or max length
 
-== Autoregressive Decoding — illustration
+== 1.1  Autoregressive Decoding
 
-#align(center)[#image("/assets/figures/day10/pdf0_page000.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page000.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Text Generation Loop — Autoregressive Decoding (source: course materials)]
-
-== Greedy & Beam Search
+== 1.2  Greedy & Beam Search
 
 - Greedy: $x_t = "arg max" p(x_t|x_(<t))$
 - Beam search keeps top-$k$ partial sequences
 - Deterministic but often dull
 
-== Greedy & Beam Search — illustration
+== 1.2  Greedy & Beam Search
 
-#align(center)[#image("/assets/figures/day10/pdf0_page002.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page002.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Text Generation Loop — Greedy & Beam Search (source: course materials)]
-
-== Sampling Methods
+== 1.3  Sampling Methods
 
 - Temperature $tau$: soften $"softmax"("logits"/tau)$
 - Top-$k$ and nucleus (top-$p$) filtering
 - Repetition penalty
 
-== Sampling Methods — illustration
+== 1.3  Sampling Methods
 
-#align(center)[#image("/assets/figures/day10/pdf0_page004.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page004.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Text Generation Loop — Sampling Methods (source: course materials)]
-
-== Latency Metrics
+== 1.4  Latency Metrics
 
 - Time to first token (TTFT)
 - Tokens per second (TPS)
 - Prefill vs decode phases
 
-== Latency Metrics — illustration
+== 1.4  Latency Metrics
 
-#align(center)[#image("/assets/figures/day10/pdf0_page005.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page005.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Text Generation Loop — Latency Metrics (source: course materials)]
+= 2 · KV Cache
 
-= KV Cache
-
-== Motivation
+== 2.1  Motivation
 
 - Self-attention recomputes keys/values for all past tokens
 - At step $t$, past $K,V$ are unchanged
 - Cache avoids $O(t^2)$ redundant work per step
 
-== Motivation — illustration
+== 2.1  Motivation
 
-#align(center)[#image("/assets/figures/day10/pdf0_page006.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page006.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[KV Cache — Motivation (source: course materials)]
-
-== Cache Structure
+== 2.2  Cache Structure
 
 - Store $K,V$ per layer per head
 - Memory $O(L dot H dot T dot d_h)$ grows with context
 - Batching pads to max length in batch
 
-== Cache Structure — illustration
+== 2.2  Cache Structure
 
-#align(center)[#image("/assets/figures/day10/pdf0_page008.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page008.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[KV Cache — Cache Structure (source: course materials)]
-
-== Prefill vs Decode
+== 2.3  Prefill vs Decode
 
 - Prefill: process prompt in parallel (compute-bound)
 - Decode: one token at a time (memory-bandwidth)
 - Continuous batching in serving systems
 
-== Prefill vs Decode — illustration
+== 2.3  Prefill vs Decode
 
-#align(center)[#image("/assets/figures/day10/pdf0_page010.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page010.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[KV Cache — Prefill vs Decode (source: course materials)]
-
-== Multi-Query / GQA
+== 2.4  Multi-Query / GQA
 
 - Share K,V heads across query heads
 - Reduces cache size with minimal quality loss
 - Standard in modern LLM inference
 
-== Multi-Query / GQA — illustration
+== 2.4  Multi-Query / GQA
 
-#align(center)[#image("/assets/figures/day10/pdf0_page012.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page012.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[KV Cache — Multi-Query / GQA (source: course materials)]
+= 3 · Efficient Attention
 
-= Efficient Attention
-
-== FlashAttention
+== 3.1  FlashAttention
 
 - Tiled softmax without materializing full $n times n$
 - IO-aware — faster on GPU memory hierarchy
 - Training and prefill benefit most
 
-== FlashAttention — illustration
+== 3.1  FlashAttention
 
-#align(center)[#image("/assets/figures/day10/pdf0_page014.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page014.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Efficient Attention — FlashAttention (source: course materials)]
-
-== PagedAttention (vLLM)
+== 3.2  PagedAttention (vLLM)
 
 - Non-contiguous KV blocks like virtual memory
 - Reduces fragmentation in batched serving
 - Higher GPU utilization
 
-== PagedAttention (vLLM) — illustration
+== 3.2  PagedAttention (vLLM)
 
-#align(center)[#image("/assets/figures/day10/pdf0_page016.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page016.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Efficient Attention — PagedAttention (vLLM) (source: course materials)]
-
-== Speculative Decoding
+== 3.3  Speculative Decoding
 
 - Draft model proposes several tokens
 - Target model verifies in parallel
 - Acceptance rate determines speedup
 
-== Speculative Decoding — illustration
+== 3.3  Speculative Decoding
 
-#align(center)[#image("/assets/figures/day10/pdf0_page018.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf0_page018.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Efficient Attention — Speculative Decoding (source: course materials)]
-
-== Long Context
+== 3.4  Long Context
 
 - RoPE scaling, YaRN, ALiBi
 - Ring attention for very long sequences
 - Context window vs true reasoning
 
-== Long Context — illustration
+== 3.4  Long Context
 
-#align(center)[#image("/assets/figures/day10/pdf1_page000.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day10/pdf1_page000.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Efficient Attention — Long Context (source: course materials)]
+= 4 · Serving & Systems
 
-= Serving & Systems
-
-== Quantization for Inference
+== 4.1  Quantization for Inference
 
 - Weight-only INT4 (GPTQ, AWQ)
 - KV cache quantization
 - Accuracy vs throughput tradeoffs
 
-== Batching Strategies
+== 4.2  Batching Strategies
 
 - Static vs continuous batching
 - Request scheduling and preemption
 - Multi-tenant SLA constraints
 
-== Course Recap
+== 4.3  Course Recap
 
 - Week 1: ML/DL foundations → Transformers
 - Week 2: generative models → production LLM inference

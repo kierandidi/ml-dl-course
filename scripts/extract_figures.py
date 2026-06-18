@@ -54,6 +54,7 @@ DAY01_MML_FIGURES = [
 MML_PLOT_BOX = {
     "2.1": (115, 575, 372, 688),   # types of vectors (bottom panels near caption)
     "4.6": (110, 124, 380, 200),   # eigenvalue area interpretation (two small panels)
+    "4.9": (133, 126, 490, 577),   # SVD: all four 2D/3D panels (multi-panel)
     "5.3": (160, 124, 300, 262),   # average incline / secant slope
     "5.8": (140, 122, 418, 185),   # forward-pass NN diagram (thin wide row)
     "6.4": (115, 255, 348, 508),   # mean/mode/median over a contour density
@@ -595,6 +596,73 @@ def extract_ucl_decks():
                 total += 1
             doc.close()
         print(f"day{day:02d}: {total} UCL slide pages rendered")
+
+
+# Hand-curated diagram slides from the UCL x DeepMind decks for days 3–5.
+# Each entry: (deck_filename, page_index, output_name, clip_box_or_None).
+# clip_box is in PDF points (x0, y0, x1, y1); None renders the whole slide
+# (auto-trimmed of surrounding whitespace). These are individual instructional
+# diagrams selected for the corresponding lecture, rendered at high resolution.
+DAY_UCL_CURATED = {
+    3: [
+        ("L2 - UCLxDeepMind DL2020.pdf", 64, "dnn_compgraph", None),
+        ("L2 - UCLxDeepMind DL2020.pdf", 48, "dnn_universal_approx", None),
+        ("L2 - UCLxDeepMind DL2020.pdf", 93, "dnn_overfitting", None),
+        ("L5 - UCLxDeepMind DL2020.pdf", 9, "dnn_train_objective", None),
+        ("L5 - UCLxDeepMind DL2020.pdf", 14, "opt_narrow_valley", None),
+        ("L5 - UCLxDeepMind DL2020.pdf", 30, "opt_methods", None),
+        ("L5 - UCLxDeepMind DL2020.pdf", 12, "opt_steepest", None),
+    ],
+    4: [
+        ("L3 - UUCLxDeepMind DL2020.pdf", 17, "cnn_locality", None),
+        ("L3 - UUCLxDeepMind DL2020.pdf", 22, "cnn_topology", None),
+        ("L3 - UUCLxDeepMind DL2020.pdf", 35, "cnn_receptive", None),
+        ("L3 - UUCLxDeepMind DL2020.pdf", 43, "cnn_convop", None),
+        ("L3 - UUCLxDeepMind DL2020.pdf", 47, "cnn_tensors", None),
+        ("L3 - UUCLxDeepMind DL2020.pdf", 57, "cnn_variants", None),
+        ("L3 - UUCLxDeepMind DL2020.pdf", 59, "cnn_pooling", None),
+        ("L3 - UUCLxDeepMind DL2020.pdf", 87, "cnn_batchnorm", None),
+        ("L3 - UUCLxDeepMind DL2020.pdf", 29, "cnn_imagenet", None),
+        ("L3 - UUCLxDeepMind DL2020.pdf", 71, "cnn_alexnet", None),
+        ("L4 - UCLxDeepMind DL2020.pdf", 19, "cnn_detection", None),
+        ("L4 - UCLxDeepMind DL2020.pdf", 86, "cnn_segmentation", None),
+    ],
+    5: [
+        ("L6 - UCLxDeepMind DL2020.pdf", 81, "rnn_pixelrnn", None),
+        ("L6 - UCLxDeepMind DL2020.pdf", 44, "rnn_unrolled", None),
+        ("L6 - UCLxDeepMind DL2020.pdf", 114, "seq2seq_nmt", None),
+        ("L8 - UCLxDeepMind DL2020.pdf", 29, "attn_alignment", None),
+        ("L8 - UCLxDeepMind DL2020.pdf", 42, "attn_content", None),
+        ("L8 - UCLxDeepMind DL2020.pdf", 14, "attn_implicit", None),
+    ],
+}
+
+
+def extract_ucl_curated():
+    """Render hand-picked diagram slides (trimmed) from UCL decks for days 3–5."""
+    for day, picks in DAY_UCL_CURATED.items():
+        day_dir = OUT / f"day{day:02d}"
+        day_dir.mkdir(parents=True, exist_ok=True)
+        ok = 0
+        for deck, page, name, box in picks:
+            src = COURSE_MATERIAL / deck
+            if not src.exists():
+                print(f"  ! skip missing: {src}")
+                continue
+            doc = fitz.open(src)
+            if page >= len(doc):
+                print(f"  ! {name}: page {page} out of range for {deck}")
+                doc.close()
+                continue
+            pg = doc[page]
+            clip = fitz.Rect(box) if box else pg.rect
+            img = _render_pil(pg, clip, scale=3.0)
+            if box is None and Image is not None:
+                img = _pil_trim(img, pad=12, thresh=10)
+            img.save(day_dir / f"{name}.png")
+            ok += 1
+            doc.close()
+        print(f"day{day:02d}: {ok}/{len(picks)} curated UCL figures rendered")
 
 
 # day -> list of (source_path_relative_to_materials, page_indices_to_render)

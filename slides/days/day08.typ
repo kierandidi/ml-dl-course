@@ -1,183 +1,194 @@
 #import "../lib.typ": *
 
-#show: course-theme.with(title: [Diffusion Inference], subtitle: [Day 8 | Aug 2026])
+#show: course-theme.with(title: [Guidance, Solvers & Fast Sampling], subtitle: [Day 8 | Aug 2026])
 
-= Day 8: Diffusion Inference
+= Day 8: Guidance, Solvers & Fast Sampling
 
 == Welcome
 
-- *Diffusion Inference* — SDEs, probability-flow ODEs, and samplers
+- *Guidance, Solvers & Fast Sampling* — Controlling and accelerating diffusion
 - 3 hours lecture + practical
 - Slides, notes, and code on the course site
 
 == Outline
 
-- Continuous-Time View
-- Samplers
-- Practical Inference
-- Connections & Outlook
+- Conditional Generation & Guidance
+- Sampling = Solving a Differential Equation
+- Fast High-Order Solvers
+- Few-Step Sampling
 
-= Continuous-Time View
+= 1 · Conditional Generation & Guidance
 
-== Forward SDE
+== 1.1  Conditioning a Diffusion Model
 
-- $d x = f(x,t) d t + g(t) d w$
-- Variance-preserving (VP) and VE variants
-- Marginal $p_t(x)$ approaches noise
+- Goal: sample $p(x | c)$ — class, text prompt, image
+- Train the denoiser with the condition: $epsilon_theta (x_t, t, c)$
+- Conditional score $nabla log p_t (x | c)$ steers sampling
+- But naive conditioning often *under-uses* the condition
+- Guidance amplifies the influence of $c$
 
-== Forward SDE — illustration
+== 1.2  Classifier Guidance
 
-#align(center)[#image("/assets/figures/day08/pdm_cfg.png", width: 80%)]
+- Bayes: $nabla log p(x|c) = nabla log p(x) + nabla log p(c|x)$
+- Train a classifier $p_phi (c | x_t)$ on noisy inputs
+- Push samples toward high $p(c|x)$ using its gradient
+- Guidance scale $w$: $nabla log p + w nabla log p(c|x)$
+- Needs a separate noisy-data classifier (a drawback)
 
-#text(size: 14pt, fill: gray)[Continuous-Time View — Forward SDE (source: course materials)]
+== 1.2  Classifier Guidance
 
-== Reverse SDE
+#align(center + horizon)[#image("/assets/figures/day08/pdm_guidance.png", width: 92%, height: 82%, fit: "contain")]
 
-- $d x = [f(x,t) - g(t)^2 nabla_x log p_t(x)] d t + g(t) dif overline(w)$
-- Score replaces unknown drift correction
-- Anderson's reverse-time SDE theorem
+== 1.3  Classifier-Free Guidance
 
-== Reverse SDE — illustration
+- Train one net for both conditional & unconditional (drop $c$)
+- Combine at sampling time, no external classifier:
+- $tilde(epsilon) = (1+w) epsilon_theta (x,t,c) - w epsilon_theta (x,t,nothing)$
+- $w$ trades diversity (low) vs fidelity/prompt-match (high)
+- The workhorse of text-to-image models
 
-#align(center)[#image("/assets/figures/day08/pdm_ddim_euler.png", width: 80%)]
+== 1.3  Classifier-Free Guidance
 
-#text(size: 14pt, fill: gray)[Continuous-Time View — Reverse SDE (source: course materials)]
+#align(center + horizon)[#image("/assets/figures/day08/pdm_cfg.png", width: 92%, height: 82%, fit: "contain")]
 
-== Probability Flow ODE
+== 1.4  Derivation: Guidance from Bayes
 
-- Same marginals without stochastic term
-- $d x = [f(x,t) - (1/2) g(t)^2 nabla_x log p_t(x)] d t$
-- Deterministic sampling path
+- Bayes: $p(x|c) prop p(x) p(c|x)$
+- Take $nabla_x log$: scores add
+- Implicit classifier: $nabla log p(c|x) = nabla log p(x|c) - nabla log p(x)$
+- Score form $arrow.r$ noise form via $s = -epsilon \\/ sigma_t$
+- Sharpen: raise $p(c|x)$ to power $w arrow.r$ guidance scale
 
-== Probability Flow ODE — illustration
+= 2 · Sampling = Solving a Differential Equation
 
-#align(center)[#image("/assets/figures/day08/pdm_deis.png", width: 80%)]
+== 2.1  Sampling Is Numerical Integration
 
-#text(size: 14pt, fill: gray)[Continuous-Time View — Probability Flow ODE (source: course materials)]
+- Day 7: sampling = integrate the reverse SDE or PF-ODE
+- Each step needs one network eval (NFE) of the score
+- Quality vs cost = solver accuracy vs number of steps
+- Discretize time $T = t_0 > t_1 > dots.h > t_N = 0$
+- Better solver $arrow.r$ same quality in fewer steps
 
-== Discretization
+== 2.1  Sampling Is Numerical Integration
 
-- Euler–Maruyama for SDEs
-- DDIM as non-Markovian deterministic integrator
-- Step count vs quality tradeoff
+#align(center + horizon)[#image("/assets/figures/day08/pdm_reverse_sde.png", width: 92%, height: 82%, fit: "contain")]
 
-== Discretization — illustration
+== 2.2  DDIM as Euler on the PF-ODE
 
-#align(center)[#image("/assets/figures/day08/pdm_flowmap.png", width: 80%)]
+- DDIM = deterministic sampler = Euler on the PF-ODE
+- Non-Markovian: skip steps without retraining
+- Same trained model, far fewer steps than DDPM
+- Deterministic $arrow.r$ reproducible, invertible, editable
+- First-order: error per step $O(Delta t^2)$
 
-#text(size: 14pt, fill: gray)[Continuous-Time View — Discretization (source: course materials)]
+== 2.2  DDIM as Euler on the PF-ODE
 
-= Samplers
+#align(center + horizon)[#image("/assets/figures/day08/pdm_ddim_euler.png", width: 92%, height: 82%, fit: "contain")]
 
-== DDPM Sampling
+== 2.3  Discretization Error & Step Count
 
-- Markovian ancestral sampling
-- $T$ steps — slow at high resolution
-- Stochasticity helps diversity
+- Few steps + 1st-order $arrow.r$ visible artifacts
+- Error accumulates over the trajectory
+- More steps shrink error but cost more NFEs
+- Curved trajectories are harder to integrate
+- Two fixes: better solver, or straighter paths
 
-== DDPM Sampling — illustration
+== 2.3  Discretization Error & Step Count
 
-#align(center)[#image("/assets/figures/day08/pdm_flowmap_semigroup.png", width: 80%)]
+#align(center + horizon)[#image("/assets/figures/day08/pdm_score_sde_2d.png", width: 92%, height: 82%, fit: "contain")]
 
-#text(size: 14pt, fill: gray)[Samplers — DDPM Sampling (source: course materials)]
+== 2.4  Stochastic vs Deterministic Samplers
 
-== DDIM
+- SDE samplers inject noise each step (self-correcting)
+- ODE samplers are deterministic (fast, fewer steps)
+- SDE: better at high NFE; ODE: better at low NFE
+- Churn: add a little noise to an ODE solver (EDM)
+- Fokker-Planck: both share the same marginals $p_t$
 
-- Skip timesteps with adjusted updates
-- eta=0 fully deterministic
-- 10–50 steps often sufficient
+= 3 · Fast High-Order Solvers
 
-== DDIM — illustration
+== 3.1  Higher-Order: Heun's Method
 
-#align(center)[#image("/assets/figures/day08/pdm_flowmap_timeline.png", width: 80%)]
+- Euler uses the slope at the start of the step
+- Heun averages start & end slopes (predictor-corrector)
+- 2nd-order: error per step $O(Delta t^3)$
+- 2 NFEs/step but far fewer steps overall
+- Backbone of the EDM sampler
 
-#text(size: 14pt, fill: gray)[Samplers — DDIM (source: course materials)]
+== 3.1  Higher-Order: Heun's Method
 
-== Higher-Order Solvers
+#align(center + horizon)[#image("/assets/figures/day08/pdm_heun_logsnr.png", width: 92%, height: 82%, fit: "contain")]
 
-- DPM-Solver, Heun, Runge–Kutta on ODE
-- Fewer function evaluations (NFE)
-- Active research area
+== 3.2  The Right Clock: log-SNR Time
 
-== Higher-Order Solvers — illustration
+- Solver accuracy depends on the time variable
+- Step uniformly in log-SNR $lambda = log(alpha^2 \\/ sigma^2)$
+- Spends steps where the trajectory bends most
+- EDM uses a tailored $sigma$ schedule (same idea)
+- Good schedule $arrow.r$ big quality gain for free
 
-#align(center)[#image("/assets/figures/day08/pdm_guidance.png", width: 80%)]
+== 3.3  Exponential Integrators (DPM-Solver / DEIS)
 
-#text(size: 14pt, fill: gray)[Samplers — Higher-Order Solvers (source: course materials)]
+- PF-ODE = linear drift + nonlinear network term
+- Solve the linear part *exactly* (integrating factor, Day 1)
+- Only approximate the smooth network part
+- Multistep: reuse past evals for higher order
+- 10-20 NFEs for high quality (DPM-Solver, DEIS)
 
-== Guidance at Inference
+== 3.3  Exponential Integrators (DPM-Solver / DEIS)
 
-- Classifier guidance (separate classifier grad)
-- CFG combines cond and uncond score
-- Large guidance → artifacts
+#align(center + horizon)[#image("/assets/figures/day08/pdm_deis.png", width: 92%, height: 82%, fit: "contain")]
 
-== Guidance at Inference — illustration
+= 4 · Few-Step Sampling
 
-#align(center)[#image("/assets/figures/day08/pdm_heun_logsnr.png", width: 80%)]
+== 4.1  The Bottleneck: Many Function Evals
 
-#text(size: 14pt, fill: gray)[Samplers — Guidance at Inference (source: course materials)]
+- Even good solvers need ~10-50 NFEs
+- Real-time / interactive needs 1-4 steps
+- Idea: learn to *jump* across time, not crawl
+- Distill a slow teacher into a fast student
+- Flow maps formalize the jump
 
-= Practical Inference
+== 4.2  Flow Maps
 
-== Scheduler Choice
+- Flow map $Phi_(s arrow.r t)$: jump a sample from time $s$ to $t$
+- Integrates the ODE in *one* learned step
+- $x_t = Phi_(s arrow.r t)(x_s)$ for any $s, t$
+- Generalizes the single-step generator
+- Learn it by distillation or self-consistency
 
-- Timestep spacing: uniform vs SNR-based
-- Respacing pretrained models
-- Distillation for 1–4 step models
+== 4.2  Flow Maps
 
-== Scheduler Choice — illustration
+#align(center + horizon)[#image("/assets/figures/day08/pdm_flowmap.png", width: 92%, height: 82%, fit: "contain")]
 
-#align(center)[#image("/assets/figures/day08/pdm_reverse_sde.png", width: 80%)]
+== 4.3  The Semigroup Property
 
-#text(size: 14pt, fill: gray)[Practical Inference — Scheduler Choice (source: course materials)]
+- Composing jumps = one bigger jump:
+- $Phi_(s arrow.r t) = Phi_(u arrow.r t) circle.small Phi_(s arrow.r u)$
+- Consistency: all points on a trajectory map to the same $x_0$
+- Self-consistency gives a training signal w/o a teacher
+- Enables 1-step generation
 
-== Memory & Speed
+== 4.3  The Semigroup Property
 
-- Attention at 512² vs 1024²
-- VAE decode bottleneck
-- Batch size 1 for interactive apps
+#align(center + horizon)[#image("/assets/figures/day08/pdm_flowmap_semigroup.png", width: 92%, height: 82%, fit: "contain")]
 
-== Memory & Speed — illustration
+== 4.4  Consistency & Distillation
 
-#align(center)[#image("/assets/figures/day08/pdm_score_sde_2d.png", width: 80%)]
+- Consistency models: train $f_theta (x_t, t) approx x_0$ for all $t$
+- Distillation: match a multi-step teacher in few steps
+- 1-4 step sampling, near teacher quality
+- Trade a little quality for huge speedups
+- Active frontier: real-time generative models
 
-#text(size: 14pt, fill: gray)[Practical Inference — Memory & Speed (source: course materials)]
+== 4.4  Consistency & Distillation
 
-== Editing & Control
-
-- Img2img: partial noise then denoise
-- Inpainting with masked regions
-- ControlNet auxiliary conditioning
-
-== Failure Modes
-
-- Mode averaging at low steps
-- Text neglect with weak guidance
-- Watermark and safety filters
-
-= Connections & Outlook
-
-== Flow Matching
-
-- Learn vector field transporting noise → data
-- Rectified flows and straight paths
-- Unified view with diffusion/flows
-
-== Consistency Models
-
-- Single-step or few-step generation
-- Distill iterative sampler
-
-== Bridge to Autoregressive
-
-- Different inductive bias: parallel vs sequential
-- Multimodal systems combine both
-- Days 9–10: language side
+#align(center + horizon)[#image("/assets/figures/day08/pdm_flowmap_timeline.png", width: 92%, height: 82%, fit: "contain")]
 
 == Summary
 
-- Day 8: *Diffusion Inference*
-- SDEs, probability-flow ODEs, and samplers
+- Day 8: *Guidance, Solvers & Fast Sampling*
+- Controlling and accelerating diffusion
 - Questions welcome — practical follows
 
 == Questions?

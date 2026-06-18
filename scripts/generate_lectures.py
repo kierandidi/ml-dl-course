@@ -8,7 +8,12 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from content_day01 import LECTURE as DAY01_LECTURE
+from content_day03 import LECTURE as DAY03_LECTURE
+from content_day04 import LECTURE as DAY04_LECTURE
+from content_day05 import LECTURE as DAY05_LECTURE
 from content_day06 import LECTURE as DAY06_LECTURE
+from content_day07 import LECTURE as DAY07_LECTURE
+from content_day08 import LECTURE as DAY08_LECTURE
 from diffusion_viz import VIZ, viz_iframe
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -152,8 +157,8 @@ $$R = \\sum_{i,j} C_{ij}\\, p(y=j|\\mathbf{x})\\, \\mathbb{1}[\\hat{y}=i].$$""",
                     {
                         "heading": "Ridge, Lasso, and elastic net",
                         "definition": (
-                            "**Ridge** ($$\\ell_2$$) penalizes $$\\lambda\\|\\mathbf{w}\\|_2^2$; "
-                            "**Lasso** ($$\\ell_1$$) penalizes $$\\lambda\\|\\mathbf{w}\\|_1$ and "
+                            "**Ridge** ($$\\ell_2$$) penalizes $$\\lambda\\|\\mathbf{w}\\|_2^2$$; "
+                            "**Lasso** ($$\\ell_1$$) penalizes $$\\lambda\\|\\mathbf{w}\\|_1$$ and "
                             "induces sparsity. **Elastic net** combines both."
                         ),
                         "body": """Ridge closed form (when invertible):
@@ -730,6 +735,36 @@ Positional information: sinusoidal encodings (original Transformer) or **rotary 
     DAY06_LECTURE,
 ]
 
+# Hand-authored, detailed lectures override the inline placeholders.
+LECTURES[2] = DAY03_LECTURE  # Day 3 — Deep Neural Networks
+LECTURES[3] = DAY04_LECTURE  # Day 4 — Convolutional Neural Networks
+LECTURES[4] = DAY05_LECTURE  # Day 5 — Sequence Models & Transformers
+LECTURES.append(DAY07_LECTURE)  # Day 7 — Score, SDEs & Flow Matching
+LECTURES.append(DAY08_LECTURE)  # Day 8 — Guidance, Solvers & Fast Sampling
+
+
+def sanitize_math(text: str) -> str:
+    """Make inline/block math robust for kramdown + KaTeX (build-time, ES5).
+
+    Inside ``$$ ... $$`` spans:
+      * ``\\|`` -> ``\\Vert`` and ``|`` -> ``\\vert``  (raw pipes otherwise get
+        parsed as Markdown table-cell separators, shredding the equation);
+      * ``\\*`` -> ``*``  (``\\*`` is an invalid KaTeX command — it only exists
+        in Markdown to escape emphasis, which is unnecessary inside math);
+      * ``\\mathbb{1}`` -> ``\\mathbf{1}``  (KaTeX ``\\mathbb`` only covers A–Z).
+    """
+    import re
+
+    def fix(m: "re.Match[str]") -> str:
+        s = m.group(1)
+        s = s.replace("\\|", "\\Vert ")
+        s = s.replace("|", "\\vert ")
+        s = s.replace("\\*", "*")
+        s = s.replace("\\mathbb{1}", "\\mathbf{1}")
+        return "$$" + s + "$$"
+
+    return re.sub(r"\$\$(.+?)\$\$", fix, text, flags=re.DOTALL)
+
 
 def expand_viz_markers(text: str) -> str:
     """Replace ``{{viz:KEY}}`` markers with embedded interactive widgets."""
@@ -824,7 +859,7 @@ def main() -> None:
         post_date = START_DATE + timedelta(days=i)
         filename = f"{post_date.isoformat()}-day{lecture['day']:02d}-{lecture['slug']}.md"
         path = POSTS_DIR / filename
-        content = expand_viz_markers(render_lecture(lecture))
+        content = sanitize_math(expand_viz_markers(render_lecture(lecture)))
         path.write_text(content, encoding="utf-8")
         line_count = content.count("\n") + 1
         created.append(path)

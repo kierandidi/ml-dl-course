@@ -7,10 +7,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from content_day01 import FIGURES as DAY01_FIGURES, SLIDES as DAY01_SLIDES
+from content_day03 import FIGURES as DAY03_FIGURES, SLIDES as DAY03_SLIDES
+from content_day04 import FIGURES as DAY04_FIGURES, SLIDES as DAY04_SLIDES
+from content_day05 import FIGURES as DAY05_FIGURES, SLIDES as DAY05_SLIDES
 from content_day06 import FIGURES as DAY06_FIGURES, SLIDES as DAY06_SLIDES
+from content_day07 import FIGURES as DAY07_FIGURES, SLIDES as DAY07_SLIDES
+from content_day08 import FIGURES as DAY08_FIGURES, SLIDES as DAY08_SLIDES
 
 # Days with hand-curated figure lists (aligned one-per-slide, None allowed).
-CURATED_FIGURES = {1: DAY01_FIGURES, 6: DAY06_FIGURES}
+CURATED_FIGURES = {1: DAY01_FIGURES, 3: DAY03_FIGURES, 4: DAY04_FIGURES, 5: DAY05_FIGURES, 6: DAY06_FIGURES, 7: DAY07_FIGURES, 8: DAY08_FIGURES}
 
 ROOT = Path(__file__).resolve().parents[1]
 DAYS_DIR = ROOT / "slides" / "days"
@@ -1410,7 +1415,12 @@ COURSE: list[tuple[str, str, list[tuple[str, list[tuple[str, list[str]]]]]]] = [
 
 
 # Use hand-authored decks for upgraded days (override the inline placeholders).
+COURSE[2] = DAY03_SLIDES  # Day 3 — Deep Neural Networks
+COURSE[3] = DAY04_SLIDES  # Day 4 — Convolutional Neural Networks
+COURSE[4] = DAY05_SLIDES  # Day 5 — Sequence Models & Transformers
 COURSE[5] = DAY06_SLIDES  # Day 6 — Generative Modeling & DDPM
+COURSE[6] = DAY07_SLIDES  # Day 7 — Score, SDEs & Flow Matching
+COURSE[7] = DAY08_SLIDES  # Day 8 — Guidance, Solvers & Fast Sampling
 
 
 def render_bullets(lines: list[str]) -> str:
@@ -1421,12 +1431,16 @@ def render_slide(title: str, lines: list[str]) -> str:
     return f"== {typst_escape(title)}\n\n{render_bullets(lines)}\n"
 
 
-def render_figure_slide(path: str, caption: str, title: str | None = None) -> str:
-    name = title if title else Path(path).stem.replace("_", " ")
+def render_figure_slide(path: str, title: str) -> str:
+    """Figure slide: image scaled to *fit* the slide (never cropped/overflowing).
+
+    `fit: "contain"` with both a width and height cap guarantees the whole
+    figure is visible regardless of its aspect ratio. No grey caption line
+    (it tended to spill onto an otherwise-empty slide).
+    """
     return (
-        f"== {typst_escape(name)}\n\n"
-        f"#align(center)[#image(\"{path}\", width: 80%)]\n\n"
-        f"#text(size: 14pt, fill: gray)[{typst_escape(caption)}]\n"
+        f"== {typst_escape(title)}\n\n"
+        f"#align(center + horizon)[#image(\"{path}\", width: 92%, height: 82%, fit: \"contain\")]\n"
     )
 
 
@@ -1454,17 +1468,18 @@ def render_day(day: int, title: str, subtitle: str, parts: list) -> str:
     figures = CURATED_FIGURES.get(day) or find_figures(day)
     fig_idx = 0
 
-    for part_i, (part_title, slides) in enumerate(parts):
-        lines.append(f"= {typst_escape(part_title)}")
+    for part_i, (part_title, slides) in enumerate(parts, start=1):
+        # Numbered section divider: "1 · Linear Algebra".
+        lines.append(f"= {part_i} · {typst_escape(part_title)}")
         lines.append("")
-        for slide_i, (slide_title, bullets) in enumerate(slides):
-            lines.append(render_slide(slide_title, bullets))
+        for slide_i, (slide_title, bullets) in enumerate(slides, start=1):
+            num = f"{part_i}.{slide_i}"
+            lines.append(render_slide(f"{num}  {slide_title}", bullets))
             # Insert the curated figure for this slide when one is available.
             fig = figures[fig_idx] if fig_idx < len(figures) else None
             fig_idx += 1
             if fig:
-                cap = f"{part_title} — {slide_title} (source: course materials)"
-                lines.append(render_figure_slide(fig, cap, title=f"{slide_title} — illustration"))
+                lines.append(render_figure_slide(fig, f"{num}  {slide_title}"))
 
     # Remaining figures (only for days using the auto-find list) go in an appendix.
     if fig_idx < len(figures):
@@ -1472,9 +1487,8 @@ def render_day(day: int, title: str, subtitle: str, parts: list) -> str:
         if remaining:
             lines.append("= Additional Figures")
             lines.append("")
-            for fig in remaining:
-                cap = f"Day {day} — supplementary illustration"
-                lines.append(render_figure_slide(fig, cap))
+            for k, fig in enumerate(remaining, start=1):
+                lines.append(render_figure_slide(fig, f"Supplementary figure {k}"))
 
     lines.extend(
         [

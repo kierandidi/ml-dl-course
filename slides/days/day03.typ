@@ -6,196 +6,193 @@
 
 == Welcome
 
-- *Deep Neural Networks* — Backpropagation, activations, optimizers
+- *Deep Neural Networks* — From the perceptron to backprop and optimization
 - 3 hours lecture + practical
 - Slides, notes, and code on the course site
 
 == Outline
 
-- From Linear to Deep
+- From Shallow to Deep
+- Anatomy of a Neural Network
 - Backpropagation
-- Training Loop
-- Optimizers
+- Optimization
+- Generalization & Regularization
 
-= From Linear to Deep
+= 1 · From Shallow to Deep
 
-== Limitations of Linear Models
+== 1.1  Why Go Beyond Linear Models
 
-- XOR and non-linearly separable data
-- Need composed non-linear transformations
-- Universal approximation intuition
+- Linear model $f(x) = w^T x + b$ can only carve the input with a *hyperplane*
+- XOR, image classes, language — not linearly separable
+- Fix-feature trick: $f(x) = w^T phi(x)$ needs hand-designed $phi$
+- Deep nets *learn* the features $phi$ jointly with the classifier
+- Composition of simple maps $arrow.r$ rich, reusable representations
 
-== Limitations of Linear Models — illustration
+== 1.2  Universal Approximation
 
-#align(center)[#image("/assets/figures/day03/ucl0_p011.png", width: 80%)]
+- One hidden layer + a squashing nonlinearity can approximate *any* continuous function on a compact set
+- Formally: for any continuous $f$ and $epsilon > 0$, a wide enough net is within $epsilon$ uniformly
+- Existence only — says nothing about *learnability* or *width needed*
+- Width may grow exponentially in input dimension
+- Motivates depth: a more parameter-efficient route to the same functions
 
-#text(size: 14pt, fill: gray)[From Linear to Deep — Limitations of Linear Models (source: course materials)]
+== 1.2  Universal Approximation
 
-== Layer Composition
+#align(center + horizon)[#image("/assets/figures/day03/dnn_universal_approx.png", width: 92%, height: 82%, fit: "contain")]
 
-- $h^(l) = sigma(W^(l) h^(l-1) + b^(l))$
-- Depth vs width tradeoffs
-- Parameter count scales with layer sizes
+== 1.3  Depth vs Width
 
-== Layer Composition — illustration
+- Some functions need exponential width at depth 1, but linear width with more depth
+- Each layer composes & folds the space $arrow.r$ piecewise-linear regions multiply
+- Depth = hierarchy: edges $arrow.r$ parts $arrow.r$ objects
+- Trade-off: depth helps expressivity but complicates optimization
 
-#align(center)[#image("/assets/figures/day03/ucl0_p012.png", width: 80%)]
+= 2 · Anatomy of a Neural Network
 
-#text(size: 14pt, fill: gray)[From Linear to Deep — Layer Composition (source: course materials)]
+== 2.1  The Multilayer Perceptron
 
-== Activations
+- Layer $l$: $z^((l)) = W^((l)) a^((l-1)) + b^((l))$, then $a^((l)) = g(z^((l)))$
+- $a^((0)) = x$ (input), $hat(y) = a^((L))$ (output)
+- Parameters $theta = {W^((l)), b^((l))}_(l=1)^L$
+- A *computational graph*: nodes = operations, edges = tensors
+- Width = neurons per layer; depth = number of layers $L$
 
-- ReLU: $max(0, z)$ — sparse, fast
-- Sigmoid / tanh — saturating, vanishing gradients
-- GELU, SiLU in modern transformers
+== 2.1  The Multilayer Perceptron
 
-== Activations — illustration
+#align(center + horizon)[#image("/assets/figures/day03/dnn_compgraph.png", width: 92%, height: 82%, fit: "contain")]
 
-#align(center)[#image("/assets/figures/day03/ucl0_p013.png", width: 80%)]
+== 2.2  Activation Functions
 
-#text(size: 14pt, fill: gray)[From Linear to Deep — Activations (source: course materials)]
+- Sigmoid $sigma(z) = 1\\/(1 + e^(-z))$ — saturates, gradients vanish
+- Tanh — zero-centered but still saturates
+- ReLU $max(0, z)$ — cheap, sparse, no saturation for $z>0$ (default)
+- Leaky ReLU / GELU / SiLU — keep a gradient for $z<0$
+- Without a nonlinearity, stacked layers collapse to one linear map
 
-== Forward Pass
+== 2.3  The Forward Pass
 
-- Cache intermediates for backward pass
-- Batching: tensor shape $(N, d)$
-- Numerical stability: log-sum-exp trick
+- Propagate $x arrow.r a^((1)) arrow.r dots.h arrow.r a^((L)) = hat(y)$
+- Classification head: softmax $p_k = e^(z_k)\\/sum_j e^(z_j)$
+- Loss compares $hat(y)$ to target $y$ (cross-entropy, MSE)
+- Cache the $z^((l))$, $a^((l))$ — backprop reuses them
 
-== Forward Pass — illustration
+= 3 · Backpropagation
 
-#align(center)[#image("/assets/figures/day03/ucl0_p053.png", width: 80%)]
+== 3.1  Learning = Minimizing a Loss
 
-#text(size: 14pt, fill: gray)[From Linear to Deep — Forward Pass (source: course materials)]
+- Objective $L(theta) = 1/m sum_(i=1)^m ell(f(x_i; theta), y_i)$
+- Find $theta^* = "arg min"_theta L(theta)$ by gradient descent
+- Need $nabla_theta L$ — millions of partials, computed *efficiently*
+- Backprop = reverse-mode autodiff = chain rule + caching
 
-= Backpropagation
+== 3.1  Learning = Minimizing a Loss
 
-== Computational Graph
+#align(center + horizon)[#image("/assets/figures/day03/dnn_train_objective.png", width: 92%, height: 82%, fit: "contain")]
 
-- Nodes = ops; edges = tensors
-- Local gradients multiply via chain rule
-- Reverse-mode AD = backprop
+== 3.2  The Chain Rule on a Graph
 
-== Computational Graph — illustration
+- Scalar chain rule: $(dif)/(dif x) f(g(x)) = f'(g(x)) g'(x)$
+- Vector form: Jacobians multiply right-to-left
+- Define the error signal $delta^((l)) = (partial L)/(partial z^((l)))$
+- One forward sweep (values) + one backward sweep (gradients)
+- Cost of gradient $approx$ cost of forward pass
 
-#align(center)[#image("/assets/figures/day03/ucl0_p054.png", width: 80%)]
+== 3.3  Derivation: The Four Backprop Equations
 
-#text(size: 14pt, fill: gray)[Backpropagation — Computational Graph (source: course materials)]
+- Output layer: $delta^((L)) = nabla_a ell dot.o g'(z^((L)))$
+- Recurse: $delta^((l)) = (W^((l+1)))^T delta^((l+1)) dot.o g'(z^((l)))$
+- Weight grad: $(partial L)/(partial W^((l))) = delta^((l)) (a^((l-1)))^T$
+- Bias grad: $(partial L)/(partial b^((l))) = delta^((l))$
+- Each $dot.o$ is elementwise; full derivation in the notes
 
-== Output Layer Gradients
+== 3.4  Vanishing & Exploding Gradients
 
-- MSE: $partial L / partial hat(y) = 2(hat(y) - y)$
-- Softmax + CE: gradient simplifies to $hat(y) - y$
-- Sigmoid + BCE similarly clean
+- $delta^((l))$ is a product of many Jacobians $arrow.r$ can shrink/blow up
+- Sigmoid/tanh: $g' <= 1\\/4 arrow.r$ deep gradients vanish
+- Fixes: ReLU, careful init (He/Xavier), residual connections
+- Normalization (Batch/Layer) keeps activations well-scaled
+- Gradient clipping bounds explosions (esp. RNNs, Day 5)
 
-== Output Layer Gradients — illustration
+= 4 · Optimization
 
-#align(center)[#image("/assets/figures/day03/ucl0_p055.png", width: 80%)]
+== 4.1  Gradient Descent is Steepest Descent
 
-#text(size: 14pt, fill: gray)[Backpropagation — Output Layer Gradients (source: course materials)]
+- $theta_(k+1) = theta_k - eta nabla L(theta_k)$
+- $-nabla L$ = direction of steepest local decrease
+- 1st-order Taylor: $L(theta + d) approx L(theta) + nabla L^T d$
+- Step size $eta$ (learning rate) is the key knob
+- Too big $arrow.r$ diverge; too small $arrow.r$ crawl
 
-== Hidden Layer Gradients
+== 4.1  Gradient Descent is Steepest Descent
 
-- $delta^(l) = (W^(l+1))^T delta^(l+1) dot.op sigma'(z^(l))$
-- Vanishing / exploding gradients in deep nets
-- Skip connections mitigate (ResNet, Day 4+)
+#align(center + horizon)[#image("/assets/figures/day03/opt_steepest.png", width: 92%, height: 82%, fit: "contain")]
 
-== Hidden Layer Gradients — illustration
+== 4.2  The Narrow-Valley Problem
 
-#align(center)[#image("/assets/figures/day03/ucl0_p056.png", width: 80%)]
+- Ill-conditioned loss: steep in one direction, flat in another
+- GD zig-zags across the valley, crawls along it
+- Conditioning $kappa = lambda_max\\/lambda_min$ of the Hessian sets the rate
+- A single $eta$ cannot suit both directions
+- Momentum & adaptive methods damp the zig-zag
 
-#text(size: 14pt, fill: gray)[Backpropagation — Hidden Layer Gradients (source: course materials)]
+== 4.2  The Narrow-Valley Problem
 
-== Implementation Notes
+#align(center + horizon)[#image("/assets/figures/day03/opt_narrow_valley.png", width: 92%, height: 82%, fit: "contain")]
 
-- Autograd in PyTorch / JAX
-- Detach, stop_gradient, custom Function
-- Check gradients with finite differences
+== 4.3  SGD, Momentum & Adam
 
-== Implementation Notes — illustration
+- SGD: estimate $nabla L$ on a *minibatch* $arrow.r$ cheap, noisy steps
+- Momentum: $v_(k+1) = beta v_k + nabla L$, $theta_(k+1) = theta_k - eta v_(k+1)$
+- Adam: per-parameter step from running 1st/2nd moments
+- Noise in SGD acts as implicit regularization
+- Schedules: warmup then decay (cosine, step)
 
-#align(center)[#image("/assets/figures/day03/ucl1_p008.png", width: 80%)]
+== 4.3  SGD, Momentum & Adam
 
-#text(size: 14pt, fill: gray)[Backpropagation — Implementation Notes (source: course materials)]
+#align(center + horizon)[#image("/assets/figures/day03/opt_methods.png", width: 92%, height: 82%, fit: "contain")]
 
-= Training Loop
+== 4.4  Derivation: Momentum as a Heavy Ball
 
-== Mini-batch SGD
+- Plain GD: a massless particle on the loss surface
+- Momentum adds *inertia*: velocity accumulates past gradients
+- $v_k = sum_(j<=k) beta^(k-j) nabla L(theta_j)$ — EMA of gradients
+- Consistent directions reinforce; oscillations cancel
+- Effective step $approx eta\\/(1-beta)$ along a steady slope
 
-- Sample batch $B subset D$ each step
-- Loss averaged over batch
-- Epoch = one pass over training set
+= 5 · Generalization & Regularization
 
-== Mini-batch SGD — illustration
+== 5.1  Overfitting & the Bias-Variance View
 
-#align(center)[#image("/assets/figures/day03/ucl1_p014.png", width: 80%)]
+- Training error falls with capacity; test error is U-shaped
+- Underfit = high bias; overfit = high variance
+- Goal: lowest *test* risk, not zero training risk
+- Validation set picks capacity & hyperparameters
+- Deep nets: more data and regularization push the sweet spot right
 
-#text(size: 14pt, fill: gray)[Training Loop — Mini-batch SGD (source: course materials)]
+== 5.1  Overfitting & the Bias-Variance View
 
-== Learning Rate Schedules
+#align(center + horizon)[#image("/assets/figures/day03/dnn_overfitting.png", width: 92%, height: 82%, fit: "contain")]
 
-- Step decay, cosine annealing, warmup
-- $eta_t$ often largest hyperparameter
-- Monitor train vs val loss curves
+== 5.2  Weight Decay & Dropout
 
-== Learning Rate Schedules — illustration
+- $L_2$ / weight decay: add $lambda \\|theta\\|^2$ $arrow.r$ smaller weights
+- Equivalent to a Gaussian prior on weights (MAP view)
+- Dropout: randomly zero units $arrow.r$ ensemble of subnetworks
+- $L_1$ encourages sparsity (feature selection)
+- Data augmentation = free, task-specific regularization
 
-#align(center)[#image("/assets/figures/day03/ucl1_p020.png", width: 80%)]
+== 5.3  Normalization & Early Stopping
 
-#text(size: 14pt, fill: gray)[Training Loop — Learning Rate Schedules (source: course materials)]
-
-== Initialization
-
-- Xavier / He scaling for variance preservation
-- Bad init → dead ReLUs or blow-up
-- LayerNorm reduces sensitivity (Day 5)
-
-== Initialization — illustration
-
-#align(center)[#image("/assets/figures/day03/ucl1_p022.png", width: 80%)]
-
-#text(size: 14pt, fill: gray)[Training Loop — Initialization (source: course materials)]
-
-== Batch Normalization
-
-- Normalize activations per mini-batch
-- Learnable scale and shift $gamma, beta$
-- Regularization side effect
-
-== Batch Normalization — illustration
-
-#align(center)[#image("/assets/figures/day03/ucl1_p029.png", width: 80%)]
-
-#text(size: 14pt, fill: gray)[Training Loop — Batch Normalization (source: course materials)]
-
-= Optimizers
-
-== Momentum
-
-- $v_(t+1) = beta v_t + nabla L$; $w_(t+1) = w_t - eta v_(t+1)$
-- Accumulates consistent gradient direction
-- Nesterov lookahead variant
-
-== Adam
-
-- Adaptive per-parameter learning rates
-- First and second moment estimates
-- Default choice for many DL experiments
-
-== Weight Decay
-
-- Decoupled WD vs L2 in AdamW
-- Regularization interacts with normalization
-
-== Debugging Training
-
-- Loss not decreasing → LR, init, bugs
-- Overfit small batch sanity check
-- Gradient clipping for RNNs / LLMs
+- BatchNorm: standardize activations per minibatch
+- LayerNorm: standardize per example (default in Transformers, Day 5)
+- Stabilizes & speeds training; mild regularizing effect
+- Early stopping: halt when validation loss climbs
+- Recipe: ReLU + good init + normalization + Adam + decay
 
 == Summary
 
 - Day 3: *Deep Neural Networks*
-- Backpropagation, activations, optimizers
+- From the perceptron to backprop and optimization
 - Questions welcome — practical follows
 
 == Questions?
