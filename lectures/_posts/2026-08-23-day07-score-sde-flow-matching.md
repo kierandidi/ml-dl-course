@@ -24,7 +24,9 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day07.pdf)
 
-### [Exercise](/projects/day07-practical/)
+### Exercise
+
+[Download the notebook](/notebooks/practicals/day07.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day07.ipynb)
 
 Day 6 built diffusion from the variational, discrete-time DDPM viewpoint. Today we take the continuous-time view that unifies modern generative modeling. The central object is the **score** — the gradient of the log-density — which we can learn by denoising and use to sample. Letting the number of noising steps go to infinity turns the forward chain into a stochastic differential equation (SDE), whose time-reversal and deterministic *probability-flow ODE* give two ways to generate data. Flow matching arrives at the same place from a different door, regressing a velocity field directly. We finish by showing that DDPM, score-SDE, and flow matching are three views of one model.
 

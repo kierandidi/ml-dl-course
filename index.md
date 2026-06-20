@@ -16,21 +16,21 @@ Each day has **lecture notes** (derivations), **PDF slides** (figures from MML, 
 
 | Day | Date | Topic | Notes | Slides | Exercise |
 |-----|------|-------|-------|--------|----------|
-| 1 | Mon 17 Aug | Math foundations | [Notes](/blog/lectures/2026/08/17/day01-math-foundations/) | [PDF](/assets/slides/day01.pdf) | [Exercise](/projects/day01-practical/) |
-| 2 | Tue 18 Aug | Statistical learning | [Notes](/blog/lectures/2026/08/18/day02-statistical-learning/) | [PDF](/assets/slides/day02.pdf) | [Exercise](/projects/day02-practical/) |
-| 3 | Wed 19 Aug | Deep neural networks | [Notes](/blog/lectures/2026/08/19/day03-deep-neural-networks/) | [PDF](/assets/slides/day03.pdf) | [Exercise](/projects/day03-practical/) |
-| 4 | Thu 20 Aug | CNNs & vision | [Notes](/blog/lectures/2026/08/20/day04-convolutional-networks/) | [PDF](/assets/slides/day04.pdf) | [Exercise](/projects/day04-practical/) |
-| 5 | Fri 21 Aug | RNNs → Transformers | [Notes](/blog/lectures/2026/08/21/day05-rnns-and-transformers/) | [PDF](/assets/slides/day05.pdf) | [Exercise](/projects/day05-practical/) |
+| 1 | Mon 17 Aug | Math foundations | [Notes](/blog/lectures/2026/08/17/day01-math-foundations/) | [PDF](/assets/slides/day01.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day01.ipynb) |
+| 2 | Tue 18 Aug | Statistical learning | [Notes](/blog/lectures/2026/08/18/day02-statistical-learning/) | [PDF](/assets/slides/day02.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day02.ipynb) |
+| 3 | Wed 19 Aug | Deep neural networks | [Notes](/blog/lectures/2026/08/19/day03-deep-neural-networks/) | [PDF](/assets/slides/day03.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day03.ipynb) |
+| 4 | Thu 20 Aug | CNNs & vision | [Notes](/blog/lectures/2026/08/20/day04-convolutional-networks/) | [PDF](/assets/slides/day04.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day04.ipynb) |
+| 5 | Fri 21 Aug | RNNs → Transformers | [Notes](/blog/lectures/2026/08/21/day05-rnns-and-transformers/) | [PDF](/assets/slides/day05.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day05.ipynb) |
 
 ## Week 2 — Generative Modeling
 
-| Day | Date | Topic | Notes | Slides | Practical |
-|-----|------|-------|-------|--------|-----------|
-| 6 | Mon 24 Aug | Generative modeling | [Notes](/blog/lectures/2026/08/24/day06-generative-modeling/) | [PDF](/assets/slides/day06.pdf) | [Exercise](/projects/day06-practical/) |
-| 7 | Tue 25 Aug | Training diffusion & flow | [Notes](/blog/lectures/2026/08/25/day07-training-diffusion-flow/) | [PDF](/assets/slides/day07.pdf) | [Exercise](/projects/day07-practical/) |
-| 8 | Wed 26 Aug | Inference (SDE / ODE) | [Notes](/blog/lectures/2026/08/26/day08-diffusion-flow-inference/) | [PDF](/assets/slides/day08.pdf) | [Exercise](/projects/day08-practical/) |
-| 9 | Thu 27 Aug | Autoregressive LLMs | [Notes](/blog/lectures/2026/08/27/day09-autoregressive-llms/) | [PDF](/assets/slides/day09.pdf) | [Exercise](/projects/day09-practical/) |
-| 10 | Fri 28 Aug | AR inference & KV cache | [Notes](/blog/lectures/2026/08/28/day10-ar-inference/) | [PDF](/assets/slides/day10.pdf) | [Exercise](/projects/day10-practical/) |
+| Day | Date | Topic | Notes | Slides | Exercise |
+|-----|------|-------|-------|--------|----------|
+| 6 | Mon 24 Aug | Generative modeling & diffusion | [Notes](/blog/lectures/2026/08/22/day06-generative-modeling-diffusion/) | [PDF](/assets/slides/day06.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day06.ipynb) |
+| 7 | Tue 25 Aug | Score, SDEs & flow matching | [Notes](/blog/lectures/2026/08/23/day07-score-sde-flow-matching/) | [PDF](/assets/slides/day07.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day07.ipynb) |
+| 8 | Wed 26 Aug | Guidance, solvers & fast sampling | [Notes](/blog/lectures/2026/08/24/day08-guidance-solvers-fast-sampling/) | [PDF](/assets/slides/day08.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day08.ipynb) |
+| 9 | Thu 27 Aug | Autoregressive LLMs | [Notes](/blog/lectures/2026/08/25/day09-autoregressive-llms/) | [PDF](/assets/slides/day09.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day09.ipynb) |
+| 10 | Fri 28 Aug | LLM inference & KV cache | [Notes](/blog/lectures/2026/08/26/day10-ar-inference/) | [PDF](/assets/slides/day10.pdf) | [Colab](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day10.ipynb) |
 
 ## Reading list
 

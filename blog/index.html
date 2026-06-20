@@ -1,10 +1,20 @@
 ---
-layout: grid
+layout: page
 title: Lessons
 description: >
-  Lessons for the course.
-last_modified_at: 2022-07-17
-no_link_title: false 
-no_excerpt: false 
+  Daily lecture notes for the two-week course, in order (Day 1 → Day 10).
+no_link_title: false
+no_excerpt: false
 hide_image: false
 ---
+
+{% assign ordered = site.posts | sort:"date" %}
+{% assign no_third_column = page.no_third_column | default:site.hydejack.no_third_column | default:false %}
+
+<div class="columns {% unless no_third_column %}columns-break{% endunless %}">
+  {% for post in ordered %}
+    <div class="column column-1-2">
+      {% include_cached pro/post-card.html post=post %}
+    </div>
+  {% endfor %}
+</div>

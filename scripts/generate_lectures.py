@@ -15,6 +15,8 @@ from content_day05 import LECTURE as DAY05_LECTURE
 from content_day06 import LECTURE as DAY06_LECTURE
 from content_day07 import LECTURE as DAY07_LECTURE
 from content_day08 import LECTURE as DAY08_LECTURE
+from content_day09 import LECTURE as DAY09_LECTURE
+from content_day10 import LECTURE as DAY10_LECTURE
 from diffusion_viz import VIZ, viz_iframe
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -568,6 +570,8 @@ LECTURES[3] = DAY04_LECTURE  # Day 4 — Convolutional Neural Networks
 LECTURES[4] = DAY05_LECTURE  # Day 5 — Sequence Models & Transformers
 LECTURES.append(DAY07_LECTURE)  # Day 7 — Score, SDEs & Flow Matching
 LECTURES.append(DAY08_LECTURE)  # Day 8 — Guidance, Solvers & Fast Sampling
+LECTURES.append(DAY09_LECTURE)  # Day 9 — Autoregressive Language Models
+LECTURES.append(DAY10_LECTURE)  # Day 10 — LLM Inference & Alignment
 
 
 def sanitize_math(text: str) -> str:
@@ -665,7 +669,14 @@ def render_lecture(lecture: dict) -> str:
             "",
             f"### [Slides](/assets/slides/day{day_str}.pdf)",
             "",
-            f"### [Exercise](/projects/day{day_str}-practical/)",
+            "### Exercise",
+            "",
+            (
+                f"[Download the notebook](/notebooks/practicals/day{day_str}.ipynb) · "
+                f"[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]"
+                f"(https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/"
+                f"notebooks/practicals/day{day_str}.ipynb)"
+            ),
             "",
             lecture["intro"],
             "",

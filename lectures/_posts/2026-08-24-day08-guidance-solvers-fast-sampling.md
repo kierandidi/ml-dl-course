@@ -24,7 +24,9 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day08.pdf)
 
-### [Exercise](/projects/day08-practical/)
+### Exercise
+
+[Download the notebook](/notebooks/practicals/day08.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day08.ipynb)
 
 Days 6–7 built diffusion models and showed that sampling means running a learned dynamics backward in time. Today we make them **useful and fast**. First, **guidance** lets us steer generation toward a condition — a class label or a text prompt — and trade diversity for fidelity. Second, we recognize sampling as **numerical integration** of the probability-flow ODE (or reverse SDE), which lets us import centuries of numerical-analysis wisdom: DDIM is just Euler's method, and high-order and exponential integrators reach high quality in a handful of steps. Finally, **flow maps** and **consistency models** collapse the trajectory into a single learned jump, pushing toward real-time, few-step generation.
 
@@ -348,3 +350,4 @@ Before moving to the practical, confirm you can:
 - Contrast stochastic and deterministic samplers and state what the Fokker–Planck equation guarantees.
 - Explain Heun's method, log-SNR time stepping, and exponential integrators (DPM-Solver/DEIS).
 - Define a flow map and the semigroup/consistency property, and explain how consistency models reach one-step sampling.
+- Looking ahead: diffusion fought the cost of *many sampling steps* (NFEs) with solvers and flow maps. Day 9 returns to the autoregressive family from the Day 6 taxonomy, where the analogous cost is *serial token-by-token decoding* — fought on Day 10 with the KV cache.

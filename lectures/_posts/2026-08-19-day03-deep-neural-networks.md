@@ -22,7 +22,9 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day03.pdf)
 
-### [Exercise](/projects/day03-practical/)
+### Exercise
+
+[Download the notebook](/notebooks/practicals/day03.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day03.ipynb)
 
 Yesterday we fit linear and logistic models; today we make them deep. A neural network is nothing more than a *composition* of simple parameterized maps, but composition buys an enormous amount: the ability to learn features rather than hand-craft them. We will build the multilayer perceptron from scratch, derive backpropagation as reverse-mode automatic differentiation, understand why deep gradients vanish or explode, and study the optimization and regularization tricks that turn a pile of matrix multiplies into a model that generalizes.
 

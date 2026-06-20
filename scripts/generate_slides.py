@@ -14,9 +14,11 @@ from content_day05 import FIGURES as DAY05_FIGURES, SLIDES as DAY05_SLIDES
 from content_day06 import FIGURES as DAY06_FIGURES, SLIDES as DAY06_SLIDES
 from content_day07 import FIGURES as DAY07_FIGURES, SLIDES as DAY07_SLIDES
 from content_day08 import FIGURES as DAY08_FIGURES, SLIDES as DAY08_SLIDES
+from content_day09 import FIGURES as DAY09_FIGURES, SLIDES as DAY09_SLIDES
+from content_day10 import FIGURES as DAY10_FIGURES, SLIDES as DAY10_SLIDES
 
 # Days with hand-curated figure lists (aligned one-per-slide, None allowed).
-CURATED_FIGURES = {1: DAY01_FIGURES, 2: DAY02_FIGURES, 3: DAY03_FIGURES, 4: DAY04_FIGURES, 5: DAY05_FIGURES, 6: DAY06_FIGURES, 7: DAY07_FIGURES, 8: DAY08_FIGURES}
+CURATED_FIGURES = {1: DAY01_FIGURES, 2: DAY02_FIGURES, 3: DAY03_FIGURES, 4: DAY04_FIGURES, 5: DAY05_FIGURES, 6: DAY06_FIGURES, 7: DAY07_FIGURES, 8: DAY08_FIGURES, 9: DAY09_FIGURES, 10: DAY10_FIGURES}
 
 ROOT = Path(__file__).resolve().parents[1]
 DAYS_DIR = ROOT / "slides" / "days"
@@ -1426,6 +1428,8 @@ COURSE[4] = DAY05_SLIDES  # Day 5 — Sequence Models & Transformers
 COURSE[5] = DAY06_SLIDES  # Day 6 — Generative Modeling & DDPM
 COURSE[6] = DAY07_SLIDES  # Day 7 — Score, SDEs & Flow Matching
 COURSE[7] = DAY08_SLIDES  # Day 8 — Guidance, Solvers & Fast Sampling
+COURSE[8] = DAY09_SLIDES  # Day 9 — Autoregressive Language Models
+COURSE[9] = DAY10_SLIDES  # Day 10 — LLM Inference & Alignment
 
 
 def render_bullets(lines: list[str]) -> str:

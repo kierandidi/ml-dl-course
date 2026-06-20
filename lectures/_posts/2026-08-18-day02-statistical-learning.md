@@ -21,7 +21,9 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day02.pdf)
 
-### [Exercise](/projects/day02-practical/)
+### Exercise
+
+[Download the notebook](/notebooks/practicals/day02.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day02.ipynb)
 
 Day 1 built the mathematical language; today we use it to design learning algorithms. Following MML Part II, we start with the **framework** for how data, models, and learning fit together (Chapter 8), then work through the four central pillars: **linear regression** (Ch. 9), **PCA** for dimensionality reduction (Ch. 10), **Gaussian mixture models** for density estimation (Ch. 11), and **support vector machines** for classification (Ch. 12). Each section connects back to the linear-algebra and probability tools from Day 1.
 

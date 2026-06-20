@@ -258,7 +258,17 @@ SLIDES = (
                         "Transformer: every pair interacts in one layer, same treatment",
                         "Constant path length $arrow.r$ long-range deps no harder than short",
                         "Parallel training $arrow.r$ scales to internet-scale data (LLMs)",
-                        "Day 9-10: pretraining; proteins/sequences: see structural-bioinformatics course",
+                        "Today = the *mechanism*; proteins/sequences: structural-bioinformatics course",
+                    ],
+                ),
+                (
+                    "Bridge to Week 2 (Days 9–10)",
+                    [
+                        "We built the block; Day 9 turns it into a *production* decoder-only GPT",
+                        "Deferred to Day 9: tokenisation (BPE), RoPE, RMSNorm, GeGLU, GQA",
+                        "Deferred to Day 9: the full GPT forward pass + cross-entropy training loop",
+                        "Deferred to Day 9: nanoGPT walkthrough (build & train one fully)",
+                        "Deferred to Day 10: KV-cache inference, sampling, light post-training",
                     ],
                 ),
             ],
@@ -543,7 +553,9 @@ $$\\mathrm{Attention}(Q,K,V) = \\mathrm{softmax}\\!\\left(\\frac{QK^{\\top}}{\\s
 
 The cost is $$O(N^2)$$ attention, motivating sparse attention, linear attention, and state-space models for very long contexts. But for the sequence lengths that dominated NLP and protein modelling (hundreds to a few thousand tokens), the Transformer remains the default.
 
-**Connections.** Day 9–10 cover LLM pretraining and inference. For sequence alignment, evolutionary conservation, and protein language models, the [structural bioinformatics course](https://structural-bioinformatics.netlify.app/blog/proteins/2023-08-02-lesson4/) (Lesson 4: Evolution, Language and Bioinformatics; Lesson 7: Generative Modelling) provides complementary biological motivation and references.""",
+**Connections.** Day 9–10 cover LLM pretraining and inference. For sequence alignment, evolutionary conservation, and protein language models, the [structural bioinformatics course](https://structural-bioinformatics.netlify.app/blog/proteins/2023-08-02-lesson4/) (Lesson 4: Evolution, Language and Bioinformatics; Lesson 7: Generative Modelling) provides complementary biological motivation and references.
+
+**Bridge to Week 2.** Today we built the Transformer block as a general-purpose *mechanism* and showed how causal masking turns it into an autoregressive sequence model. We deliberately stop here: the details that turn this block into a *production* large language model belong to Day 9, where we return to autoregressive modelling (named on Day 6, then set aside for diffusion on Days 6–8) and build one end to end. Specifically, we defer to **Day 9** the input pipeline (subword **tokenisation**/BPE, document packing), the modern block internals (**RMSNorm**, **GeGLU**, **rotary position embeddings (RoPE)**, **grouped-query attention**), the full GPT forward pass and **cross-entropy training loop**, and a **nanoGPT** code walkthrough; and to **Day 10** efficient **KV-cache** inference, sampling strategies, and the light GPT→ChatGPT post-training arc. Keep the picture from today — attention as a weighted average, the block as horizontal-then-vertical mixing — as the scaffold those details hang on.""",
                 },
             ],
         },
@@ -557,5 +569,6 @@ The cost is $$O(N^2)$$ attention, motivating sparse attention, linear attention,
         "Assemble a Transformer block (multi-head attention, MLP, residual + LayerNorm, position encoding) and explain causal masking.",
         "Connect Turner's $$D\\times N$$ layout to standard $$Q,K,V$$ batch notation and derive the $$1/\\sqrt{d_k}$$ scaling.",
         "Contrast RNNs and Transformers on path length, parallelism, and scalability.",
+        "List what Day 9 adds on top of today's block (tokenisation, RoPE, RMSNorm/GeGLU, GQA, the GPT training loop, nanoGPT) to turn it into a production autoregressive LM.",
     ],
 }

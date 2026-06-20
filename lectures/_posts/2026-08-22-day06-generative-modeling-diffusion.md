@@ -23,7 +23,9 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day06.pdf)
 
-### [Exercise](/projects/day06-practical/)
+### Exercise
+
+[Download the notebook](/notebooks/practicals/day06.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day06.ipynb)
 
 Week 2 turns to **generative modeling**: instead of predicting a label from an input, we want to model the data distribution itself and draw new samples from it. Today we build the **variational view of diffusion**. We start from variational autoencoders (VAEs) and the evidence lower bound, then show that a *denoising diffusion probabilistic model* (DDPM) is essentially a deep, fixed-encoder hierarchical VAE. We will derive the forward noising process and its closed-form marginal, the Gaussian reverse posterior that makes training tractable, and the surprisingly simple noise-prediction loss. Throughout we use the unified notation of *The Principles of Diffusion Models* ($x_t = \alpha_t x_0 + \sigma_t \epsilon$) so that everything connects cleanly to the score-based and flow-based views in Day 7.
 

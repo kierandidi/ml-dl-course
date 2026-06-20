@@ -209,7 +209,15 @@
 - Transformer: every pair interacts in one layer, same treatment
 - Constant path length $arrow.r$ long-range deps no harder than short
 - Parallel training $arrow.r$ scales to internet-scale data (LLMs)
-- Day 9-10: pretraining; proteins/sequences: see structural-bioinformatics course
+- Today = the *mechanism*; proteins/sequences: structural-bioinformatics course
+
+== 5.4  Bridge to Week 2 (Days 9–10)
+
+- We built the block; Day 9 turns it into a *production* decoder-only GPT
+- Deferred to Day 9: tokenisation (BPE), RoPE, RMSNorm, GeGLU, GQA
+- Deferred to Day 9: the full GPT forward pass + cross-entropy training loop
+- Deferred to Day 9: nanoGPT walkthrough (build & train one fully)
+- Deferred to Day 10: KV-cache inference, sampling, light post-training
 
 == Summary
 

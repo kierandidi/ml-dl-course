@@ -56,7 +56,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 1 — Math foundations (17 Aug) {: #day-1}
 
-**[Lecture notes](/blog/lectures/2026/08/17/day01-math-foundations/) · [Slides](/assets/slides/day01.pdf) · [Practical](/projects/day01-practical/)**
+**[Lecture notes](/blog/lectures/2026/08/17/day01-math-foundations/) · [Slides](/assets/slides/day01.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day01.ipynb)**
 
 - [Deisenroth, Faisal & Ong — *Mathematics for Machine Learning*](https://mml-book.com) (Ch. 2–6: linear algebra through probability)
 - [Deisenroth & Ong — *There and Back Again: A Tale of Slopes and Expectations*](https://mml-book.github.io/slopes-expectations.html) (NeurIPS 2020 tutorial on integration & differentiation)
@@ -68,7 +68,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 2 — Statistical learning (18 Aug) {: #day-2}
 
-**[Lecture notes](/blog/lectures/2026/08/18/day02-statistical-learning/) · [Slides](/assets/slides/day02.pdf) · [Practical](/projects/day02-practical/)**
+**[Lecture notes](/blog/lectures/2026/08/18/day02-statistical-learning/) · [Slides](/assets/slides/day02.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day02.ipynb)**
 
 - [Hastie et al. — ESL](https://hastie.su.domains/ElemStatLearn/), Ch. 3–4 (linear methods, classification)
 - [Murphy — PML](https://probml.github.io/pml-book/book1.html), Ch. 11 (linear / logistic regression)
@@ -79,7 +79,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 3 — Deep neural networks (19 Aug) {: #day-3}
 
-**[Lecture notes](/blog/lectures/2026/08/19/day03-deep-neural-networks/) · [Slides](/assets/slides/day03.pdf) · [Practical](/projects/day03-practical/)**
+**[Lecture notes](/blog/lectures/2026/08/19/day03-deep-neural-networks/) · [Slides](/assets/slides/day03.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day03.ipynb)**
 
 - [Goodfellow et al. — Deep Learning](https://www.deeplearningbook.org/), Ch. 6–8 (MLPs, backprop, optimization)
 - [UCL × DeepMind — Lecture 2 (feedforward & optimization)](https://www.deepmind.com/learning-resources/deep-learning-lecture-series-2020)
@@ -90,7 +90,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 4 — CNNs & computer vision (20 Aug) {: #day-4}
 
-**[Lecture notes](/blog/lectures/2026/08/20/day04-convolutional-networks/) · [Slides](/assets/slides/day04.pdf) · [Practical](/projects/day04-practical/)**
+**[Lecture notes](/blog/lectures/2026/08/20/day04-convolutional-networks/) · [Slides](/assets/slides/day04.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day04.ipynb)**
 
 - [Goodfellow et al. — Deep Learning, Ch. 9](https://www.deeplearningbook.org/contents/convnets.html) (convolutional networks)
 - [CS231n — Convolutional Neural Networks](https://cs231n.github.io/convolutional-networks/) (Stanford vision course notes)
@@ -102,7 +102,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 5 — RNNs & Transformers (21 Aug) {: #day-5}
 
-**[Lecture notes](/blog/lectures/2026/08/21/day05-rnns-and-transformers/) · [Slides](/assets/slides/day05.pdf) · [Practical](/projects/day05-practical/)**
+**[Lecture notes](/blog/lectures/2026/08/21/day05-rnns-and-transformers/) · [Slides](/assets/slides/day05.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day05.ipynb)**
 
 - [Vaswani et al. — Attention Is All You Need](https://arxiv.org/abs/1706.03762) (transformer architecture)
 - [Karpathy — The Unreasonable Effectiveness of RNNs](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) (sequence modeling intuition)
@@ -115,7 +115,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 6 — Generative modeling (24 Aug) {: #day-6}
 
-**[Lecture notes](/blog/lectures/2026/08/24/day06-generative-modeling/) · [Slides](/assets/slides/day06.pdf) · [Practical](/projects/day06-practical/)**
+**[Lecture notes](/blog/lectures/2026/08/22/day06-generative-modeling-diffusion/) · [Slides](/assets/slides/day06.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day06.ipynb)**
 
 - [Principles of Diffusion Models](https://arxiv.org/abs/2510.21890) — Ch. 1–2 (generative modeling, variational view)
 - [Kingma & Welling — VAE](https://arxiv.org/abs/1312.6114) (ELBO, reparameterization)
@@ -127,7 +127,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 7 — Training diffusion & flow models (25 Aug) {: #day-7}
 
-**[Lecture notes](/blog/lectures/2026/08/25/day07-training-diffusion-flow/) · [Slides](/assets/slides/day07.pdf) · [Practical](/projects/day07-practical/)**
+**[Lecture notes](/blog/lectures/2026/08/23/day07-score-sde-flow-matching/) · [Slides](/assets/slides/day07.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day07.ipynb)**
 
 - [MIT 6.S184 — 2026 lectures 2–3](https://diffusion.csail.mit.edu/2026/index.html) (flow matching, score matching)
 - [MIT course notes PDF](https://diffusion.csail.mit.edu/) (companion to lectures)
@@ -140,7 +140,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 8 — Inference: SDEs & ODEs (26 Aug) {: #day-8}
 
-**[Lecture notes](/blog/lectures/2026/08/26/day08-diffusion-flow-inference/) · [Slides](/assets/slides/day08.pdf) · [Practical](/projects/day08-practical/)**
+**[Lecture notes](/blog/lectures/2026/08/24/day08-guidance-solvers-fast-sampling/) · [Slides](/assets/slides/day08.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day08.ipynb)**
 
 - [Song et al. — Score-Based SDEs](https://arxiv.org/abs/2011.13456) — § sampling and reverse-time SDE
 - [Ho et al. — DDPM](https://arxiv.org/abs/2006.11239) — sampling algorithms
@@ -153,7 +153,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 9 — Autoregressive LLMs (27 Aug) {: #day-9}
 
-**[Lecture notes](/blog/lectures/2026/08/27/day09-autoregressive-llms/) · [Slides](/assets/slides/day09.pdf) · [Practical](/projects/day09-practical/)**
+**[Lecture notes](/blog/lectures/2026/08/25/day09-autoregressive-llms/) · [Slides](/assets/slides/day09.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day09.ipynb)**
 
 - [Vaswani et al. — Attention Is All You Need](https://arxiv.org/abs/1706.03762) (full architecture)
 - [Gordić — Inside the Transformer: Life of a Token](https://www.aleksagordic.com/blog/transformer) (modern training stack: RoPE, RMSNorm, GQA)
@@ -165,7 +165,7 @@ Use these alongside each lecture. **Notes · Slides · Practical** are on the [A
 
 ### Day 10 — AR inference & KV cache (28 Aug) {: #day-10}
 
-**[Lecture notes](/blog/lectures/2026/08/28/day10-ar-inference/) · [Slides](/assets/slides/day10.pdf) · [Practical](/projects/day10-practical/) · [Assessment](/projects/final-assessment/)**
+**[Lecture notes](/blog/lectures/2026/08/26/day10-ar-inference/) · [Slides](/assets/slides/day10.pdf) · [Exercise (Colab)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day10.ipynb) · [Assessment](/projects/final-assessment/)**
 
 - [Vaswani et al.](https://arxiv.org/abs/1706.03762) — §3 (complexity, autoregressive decoding)
 - [Holtzman et al. — Neural Text Degeneration](https://arxiv.org/abs/1904.09751) (nucleus / top-*p* sampling)

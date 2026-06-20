@@ -1,172 +1,186 @@
 #import "../lib.typ": *
 
-#show: course-theme.with(title: [Autoregressive Inference], subtitle: [Day 10 | Aug 2026])
+#show: course-theme.with(title: [LLM Inference & Alignment], subtitle: [Day 10 | Aug 2026])
 
-= Day 10: Autoregressive Inference
+= Day 10: LLM Inference & Alignment
 
 == Welcome
 
-- *Autoregressive Inference* — Decoding strategies and KV cache
+- *LLM Inference & Alignment* — From a base model to a usable assistant
 - 3 hours lecture + practical
 - Slides, notes, and code on the course site
 
 == Outline
 
-- Text Generation Loop
-- KV Cache
-- Efficient Attention
-- Serving & Systems
+- Autoregressive Decoding
+- KV Cache & Memory
+- Sampling & Systems
+- From GPT to ChatGPT (light)
 
-= 1 · Text Generation Loop
+= 1 · Autoregressive Decoding
 
-== 1.1  Autoregressive Decoding
+== 1.1  The Decode Loop
 
-- Start from prompt tokens
-- Repeat: forward pass → logits → sample/argmax → append
-- Stop at EOS or max length
+- Day 9 gave us $p_theta (x_t | x_(<t))$ — now we *generate*
+- Sample $x_t$, append it, feed back, repeat
+- Inherently *serial*: token $t$ needs tokens $< t$
+- Two phases: prefill (the prompt) then decode (one by one)
+- Latency = time-to-first-token + per-token time
 
-== 1.1  Autoregressive Decoding
+== 1.1  The Decode Loop
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page000.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_generation.png", width: 92%, height: 82%, fit: "contain")]
 
-== 1.2  Greedy & Beam Search
+== 1.2  Exposure Bias
 
-- Greedy: $x_t = "arg max" p(x_t|x_(<t))$
-- Beam search keeps top-$k$ partial sequences
-- Deterministic but often dull
+- Training: teacher forcing on ground-truth context
+- Generation: model conditions on its *own* past outputs
+- Small errors can compound over a long generation
+- Mitigated by scale, good data, and decoding choices
+- A reason sampling strategy matters at inference
 
-== 1.2  Greedy & Beam Search
+== 1.3  Greedy, Sampling, and Beam
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page002.png", width: 92%, height: 82%, fit: "contain")]
+- Greedy: take the argmax each step — repetitive, brittle
+- Sampling: draw from the distribution — diverse
+- Beam search: keep top-$k$ partial sequences (translation legacy)
+- Beam helps short, high-precision outputs; hurts open-ended text
+- Modern chat: temperature + nucleus sampling
 
-== 1.3  Sampling Methods
+== 1.3  Greedy, Sampling, and Beam
 
-- Temperature $tau$: soften $"softmax"("logits"/tau)$
-- Top-$k$ and nucleus (top-$p$) filtering
-- Repetition penalty
+#align(center + horizon)[#image("/assets/figures/day10/llmks_beam.png", width: 92%, height: 82%, fit: "contain")]
 
-== 1.3  Sampling Methods
+= 2 · KV Cache & Memory
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page004.png", width: 92%, height: 82%, fit: "contain")]
+== 2.1  Why Decode Is Quadratic Without a Cache
 
-== 1.4  Latency Metrics
+- Naive decode recomputes attention over the whole prefix
+- Step $t$ costs $O(t)$; a full sequence costs $O(T^2)$
+- But keys/values of past tokens never change
+- Idea: compute them once, store, and reuse
+- This is the single biggest inference optimization
 
-- Time to first token (TTFT)
-- Tokens per second (TPS)
-- Prefill vs decode phases
+== 2.2  The KV Cache
 
-== 1.4  Latency Metrics
+- Cache $K, V$ for every layer and past position
+- Each new token computes its own $q, k, v$
+- Append $k, v$ to the cache; attend over the cache
+- Per-step cost drops from $O(t)$ recompute to $O(1)$ append
+- Prefill fills the cache; decode extends it
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page005.png", width: 92%, height: 82%, fit: "contain")]
+== 2.2  The KV Cache
 
-= 2 · KV Cache
+#align(center + horizon)[#image("/assets/figures/day10/llmks_kvcache.png", width: 92%, height: 82%, fit: "contain")]
 
-== 2.1  Motivation
+== 2.3  KV-Cache Memory and GQA
 
-- Self-attention recomputes keys/values for all past tokens
-- At step $t$, past $K,V$ are unchanged
-- Cache avoids $O(t^2)$ redundant work per step
+- Cache size ~ $2 dot L dot n_"kv" dot d_"head" dot T$ per sequence
+- Grows with context length $T$ and batch size
+- Often the real bottleneck — bandwidth and memory bound
+- Grouped-query attention (Day 9) shrinks $n_"kv"$
+- PagedAttention manages the cache like virtual memory
 
-== 2.1  Motivation
+== 2.3  KV-Cache Memory and GQA
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page006.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_kv_bottleneck.png", width: 92%, height: 82%, fit: "contain")]
 
-== 2.2  Cache Structure
+= 3 · Sampling & Systems
 
-- Store $K,V$ per layer per head
-- Memory $O(L dot H dot T dot d_h)$ grows with context
-- Batching pads to max length in batch
+== 3.1  Temperature
 
-== 2.2  Cache Structure
+- Rescale logits before softmax: $p_i prop exp(z_i \\/ T)$
+- $T < 1$: sharper, more deterministic
+- $T > 1$: flatter, more random
+- $T arrow.r 0$ recovers greedy decoding
+- The first knob for the quality/diversity trade-off
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page008.png", width: 92%, height: 82%, fit: "contain")]
+== 3.1  Temperature
 
-== 2.3  Prefill vs Decode
+#align(center + horizon)[#image("/assets/figures/day10/llmks_sampling.png", width: 92%, height: 82%, fit: "contain")]
 
-- Prefill: process prompt in parallel (compute-bound)
-- Decode: one token at a time (memory-bandwidth)
-- Continuous batching in serving systems
+== 3.2  Top-k and Top-p (Nucleus)
 
-== 2.3  Prefill vs Decode
+- Top-$k$: sample only from the $k$ most likely tokens
+- Top-$p$: smallest set whose probability mass exceeds $p$
+- Truncates the unreliable long tail of the distribution
+- Nucleus (top-$p$) adapts the cutoff to each step
+- Common default: temperature + top-$p$ together
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page010.png", width: 92%, height: 82%, fit: "contain")]
+== 3.2  Top-k and Top-p (Nucleus)
 
-== 2.4  Multi-Query / GQA
+#align(center + horizon)[#image("/assets/figures/day10/llmks_topk_topp.png", width: 92%, height: 82%, fit: "contain")]
 
-- Share K,V heads across query heads
-- Reduces cache size with minimal quality loss
-- Standard in modern LLM inference
+== 3.3  Throughput: Prefill vs Decode
 
-== 2.4  Multi-Query / GQA
+- Prefill is compute-bound; decode is memory-bandwidth-bound
+- Decode reuses weights for one token at a time
+- Batch many requests to amortize weight reads
+- Continuous batching: add/remove requests mid-flight
+- Metrics: tokens/sec, TTFT, inter-token latency
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page012.png", width: 92%, height: 82%, fit: "contain")]
+== 3.4  FlashAttention & PagedAttention
 
-= 3 · Efficient Attention
+- FlashAttention: IO-aware exact attention, no big $N times N$ matrix
+- Tiles the computation in fast on-chip memory
+- Speeds up training and prefill, saves memory
+- PagedAttention (vLLM): non-contiguous KV cache in pages
+- Less fragmentation $arrow.r$ higher batch sizes, more throughput
 
-== 3.1  FlashAttention
+== 3.5  Speculative Decoding & Quantization
 
-- Tiled softmax without materializing full $n times n$
-- IO-aware — faster on GPU memory hierarchy
-- Training and prefill benefit most
+- Speculative: a small draft model proposes several tokens
+- The big model *verifies* them in one parallel pass
+- Accepted tokens are free — same distribution, fewer big-model steps
+- Quantization: INT8 / INT4 weights shrink memory + bandwidth
+- Both attack the serial / memory-bound decode cost
 
-== 3.1  FlashAttention
+= 4 · From GPT to ChatGPT (light)
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page014.png", width: 92%, height: 82%, fit: "contain")]
+== 4.1  From Base Model to Assistant
 
-== 3.2  PagedAttention (vLLM)
+- Base LM (Day 9): predicts internet text, not 'helpful'
+- Pipeline: pretrain $arrow.r$ SFT $arrow.r$ preference tuning
+- Then: system prompt + safety + tools
+- Each stage uses far less data than pretraining
+- Turns a next-token predictor into a chat model
 
-- Non-contiguous KV blocks like virtual memory
-- Reduces fragmentation in batched serving
-- Higher GPU utilization
+== 4.1  From Base Model to Assistant
 
-== 3.2  PagedAttention (vLLM)
+#align(center + horizon)[#image("/assets/figures/day10/llmks_paradigm_shift.png", width: 92%, height: 82%, fit: "contain")]
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page016.png", width: 92%, height: 82%, fit: "contain")]
+== 4.2  Supervised Fine-Tuning (SFT)
 
-== 3.3  Speculative Decoding
+- Fine-tune on curated (instruction, response) conversations
+- Same next-token loss, masked to the *assistant* tokens
+- Teaches format, instruction-following, tone
+- LoRA / PEFT: adapt cheaply without full fine-tuning
+- Small, high-quality data matters more than volume
 
-- Draft model proposes several tokens
-- Target model verifies in parallel
-- Acceptance rate determines speedup
+== 4.3  Preference Tuning (RLHF / DPO)
 
-== 3.3  Speculative Decoding
+- Collect human preferences: response A vs response B
+- RLHF: train a reward model, optimize it with PPO
+- DPO: optimize the preferences directly, no RL loop
+- Aligns the model with human judgments of quality
+- Details in the optional notes — concept is the takeaway
 
-#align(center + horizon)[#image("/assets/figures/day10/pdf0_page018.png", width: 92%, height: 82%, fit: "contain")]
+== 4.4  Course Recap
 
-== 3.4  Long Context
+- Week 1: ML/DL foundations $arrow.r$ CNNs $arrow.r$ Transformers
+- Week 2: generative models, diffusion, and autoregressive LLMs
+- Three generative paths: AR, diffusion/score, flows
+- Same backbone — Transformers — powers all of it
+- Transformers everywhere: text, vision, audio, biology
 
-- RoPE scaling, YaRN, ALiBi
-- Ring attention for very long sequences
-- Context window vs true reasoning
+== 4.4  Course Recap
 
-== 3.4  Long Context
-
-#align(center + horizon)[#image("/assets/figures/day10/pdf1_page000.png", width: 92%, height: 82%, fit: "contain")]
-
-= 4 · Serving & Systems
-
-== 4.1  Quantization for Inference
-
-- Weight-only INT4 (GPTQ, AWQ)
-- KV cache quantization
-- Accuracy vs throughput tradeoffs
-
-== 4.2  Batching Strategies
-
-- Static vs continuous batching
-- Request scheduling and preemption
-- Multi-tenant SLA constraints
-
-== 4.3  Course Recap
-
-- Week 1: ML/DL foundations → Transformers
-- Week 2: generative models → production LLM inference
-- Final assessment ties math + code together
+#align(center + horizon)[#image("/assets/figures/day10/llmks_summary.png", width: 92%, height: 82%, fit: "contain")]
 
 == Summary
 
-- Day 10: *Autoregressive Inference*
-- Decoding strategies and KV cache
+- Day 10: *LLM Inference & Alignment*
+- From a base model to a usable assistant
 - Questions welcome — practical follows
 
 == Questions?

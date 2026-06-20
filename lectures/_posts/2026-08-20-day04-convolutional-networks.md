@@ -22,7 +22,9 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day04.pdf)
 
-### [Exercise](/projects/day04-practical/)
+### Exercise
+
+[Download the notebook](/notebooks/practicals/day04.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day04.ipynb)
 
 Fully-connected networks treat an image as an unordered bag of pixels — throwing away the very structure that makes vision tractable. Convolutional neural networks instead bake three priors directly into the architecture: locality, weight sharing, and hierarchy. Today we build the convolution operation from these priors, count its parameters and receptive field, assemble the conv–norm–nonlinearity block, trace the architectures that won ImageNet (AlexNet, VGG, ResNet), and see how the same backbone extends to detection and segmentation.
 

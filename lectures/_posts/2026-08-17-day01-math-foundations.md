@@ -22,7 +22,9 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day01.pdf)
 
-### [Exercise](/projects/day01-practical/)
+### Exercise
+
+[Download the notebook](/notebooks/practicals/day01.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day01.ipynb)
 
 Machine learning rests on four mathematical pillars laid out in Part I of *Mathematics for Machine Learning* (MML): we represent data as vectors and matrices (linear algebra); measure similarity with norms and inner products (analytic geometry); exploit matrix structure and gradients (decompositions and vector calculus); and quantify uncertainty with probability. Today we also cover integration and differentiation as complementary tools for expectations and optimization, and finish with an ODE/SDE crash course that foreshadows diffusion models in Week 2.
 

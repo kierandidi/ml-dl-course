@@ -54,15 +54,17 @@ Then commit and push so feeds, sitemap, and absolute links resolve correctly.
 |--------------|------------------|
 | `lectures/_posts/*.md` | **Lessons** (blog) — notes, TOC, KaTeX |
 | `assets/slides/dayNN.pdf` | Linked as **Slides** on each day |
-| `_projects/dayNN-practical.md` | **Practicals** — derivations + notebook link |
+| `projects.md` | **Exercises** hub — table with Download + Open-in-Colab per day |
+| `_projects/final-assessment.md` | **Final assessment** project page |
 | `assets/img/lessons/dayNN.png` | **Title/hero image** on each lesson card |
-| `notebooks/` | Not served by Jekyll (excluded); link from practical pages |
+| `notebooks/` | Served as static files — used by Download links; Colab opens them from GitHub |
 
-Slides and practicals are linked at the top of every lesson post:
+Slides and the exercise (download + Colab) are linked at the top of every lesson post:
 
 ```markdown
 ### [Slides](/assets/slides/day01.pdf)
-### [Practical](/projects/day01-practical/)
+### Exercise
+[Download the notebook](/notebooks/practicals/day01.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day01.ipynb)
 ```
 
 ## 5. Local preview (before push)

@@ -1099,26 +1099,77 @@ xb, yb = get_batch(data, block_size)
 print(xb.shape, yb.shape)"""
         )
     )
-    cells += exercise_header("9.2", "Tiny GPT", "Causal self-attention block + LM head.")
+    cells += exercise_header(
+        "9.2",
+        "Tiny GPT",
+        "Pre-norm blocks with explicit causal self-attention, mirroring nanoGPT's `model.py`.",
+    )
     cells.append(
         code(
-            """class TinyGPT(nn.Module):
+            """import math
+
+class CausalSelfAttention(nn.Module):
+    \"\"\"Multi-head self-attention with a causal mask (nanoGPT-style).\"\"\"
+    def __init__(self, d_model, nhead, block_size):
+        super().__init__()
+        assert d_model % nhead == 0
+        self.nhead = nhead
+        self.head_dim = d_model // nhead
+        self.qkv = nn.Linear(d_model, 3 * d_model)   # query, key, value in one matmul
+        self.proj = nn.Linear(d_model, d_model)      # output projection
+        # lower-triangular mask: position i may attend to j <= i only
+        self.register_buffer(
+            "mask", torch.tril(torch.ones(block_size, block_size)).view(1, 1, block_size, block_size)
+        )
+
+    def forward(self, x):
+        B, T, C = x.shape
+        q, k, v = self.qkv(x).split(C, dim=2)
+        # (B, T, C) -> (B, nhead, T, head_dim)
+        q = q.view(B, T, self.nhead, self.head_dim).transpose(1, 2)
+        k = k.view(B, T, self.nhead, self.head_dim).transpose(1, 2)
+        v = v.view(B, T, self.nhead, self.head_dim).transpose(1, 2)
+        att = (q @ k.transpose(-2, -1)) / math.sqrt(self.head_dim)   # scaled dot-product
+        att = att.masked_fill(self.mask[:, :, :T, :T] == 0, float("-inf"))
+        att = F.softmax(att, dim=-1)                  # soft dictionary lookup
+        y = att @ v                                   # weighted average of past values
+        y = y.transpose(1, 2).contiguous().view(B, T, C)
+        return self.proj(y)
+
+class Block(nn.Module):
+    \"\"\"Pre-norm Transformer block: LN -> attn -> residual, LN -> MLP -> residual.\"\"\"
+    def __init__(self, d_model, nhead, block_size):
+        super().__init__()
+        self.ln1 = nn.LayerNorm(d_model)
+        self.attn = CausalSelfAttention(d_model, nhead, block_size)
+        self.ln2 = nn.LayerNorm(d_model)
+        self.mlp = nn.Sequential(
+            nn.Linear(d_model, 4 * d_model), nn.GELU(), nn.Linear(4 * d_model, d_model)
+        )
+
+    def forward(self, x):
+        x = x + self.attn(self.ln1(x))   # residual around attention
+        x = x + self.mlp(self.ln2(x))    # residual around MLP
+        return x
+
+class TinyGPT(nn.Module):
     def __init__(self, vocab_size, d_model=32, nhead=4, n_layers=2, block_size=16):
         super().__init__()
         self.block_size = block_size
         self.token_emb = nn.Embedding(vocab_size, d_model)
         self.pos_emb = nn.Embedding(block_size, d_model)
-        layer = nn.TransformerEncoderLayer(d_model, nhead, dim_feedforward=64, batch_first=True)
-        self.tr = nn.TransformerEncoder(layer, num_layers=n_layers)
+        self.blocks = nn.ModuleList([Block(d_model, nhead, block_size) for _ in range(n_layers)])
+        self.ln_f = nn.LayerNorm(d_model)
         self.lm_head = nn.Linear(d_model, vocab_size)
 
     def forward(self, idx):
         B, T = idx.shape
         pos = torch.arange(T, device=idx.device)
-        x = self.token_emb(idx) + self.pos_emb(pos)
-        mask = torch.triu(torch.ones(T, T, device=idx.device), diagonal=1).bool()
-        x = self.tr(x, mask=mask)
-        return self.lm_head(x)
+        x = self.token_emb(idx) + self.pos_emb(pos)   # token + position embeddings
+        for block in self.blocks:
+            x = block(x)
+        x = self.ln_f(x)                              # final layer norm
+        return self.lm_head(x)                        # logits over the vocabulary
 
 model = TinyGPT(len(chars), block_size=block_size).to(device)
 opt = torch.optim.Adam(model.parameters(), lr=3e-3)"""

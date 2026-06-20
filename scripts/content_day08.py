@@ -525,5 +525,6 @@ The trade-off is explicit: a small drop in sample quality for a $$10$$–$$1000\
         "Contrast stochastic and deterministic samplers and state what the Fokker–Planck equation guarantees.",
         "Explain Heun's method, log-SNR time stepping, and exponential integrators (DPM-Solver/DEIS).",
         "Define a flow map and the semigroup/consistency property, and explain how consistency models reach one-step sampling.",
+        "Looking ahead: diffusion fought the cost of *many sampling steps* (NFEs) with solvers and flow maps. Day 9 returns to the autoregressive family from the Day 6 taxonomy, where the analogous cost is *serial token-by-token decoding* — fought on Day 10 with the KV cache.",
     ],
 }

@@ -23,6 +23,18 @@ FIGURE_OVERRIDES: dict[int, list[str]] = {
         "/assets/figures/day02/mml_pca_illustration.png",
         "/assets/figures/day02/mml_svm_margin.png",
     ],
+    9: [
+        "/assets/figures/day09/llmks_architecture.png",
+        "/assets/figures/day09/llmks_attention_dict.png",
+        "/assets/figures/day09/llmks_rope.png",
+        "/assets/figures/day09/llmks_training.png",
+    ],
+    10: [
+        "/assets/figures/day10/llmks_generation.png",
+        "/assets/figures/day10/llmks_kvcache.png",
+        "/assets/figures/day10/llmks_sampling.png",
+        "/assets/figures/day10/llmks_kv_bottleneck.png",
+    ],
 }
 
 
@@ -50,8 +62,8 @@ LECTURE_URLS = {
     6: "/blog/lectures/2026/08/24/day06-generative-modeling/",
     7: "/blog/lectures/2026/08/25/day07-training-diffusion-flow/",
     8: "/blog/lectures/2026/08/26/day08-diffusion-flow-inference/",
-    9: "/blog/lectures/2026/08/27/day09-autoregressive-llms/",
-    10: "/blog/lectures/2026/08/28/day10-ar-inference/",
+    9: "/blog/lectures/2026/08/25/day09-autoregressive-llms/",
+    10: "/blog/lectures/2026/08/26/day10-ar-inference/",
 }
 
 PAGES: list[dict] = [
@@ -534,14 +546,81 @@ Choose **one** generative track (A or B), not both.
 """
 
 
+# ---------------------------------------------------------------------------
+# Exercises hub (single page with a table; download + Open-in-Colab per day).
+# Replaces the previous one-page-per-exercise approach.
+# ---------------------------------------------------------------------------
+GITHUB = "kierandidi/ml-dl-course"
+BRANCH = "main"
+
+TOPICS = [
+    (1, "Math foundations"),
+    (2, "Statistical learning"),
+    (3, "Deep neural networks"),
+    (4, "CNNs & vision"),
+    (5, "RNNs → Transformers"),
+    (6, "Generative modeling & DDPM"),
+    (7, "Score, SDEs & flow matching"),
+    (8, "Guidance, solvers & fast sampling"),
+    (9, "Autoregressive LLMs"),
+    (10, "LLM inference & KV cache"),
+]
+
+
+def colab_url(day: int) -> str:
+    return (
+        f"https://colab.research.google.com/github/{GITHUB}/blob/{BRANCH}"
+        f"/notebooks/practicals/day{day:02d}.ipynb"
+    )
+
+
+def build_projects_hub() -> str:
+    rows = []
+    for day, topic in TOPICS:
+        nb = f"/notebooks/practicals/day{day:02d}.ipynb"
+        download = f'<a href="{nb}" download>Download</a>'
+        colab = f'[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colab_url(day)})'
+        rows.append(f"| {day} | {topic} | {download} | {colab} |")
+    table = "\n".join(rows)
+    return f"""---
+layout: page
+title: Exercises
+description: >
+  Daily exercise notebooks for the ML & Deep Learning course (Aug 2026) —
+  download to run locally or open directly in Google Colab.
+---
+
+Each exercise is a self-contained Jupyter notebook (~45–60 min) aligned with that
+day's lecture notes and slides. **Download** it to run locally, or **Open in Colab**
+to run it in your browser (free GPU, no setup).
+
+| Day | Topic | Notebook | Run |
+|-----|-------|----------|-----|
+{table}
+
+> Colab opens each notebook straight from the [course repository](https://github.com/{GITHUB}). For local use, clone the repo and open the files in [`notebooks/practicals/`](/notebooks/practicals/).
+
+## Final assessment
+
+The course concludes with a [final assessment](/projects/final-assessment/) —
+written math plus PyTorch coding (~3 hours).
+"""
+
+
 def main():
     PROJECTS.mkdir(parents=True, exist_ok=True)
-    for meta in PAGES:
-        path = PROJECTS / meta["file"]
-        path.write_text(render_page(meta), encoding="utf-8")
-        print(f"Wrote {path}")
+    # Single Exercises hub page (replaces per-day project pages).
+    (ROOT / "projects.md").write_text(build_projects_hub(), encoding="utf-8")
+    print("Wrote projects.md")
+    # Final assessment stays as its own project page.
     (PROJECTS / "final-assessment.md").write_text(FINAL_ASSESSMENT, encoding="utf-8")
-    print("Wrote final-assessment.md")
+    print("Wrote _projects/final-assessment.md")
+    # Remove the deprecated one-page-per-exercise files.
+    for day in range(1, 11):
+        stale = PROJECTS / f"day{day:02d}-practical.md"
+        if stale.exists():
+            stale.unlink()
+            print(f"Removed {stale.name}")
 
 
 if __name__ == "__main__":

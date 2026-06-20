@@ -24,7 +24,9 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day05.pdf)
 
-### [Exercise](/projects/day05-practical/)
+### Exercise
+
+[Download the notebook](/notebooks/practicals/day05.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day05.ipynb)
 
 Images have a fixed grid; language, audio, protein sequences, and time series do not. We start with recurrent networks and the seq2seq bottleneck, then build the Transformer from first principles following Richard Turner's note (arXiv:2304.10557): attention is nothing more than a *weighted linear combination* across the sequence, with weights learned from query–key similarity. We assemble the full block (multi-head attention, MLP, residuals, LayerNorm, position encoding), connect it to the standard $$Q,K,V$$ notation, and explain why this architecture replaced recurrence for large-scale sequence modelling.
 
@@ -238,6 +240,8 @@ The cost is $$O(N^2)$$ attention, motivating sparse attention, linear attention,
 
 **Connections.** Day 9–10 cover LLM pretraining and inference. For sequence alignment, evolutionary conservation, and protein language models, the [structural bioinformatics course](https://structural-bioinformatics.netlify.app/blog/proteins/2023-08-02-lesson4/) (Lesson 4: Evolution, Language and Bioinformatics; Lesson 7: Generative Modelling) provides complementary biological motivation and references.
 
+**Bridge to Week 2.** Today we built the Transformer block as a general-purpose *mechanism* and showed how causal masking turns it into an autoregressive sequence model. We deliberately stop here: the details that turn this block into a *production* large language model belong to Day 9, where we return to autoregressive modelling (named on Day 6, then set aside for diffusion on Days 6–8) and build one end to end. Specifically, we defer to **Day 9** the input pipeline (subword **tokenisation**/BPE, document packing), the modern block internals (**RMSNorm**, **GeGLU**, **rotary position embeddings (RoPE)**, **grouped-query attention**), the full GPT forward pass and **cross-entropy training loop**, and a **nanoGPT** code walkthrough; and to **Day 10** efficient **KV-cache** inference, sampling strategies, and the light GPT→ChatGPT post-training arc. Keep the picture from today — attention as a weighted average, the block as horizontal-then-vertical mixing — as the scaffold those details hang on.
+
 ## Checkpoint summary
 
 Before moving to the practical, confirm you can:
@@ -250,3 +254,4 @@ Before moving to the practical, confirm you can:
 - Assemble a Transformer block (multi-head attention, MLP, residual + LayerNorm, position encoding) and explain causal masking.
 - Connect Turner's $$D\times N$$ layout to standard $$Q,K,V$$ batch notation and derive the $$1/\sqrt{d_k}$$ scaling.
 - Contrast RNNs and Transformers on path length, parallelism, and scalability.
+- List what Day 9 adds on top of today's block (tokenisation, RoPE, RMSNorm/GeGLU, GQA, the GPT training loop, nanoGPT) to turn it into a production autoregressive LM.

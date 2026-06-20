@@ -144,6 +144,37 @@ DAY08_PDM_FIGURES = [
     ("11.3", None, "pdm_flowmap_semigroup"),  # semigroup property
 ]
 
+# Days 9–10 — Transformers/LLM deck (Beyer-inspired). Full-slide renders of
+# hand-picked pages from material/slides-transformers-llmks.pdf. Page numbers are
+# 1-based (as shown in the PDF); converted to 0-based at render time.
+# (page_1based, output_name)
+LLMKS_PDF = "slides-transformers-llmks.pdf"
+
+DAY09_LLMKS_FIGURES = [
+    (6, "llmks_paradigm"),          # NLP after Transformers: one type fits all
+    (7, "llmks_attention_block"),   # the core building block: attention
+    (16, "llmks_attention_dict"),   # attention as a soft dictionary lookup
+    (22, "llmks_mha"),              # multi-head attention
+    (24, "llmks_architecture"),     # the Transformer architecture
+    (30, "llmks_rope"),             # rotary positional embeddings
+    (35, "llmks_ffn"),              # position-wise feed-forward
+    (37, "llmks_residual"),         # residual / skip connection
+    (41, "llmks_decoder_masked"),   # decoder: masked self-attention
+    (45, "llmks_training"),         # training with cross-entropy loss
+]
+
+DAY10_LLMKS_FIGURES = [
+    (46, "llmks_generation"),       # generation: one token at a time
+    (48, "llmks_kvcache"),          # KV cache
+    (50, "llmks_sampling"),         # sampling
+    (51, "llmks_topk_topp"),        # top-k / top-p
+    (52, "llmks_beam"),             # beam search
+    (56, "llmks_kv_bottleneck"),    # KV cache size; MQA/GQA
+    (58, "llmks_summary"),          # summary visualization
+    (60, "llmks_paradigm_shift"),   # change of paradigm
+]
+
+
 # UCL x DeepMind lecture decks → Week 1 days (diagram-rich pages auto-selected)
 DAY_UCL_DECKS = {
     3: ["L2 - UCLxDeepMind DL2020.pdf", "L5 - UCLxDeepMind DL2020.pdf"],
@@ -813,12 +844,39 @@ def render_pdf_pages(pdf_path: Path, pages: list[int], out_dir: Path, prefix: st
     return count
 
 
+def extract_llmks_figures():
+    """Render hand-picked full slides from the Transformers/LLM deck for days 9–10."""
+    if fitz is None:
+        print("pymupdf not installed, skipping LLMKS render")
+        return
+    src = COURSE_MATERIAL / LLMKS_PDF
+    if not src.exists():
+        print(f"skip missing: {src}")
+        return
+    doc = fitz.open(src)
+    for day, figs in [(9, DAY09_LLMKS_FIGURES), (10, DAY10_LLMKS_FIGURES)]:
+        day_dir = OUT / f"day{day:02d}"
+        day_dir.mkdir(parents=True, exist_ok=True)
+        ok = 0
+        for page_1based, name in figs:
+            p = page_1based - 1
+            if p < 0 or p >= len(doc):
+                print(f"day{day:02d}: page {page_1based} out of range for {name}")
+                continue
+            pix = doc[p].get_pixmap(matrix=fitz.Matrix(2, 2))
+            pix.save(day_dir / f"{name}.png")
+            ok += 1
+        print(f"day{day:02d}: {ok}/{len(figs)} LLMKS slides rendered")
+    doc.close()
+
+
 def main():
     extract_day01_materials()
     extract_day02_mml()
     if fitz is not None:
         extract_ucl_decks()           # Week 1: days 3–5 (UCL x DeepMind)
         extract_principles_figures()  # Week 2: days 6–8 (Principles of Diffusion)
+        extract_llmks_figures()       # Week 2: days 9–10 (Transformers/LLM deck)
     for day, sources in PDF_SOURCES.items():
         day_dir = OUT / f"day{day:02d}"
         day_dir.mkdir(parents=True, exist_ok=True)

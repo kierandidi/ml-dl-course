@@ -78,7 +78,8 @@ Or use the Python helpers (requires Typst on `PATH`):
 python3 scripts/extract_figures.py    # pull PNGs from UCL/MIT/PPTX/PDF sources
 python3 scripts/generate_slides.py
 bash scripts/build_slides.sh
-python3 scripts/generate_project_pages.py  # practical pages with math + figures
+python3 scripts/generate_project_pages.py  # Exercises hub (projects.md) + final assessment
+python3 scripts/setup_lesson_heroes.py     # cropped concept hero image per day
 ```
 
 PDFs are served from `/assets/slides/dayNN.pdf` on the site.
@@ -135,8 +136,7 @@ Push to the default branch; Netlify rebuilds automatically.
 Lecture markdown is produced by scripts in `scripts/`:
 
 ```bash
-python scripts/generate_lectures.py      # Week 1 (days 1–5)
-python scripts/generate_lectures_w2.py   # Week 2 (days 6–10)
+python scripts/generate_lectures.py      # all days 1–10 (content_dayNN.py modules)
 ```
 
 Review diffs before committing generated posts.
