@@ -139,25 +139,38 @@
 
 #align(center + horizon)[#image("/assets/figures/day07/pdm_score_landscape.png", width: 92%, height: 82%, fit: "contain")]
 
-== 4.3  Reverse SDE & Probability-Flow ODE
+== 4.3  Heuristic: Reversing an SDE
 
-- Reverse SDE (Anderson): run time backward using the score
-- $dif x = [f - g^2 nabla log p_t] dif t + g dif macron(w)$
-- Probability-flow ODE: *same marginals*, no noise
-- $dif x = [f - 1/2 g^2 nabla log p_t] dif t$
-- SDE = stochastic sampler; ODE = deterministic + likelihood
+- Chain rule: $p_(t,delta)(x,y) = p_(t+delta|t)(y|x) p_t(x) = p_(t|t+delta)(x|y) p_(t+delta)(y)$
+- Forward step (Euler): $p_(t+delta|t)(y|x) = N(y | x + f delta, delta g^2)$
+- Taylor on $log p_t$ around $y$: factor $exp((x-y)^T s(y,t))$ with $s = nabla log p_t$
+- Complete the square $arrow.r$ reverse drift $f - g^2 s$
+- Full step-by-step derivation: optional notes block
 
-== 4.3  Reverse SDE & Probability-Flow ODE
+== 4.3  Heuristic: Reversing an SDE
 
 #align(center + horizon)[#image("/assets/figures/day07/pdm_three_dynamics.png", width: 92%, height: 82%, fit: "contain")]
 
-== 4.4  Derivation: The DSM Objective
+== 4.4  Reverse SDE & Probability-Flow ODE
+
+- Anderson (1982): rigorous reverse-time SDE with score term
+- $dif x = [f - g^2 s] dif t + g dif macron(w)$, $s = nabla log p_t approx s_theta$
+- Probability-flow ODE: *same marginals*, no noise
+- $dif x = [f - 1/2 g^2 s] dif t$
+- SDE = stochastic sampler; ODE = deterministic + likelihood
+- PF-ODE from FPE: Day 8 (optional derivation block)
+
+== 4.5  Derivation: The DSM Objective
 
 - Want $s_theta (x,t) approx nabla log p_t (x)$ (marginal)
 - Marginal score = $EE[ nabla log p_t (x_t | x_0) | x_t]$
 - So regress on the *conditional* score (known Gaussian)
 - $nabla log p_t (x_t|x_0) = -(x_t - alpha_t x_0)\\/sigma_t^2 = -epsilon\\/sigma_t$
 - $arrow.r$ predicting the score $=$ predicting the noise
+
+== 4.5  Derivation: The DSM Objective
+
+#align(center + horizon)[#image("/assets/figures/day07/pdm_nf.png", width: 92%, height: 82%, fit: "contain")]
 
 = 5 · Flow Matching
 
@@ -171,7 +184,7 @@
 
 == 5.1  Continuous Normalizing Flows
 
-#align(center + horizon)[#image("/assets/figures/day07/pdm_nf.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_cond_transition.png", width: 92%, height: 82%, fit: "contain")]
 
 == 5.2  Conditional Flow Matching
 
@@ -183,7 +196,7 @@
 
 == 5.2  Conditional Flow Matching
 
-#align(center + horizon)[#image("/assets/figures/day07/pdm_cond_transition.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_cond_vs_marginal.png", width: 92%, height: 82%, fit: "contain")]
 
 == 5.3  Conditional vs Marginal Velocity
 
@@ -195,7 +208,7 @@
 
 == 5.3  Conditional vs Marginal Velocity
 
-#align(center + horizon)[#image("/assets/figures/day07/pdm_cond_vs_marginal.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_curved_paths.png", width: 92%, height: 82%, fit: "contain")]
 
 == 5.4  Rectified Flow & Reflow
 
@@ -207,7 +220,7 @@
 
 == 5.4  Rectified Flow & Reflow
 
-#align(center + horizon)[#image("/assets/figures/day07/pdm_curved_paths.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_param_equiv.png", width: 92%, height: 82%, fit: "contain")]
 
 = 6 · One Model, Many Views
 
@@ -221,7 +234,7 @@
 
 == 6.1  Four Equivalent Parameterizations
 
-#align(center + horizon)[#image("/assets/figures/day07/pdm_param_equiv.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day07/pdm_unified.png", width: 92%, height: 82%, fit: "contain")]
 
 == 6.2  The Unified Picture
 
@@ -230,10 +243,6 @@
 - Sample with: ancestral, Langevin, reverse SDE, or ODE
 - Score $arrow.l.r$ noise $arrow.l.r$ velocity are interchangeable
 - Day 8: guidance, fast solvers, and few-step sampling
-
-== 6.2  The Unified Picture
-
-#align(center + horizon)[#image("/assets/figures/day07/pdm_unified.png", width: 92%, height: 82%, fit: "contain")]
 
 == Summary
 

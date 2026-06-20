@@ -1,13 +1,13 @@
 ---
 layout: project
-title: Day 10 Practical — KV Cache & Inference
+title: Day 10 Exercise — KV Cache & Inference
 caption: Efficient autoregressive decoding
 description: >
   KV cache memory formula, timed generation with/without cache.
 date: '28-08-2026'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day10.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day10.pdf
@@ -15,7 +15,7 @@ links:
     url: /blog/lectures/2026/08/28/day10-ar-inference/
 ---
 
-# Day 10 Practical — KV Cache & Inference
+# Day 10 Exercise — KV Cache & Inference
 
 
 ## Figures from lecture materials

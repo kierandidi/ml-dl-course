@@ -1,13 +1,13 @@
 ---
 layout: project
-title: Day 7 Practical — Flow & Diffusion Training
+title: Day 7 Exercise — Flow & Diffusion Training
 caption: Flow matching and denoising
 description: >
   1D flow matching and denoising score targets (MIT Lab 2 inspired).
 date: '25-08-2026'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day07.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day07.pdf
@@ -15,21 +15,21 @@ links:
     url: /blog/lectures/2026/08/25/day07-training-diffusion-flow/
 ---
 
-# Day 7 Practical — Flow & Diffusion Training
+# Day 7 Exercise — Flow & Diffusion Training
 
 
 ## Figures from lecture materials
 
-![Source illustration — Day 7 (extracted from course PDFs/PPTX)](/assets/figures/day07/pdf0_page000.png)
+![Source illustration — Day 7 (extracted from course PDFs/PPTX)](/assets/figures/day07/pdm_cond_transition.png)
 *Source illustration — Day 7 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 7 (extracted from course PDFs/PPTX)](/assets/figures/day07/pdf0_page002.png)
+![Source illustration — Day 7 (extracted from course PDFs/PPTX)](/assets/figures/day07/pdm_cond_vs_marginal.png)
 *Source illustration — Day 7 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 7 (extracted from course PDFs/PPTX)](/assets/figures/day07/pdf0_page004.png)
+![Source illustration — Day 7 (extracted from course PDFs/PPTX)](/assets/figures/day07/pdm_curved_paths.png)
 *Source illustration — Day 7 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 7 (extracted from course PDFs/PPTX)](/assets/figures/day07/pdf0_page006.png)
+![Source illustration — Day 7 (extracted from course PDFs/PPTX)](/assets/figures/day07/pdm_dsm_trick.png)
 *Source illustration — Day 7 (extracted from course PDFs/PPTX)*
 
 

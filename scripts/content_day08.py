@@ -14,6 +14,8 @@ All prose and derivations are written for this course; interactive widgets are
 referenced by ``{{viz:KEY}}`` markers expanded by generate_lectures.py.
 """
 
+from diffusion_appendix import DAY08_OPTIONAL
+
 # Curated figures aligned to each content slide (in order). None => no figure slide.
 FIGURES = [
     # Conditional generation & guidance
@@ -97,6 +99,16 @@ SLIDES = (
                         "Quality vs cost = solver accuracy vs number of steps",
                         "Discretize time $T = t_0 > t_1 > dots.h > t_N = 0$",
                         "Better solver $arrow.r$ same quality in fewer steps",
+                    ],
+                ),
+                (
+                    "Derivation: PF-ODE from the FPE",
+                    [
+                        "FPE: $partial_t p_t = - nabla dot (f p_t) + 1/2 g^2 Delta p_t$",
+                        "Log-derivative trick: $nabla p_t = p_t s$, $s = nabla log p_t$",
+                        "Factor $p_t$ out $arrow.r$ Liouville: $partial_t p_t = - nabla dot ( tilde(mu) p_t )$",
+                        "$tilde(mu) = f - 1/2 g^2 s$ $arrow.r$ PF-ODE (vs reverse SDE: $f - g^2 s$)",
+                        "Full derivation: optional notes block",
                     ],
                 ),
                 (
@@ -220,11 +232,12 @@ LECTURE = {
     "title": "Guidance, Solvers, and Few-Step Sampling",
     "description": "Controlling diffusion with guidance, sampling as ODE/SDE solving, fast high-order solvers, and one-step flow maps.",
     "reading": [
-        "[The Principles of Diffusion Models](https://arxiv.org/abs/2510.21890), Ch. 8–11",
+        "[The Principles of Diffusion Models](https://arxiv.org/abs/2510.21890), Ch. 8–11; Appendix B (FPE), D.2.6 (PF-ODE proof)",
         "[Ho & Salimans — Classifier-Free Diffusion Guidance (2022)](https://arxiv.org/abs/2207.12598)",
         "[Song et al. — Denoising Diffusion Implicit Models (DDIM, 2021)](https://arxiv.org/abs/2010.02502)",
         "[Karras et al. — Elucidating the Design Space of Diffusion Models (EDM, 2022)](https://arxiv.org/abs/2206.00364)",
         "[Song et al. — Consistency Models (2023)](https://arxiv.org/abs/2303.01469)",
+        "[SDE course — Lesson 2 §4: PF-ODE derivation from the FPE](/material/sde-course/) (local notes)",
     ],
     "intro": (
         "Days 6–7 built diffusion models and showed that sampling means running a learned dynamics "
@@ -325,6 +338,22 @@ So CFG is not a heuristic — it is Bayes' rule plus a sharpening exponent, expr
 On Day 7 we derived two dynamics with the right marginals — the reverse SDE and the PF-ODE. Turning either into an algorithm means choosing a **time discretization** $$T=t_0>t_1>\\dots>t_N=0$$ and a **numerical scheme** to step between consecutive times. The cost is dominated by the number of network evaluations (NFEs), since the network (the score/denoiser) is by far the most expensive operation.
 
 This reframing is liberating: the quality–speed trade-off becomes a classic **numerical-analysis** question. A more accurate integrator reaches the same quality in fewer steps. Everything in this lecture is an answer to "how do we integrate this ODE well in as few NFEs as possible?".""",
+                },
+                {
+                    "heading": "The probability-flow ODE from the Fokker–Planck equation",
+                    "definition": (
+                        "Rewriting the FPE with the log-derivative trick yields a **Liouville equation** "
+                        "for an ODE with drift $$\\tilde{\\boldsymbol{\\mu}} = \\boldsymbol{f} - \\tfrac12 g^2\\boldsymbol{s}$$ "
+                        "— the probability-flow ODE, sharing marginals with the forward/reverse SDE."
+                    ),
+                    "body": """The forward SDE $$\\mathrm{d}\\boldsymbol{x}=\\boldsymbol{f}\\,\\mathrm{d}t+g\\,\\mathrm{d}\\boldsymbol{w}$$ evolves $$p_t$$ by the Fokker–Planck equation. Applying the **log-derivative trick** $$\\nabla p_t=p_t\\boldsymbol{s}$$ and factoring $$p_t$$ outside the divergence gives
+
+$$\\partial_t p_t = -\\nabla\\cdot\\Big(p_t\\,\\big(\\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}\\big)\\Big),$$
+
+which is the FPE of a process with **zero diffusion** — an ODE $$\\mathrm{d}\\boldsymbol{x}=[\\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}]\\,\\mathrm{d}t$$. Compare the **reverse SDE** drift $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$: same $$\\{p_t\\}$$, but half the score coefficient and no noise. That is why DDIM (Euler on the PF-ODE) and DDPM share one trained $$\\boldsymbol{s}_\\theta$$.
+
+Step-by-step algebra: optional block below ([SDE course §4](https://kierandidi.github.io/), Principles D.2.6).""",
+                    "optional": DAY08_OPTIONAL,
                 },
                 {
                     "heading": "DDIM as Euler on the probability-flow ODE",

@@ -1,13 +1,13 @@
 ---
 layout: project
-title: Day 9 Practical — Train a Tiny GPT
+title: Day 9 Exercise — Train a Tiny GPT
 caption: Decoder-only language model
 description: >
   Character-level decoder-only transformer; cross-entropy training loop.
 date: '27-08-2026'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day09.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day09.pdf
@@ -15,7 +15,7 @@ links:
     url: /blog/lectures/2026/08/27/day09-autoregressive-llms/
 ---
 
-# Day 9 Practical — Train a Tiny GPT
+# Day 9 Exercise — Train a Tiny GPT
 
 
 ## Figures from lecture materials

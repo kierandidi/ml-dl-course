@@ -73,7 +73,19 @@
 
 #align(center + horizon)[#image("/assets/figures/day08/pdm_reverse_sde.png", width: 92%, height: 82%, fit: "contain")]
 
-== 2.2  DDIM as Euler on the PF-ODE
+== 2.2  Derivation: PF-ODE from the FPE
+
+- FPE: $partial_t p_t = - nabla dot (f p_t) + 1/2 g^2 Delta p_t$
+- Log-derivative trick: $nabla p_t = p_t s$, $s = nabla log p_t$
+- Factor $p_t$ out $arrow.r$ Liouville: $partial_t p_t = - nabla dot ( tilde(mu) p_t )$
+- $tilde(mu) = f - 1/2 g^2 s$ $arrow.r$ PF-ODE (vs reverse SDE: $f - g^2 s$)
+- Full derivation: optional notes block
+
+== 2.2  Derivation: PF-ODE from the FPE
+
+#align(center + horizon)[#image("/assets/figures/day08/pdm_ddim_euler.png", width: 92%, height: 82%, fit: "contain")]
+
+== 2.3  DDIM as Euler on the PF-ODE
 
 - DDIM = deterministic sampler = Euler on the PF-ODE
 - Non-Markovian: skip steps without retraining
@@ -81,11 +93,11 @@
 - Deterministic $arrow.r$ reproducible, invertible, editable
 - First-order: error per step $O(Delta t^2)$
 
-== 2.2  DDIM as Euler on the PF-ODE
+== 2.3  DDIM as Euler on the PF-ODE
 
-#align(center + horizon)[#image("/assets/figures/day08/pdm_ddim_euler.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day08/pdm_score_sde_2d.png", width: 92%, height: 82%, fit: "contain")]
 
-== 2.3  Discretization Error & Step Count
+== 2.4  Discretization Error & Step Count
 
 - Few steps + 1st-order $arrow.r$ visible artifacts
 - Error accumulates over the trajectory
@@ -93,17 +105,17 @@
 - Curved trajectories are harder to integrate
 - Two fixes: better solver, or straighter paths
 
-== 2.3  Discretization Error & Step Count
-
-#align(center + horizon)[#image("/assets/figures/day08/pdm_score_sde_2d.png", width: 92%, height: 82%, fit: "contain")]
-
-== 2.4  Stochastic vs Deterministic Samplers
+== 2.5  Stochastic vs Deterministic Samplers
 
 - SDE samplers inject noise each step (self-correcting)
 - ODE samplers are deterministic (fast, fewer steps)
 - SDE: better at high NFE; ODE: better at low NFE
 - Churn: add a little noise to an ODE solver (EDM)
 - Fokker-Planck: both share the same marginals $p_t$
+
+== 2.5  Stochastic vs Deterministic Samplers
+
+#align(center + horizon)[#image("/assets/figures/day08/pdm_heun_logsnr.png", width: 92%, height: 82%, fit: "contain")]
 
 = 3 · Fast High-Order Solvers
 
@@ -115,10 +127,6 @@
 - 2 NFEs/step but far fewer steps overall
 - Backbone of the EDM sampler
 
-== 3.1  Higher-Order: Heun's Method
-
-#align(center + horizon)[#image("/assets/figures/day08/pdm_heun_logsnr.png", width: 92%, height: 82%, fit: "contain")]
-
 == 3.2  The Right Clock: log-SNR Time
 
 - Solver accuracy depends on the time variable
@@ -127,6 +135,10 @@
 - EDM uses a tailored $sigma$ schedule (same idea)
 - Good schedule $arrow.r$ big quality gain for free
 
+== 3.2  The Right Clock: log-SNR Time
+
+#align(center + horizon)[#image("/assets/figures/day08/pdm_deis.png", width: 92%, height: 82%, fit: "contain")]
+
 == 3.3  Exponential Integrators (DPM-Solver / DEIS)
 
 - PF-ODE = linear drift + nonlinear network term
@@ -134,10 +146,6 @@
 - Only approximate the smooth network part
 - Multistep: reuse past evals for higher order
 - 10-20 NFEs for high quality (DPM-Solver, DEIS)
-
-== 3.3  Exponential Integrators (DPM-Solver / DEIS)
-
-#align(center + horizon)[#image("/assets/figures/day08/pdm_deis.png", width: 92%, height: 82%, fit: "contain")]
 
 = 4 · Few-Step Sampling
 
@@ -149,6 +157,10 @@
 - Distill a slow teacher into a fast student
 - Flow maps formalize the jump
 
+== 4.1  The Bottleneck: Many Function Evals
+
+#align(center + horizon)[#image("/assets/figures/day08/pdm_flowmap.png", width: 92%, height: 82%, fit: "contain")]
+
 == 4.2  Flow Maps
 
 - Flow map $Phi_(s arrow.r t)$: jump a sample from time $s$ to $t$
@@ -159,7 +171,7 @@
 
 == 4.2  Flow Maps
 
-#align(center + horizon)[#image("/assets/figures/day08/pdm_flowmap.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day08/pdm_flowmap_semigroup.png", width: 92%, height: 82%, fit: "contain")]
 
 == 4.3  The Semigroup Property
 
@@ -171,7 +183,7 @@
 
 == 4.3  The Semigroup Property
 
-#align(center + horizon)[#image("/assets/figures/day08/pdm_flowmap_semigroup.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day08/pdm_flowmap_timeline.png", width: 92%, height: 82%, fit: "contain")]
 
 == 4.4  Consistency & Distillation
 
@@ -180,10 +192,6 @@
 - 1-4 step sampling, near teacher quality
 - Trade a little quality for huge speedups
 - Active frontier: real-time generative models
-
-== 4.4  Consistency & Distillation
-
-#align(center + horizon)[#image("/assets/figures/day08/pdm_flowmap_timeline.png", width: 92%, height: 82%, fit: "contain")]
 
 == Summary
 

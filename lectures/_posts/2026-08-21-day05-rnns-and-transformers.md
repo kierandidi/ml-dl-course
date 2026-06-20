@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Day 5 - Sequence Models: RNNs, Attention, and Transformers
-image: /assets/img/sampling_space.png
+image: /assets/img/lessons/day05.png
 accent_image: 
-  background: url('/assets/img/sampling_space.png') center/cover
+  background: url('/assets/img/lessons/day05.png') center/cover
   overlay: false
 accent_color: '#ccc'
 theme_color: '#ccc'
@@ -15,16 +15,18 @@ invert_sidebar: true
 # Day 5 - Sequence Models: RNNs, Attention, and Transformers
 
 ### Optional reading for this lesson
+- [Turner — An Introduction to Transformers (arXiv:2304.10557)](https://arxiv.org/abs/2304.10557)
 - [UCL x DeepMind DL2020 — L6: Sequences and Recurrent Networks](https://www.youtube.com/watch?v=87kLfzmYBy8)
 - [UCL x DeepMind DL2020 — L8: Attention and Memory in Deep Learning](https://www.youtube.com/watch?v=AIiwuClvH6k)
 - [Vaswani et al. — Attention Is All You Need (2017)](https://arxiv.org/abs/1706.03762)
+- [Structural Bioinformatics — Lesson 4: Evolution, Language and Bioinformatics](https://structural-bioinformatics.netlify.app/blog/proteins/2023-08-02-lesson4/)
 - [The Illustrated Transformer — Jay Alammar](https://jalammar.github.io/illustrated-transformer/)
 
 ### [Slides](/assets/slides/day05.pdf)
 
-### [Practical](/projects/day05-practical/)
+### [Exercise](/projects/day05-practical/)
 
-Images have a fixed grid; language, audio, and time series do not. Today we build models for variable-length, ordered data. We start with recurrent networks, which share parameters across time and carry a hidden state, and we see why backpropagation through time makes them forget long-range context. Attention removes the recurrent bottleneck by letting the model look directly at any position, and the Transformer takes attention to its logical conclusion: a fully parallel architecture, built entirely from attention and MLPs, that now underpins nearly all of modern deep learning.
+Images have a fixed grid; language, audio, protein sequences, and time series do not. We start with recurrent networks and the seq2seq bottleneck, then build the Transformer from first principles following Richard Turner's note (arXiv:2304.10557): attention is nothing more than a *weighted linear combination* across the sequence, with weights learned from query–key similarity. We assemble the full block (multi-head attention, MLP, residuals, LayerNorm, position encoding), connect it to the standard $$Q,K,V$$ notation, and explain why this architecture replaced recurrence for large-scale sequence modelling.
 
 * toc
 {:toc}
@@ -119,110 +121,122 @@ Imagine summarizing a 40-word sentence into one 512-dimensional vector and recon
 
 The fix is to give the decoder access to **all** encoder hidden states, and to learn, at each output step, **which** of them to use. That mechanism is **attention** — and once we have it, we will find that the recurrence was never strictly necessary.
 
-## 4. Attention
+## 4. Building Intuition for Attention and Transformers
 
-### 4.1 Attention as a differentiable, soft lookup
+### 4.1 Tokens as a feature-by-sequence matrix (Turner)
 
-> **Attention** lets a model, at each step, compute a weighted combination of a set of vectors, where the weights measure relevance. It is a **soft, differentiable dictionary lookup**.
+> Following Turner (arXiv:2304.10557), a Transformer ingests $$N$$ tokens $$\boldsymbol{x}_n^{(0)}\in\mathbb{R}^D$$ arranged as a $$D\times N$$ matrix $$X^{(0)}=[\boldsymbol{x}_1^{(0)},\dots,\boldsymbol{x}_N^{(0)}]$$: features run *down*, the sequence runs *across*.
 {:.lead}
 
-![An alignment matrix: at each output position the model places most weight on the relevant input positions — a learned, soft correspondence (UCL L8).](/assets/figures/day05/attn_alignment.png)
+**Why this notation.** Most Transformer tutorials use batch notation $$X\in\mathbb{R}^{N\times d}$$ (one row per token). Turner instead writes $$X\in\mathbb{R}^{D\times N}$$ so that **stage 1** of the block acts *horizontally* (mixing across the sequence, row by row) and **stage 2** acts *vertically* (refining features within each token). Both are equivalent up to transpose; Turner's layout makes the geometry of the block visually obvious.
 
-Instead of compressing the source into one vector, the decoder keeps **all** encoder states $$\boldsymbol{h}_1,\dots,\boldsymbol{h}_T$$ available and, at each output step, forms a context as a **weighted sum** of them. The weights are large for relevant positions and near zero elsewhere, producing an **alignment** between output and input. Because the weights are computed by a differentiable softmax, the whole thing trains end-to-end with backprop, and the alignment matrix is directly interpretable — you can read off which source words the model used for each output word.
+**Tokenisation is universal.** Words embedded into vectors, image patches flattened and linearly projected (ViT), or amino-acid residues encoded for protein language models — all become columns of $$X^{(0)}$$. The Transformer iterates $$X^{(m)}=\text{transformer-block}(X^{(m-1)})$$ for $$m=1,\dots,M$$, producing a refined $$D\times N$$ representation usable for next-token prediction, classification (pool or a special token), or sequence-to-sequence heads.
 
-### 4.2 Content-based addressing: query, key, value
+This generic "bag of tokens" view is why one architecture serves text, vision, and biology — a theme also stressed in the [structural bioinformatics course](https://structural-bioinformatics.netlify.app/blog/proteins/2023-08-02-lesson4/) when connecting sequence alignment and language models to protein design.
 
-> In **content-based attention**, a **query** $$\boldsymbol{q}$$ is compared to each **key** $$\boldsymbol{k}_j$$ by a similarity; a softmax turns similarities into weights $$a_j$$; the output is the weighted sum of **values** $$\sum_j a_j \boldsymbol{v}_j.$$
+### 4.2 Attention is a weighted linear combination
+
+> The first stage of a Transformer block forms, at each sequence position $$n$$, a **convex combination** of all input token vectors: $$\boldsymbol{y}_n^{(m)} = \sum_{n'=1}^{N} \boldsymbol{x}_{n'}^{(m-1)}\,A_{n',n}^{(m)},\quad A_{n',n}\ge 0,\;\sum_{n'}A_{n',n}=1.$$
 {:.lead}
 
-![Addressing by content: compare a query to each key by similarity, normalize with a softmax (with sharpness $$\beta$$), and read out the closest values (UCL L8).](/assets/figures/day05/attn_content.png)
+This is the core intuition Turner emphasises: before queries, keys, or multi-head anything, **attention is just a weighted average**. Each column $$n$$ of the output is a linear combination of the input columns, with weights that sum to one — a soft, learned "which positions matter for updating position $$n$$?"
 
-The query/key/value vocabulary is the heart of attention:
+**Matrix form.** Stacking all positions,
 
-- **Query** $$\boldsymbol{q}$$: what the current position is looking for.
-- **Keys** $$\boldsymbol{k}_j$$: an index describing each candidate item.
-- **Values** $$\boldsymbol{v}_j$$: the content actually retrieved.
+$$Y^{(m)} = X^{(m-1)} A^{(m)},\qquad Y,\,X\in\mathbb{R}^{D\times N},\;A\in\mathbb{R}^{N\times N}.$$
 
-With a dot-product similarity, the weights are
+Entry $$A_{n',n}$$ is large when token $$n'$$ is *relevant* for representing token $$n$$; near zero when irrelevant. In machine translation this becomes an **alignment matrix** (see below); in vision, patches from the same object often attend to each other.
 
-$$a_j = \mathrm{softmax}_j\big(\boldsymbol{q}^{\top}\boldsymbol{k}_j\big) = \frac{\exp(\boldsymbol{q}^{\top}\boldsymbol{k}_j)}{\sum_{l}\exp(\boldsymbol{q}^{\top}\boldsymbol{k}_l)},\qquad \text{output} = \sum_j a_j \boldsymbol{v}_j.$$
+![An alignment matrix: learned weights $$A_{n',n}$$ show soft correspondence between input and output positions (UCL L8).](/assets/figures/day05/attn_alignment.png)
 
-This is a **soft** version of looking up the key most similar to the query and returning its value — but differentiable, so it can be learned. Everything else in the Transformer is built from this primitive.
+Nothing here requires neural networks beyond choosing the weights $$A$$. The entire design question is: **where do the weights come from?**
 
-### 4.3 Derivation: scaled dot-product attention
+### 4.3 Self-attention: learning the weights from the input
 
-> Stacking queries, keys, and values into matrices $$Q,K,V$$ gives $$\mathrm{Attention}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V,$$ where the $$1/\sqrt{d_k}$$ scaling keeps the softmax in a healthy gradient regime.
+> **Self-attention** generates $$A$$ from the input itself. Start with dot-product similarity, apply softmax for normalisation, then introduce **queries** $$\boldsymbol{q}_n=U_q\boldsymbol{x}_n$$ and **keys** $$\boldsymbol{k}_n=U_k\boldsymbol{x}_n$$ for asymmetric, content-based weights.
 {:.lead}
 
-Batch the $$n$$ queries into rows of $$Q\in\mathbb{R}^{n\times d_k}$$, the keys into $$K\in\mathbb{R}^{m\times d_k}$$, and the values into $$V\in\mathbb{R}^{m\times d_v}$$. Then $$QK^{\top}\in\mathbb{R}^{n\times m}$$ holds **all** query–key dot products at once, a softmax over each row gives the attention weights, and multiplying by $$V$$ reads out the values — all as two matrix multiplies (highly parallel on a GPU).
+Turner builds the attention matrix in three deliberate steps.
 
-**Why divide by $$\sqrt{d_k}$$?** Suppose the entries of $$\boldsymbol{q}$$ and $$\boldsymbol{k}$$ are independent with mean $$0$$ and variance $$1$$. Then their dot product
+**Step 1 — naive similarity.** Measure how much position $$n'$$ should contribute to $$n$$ by the dot product of their feature vectors, then normalise with a softmax:
 
-$$\boldsymbol{q}^{\top}\boldsymbol{k} = \sum_{i=1}^{d_k} q_i k_i$$
+$$A_{n,n'} \propto \exp(\boldsymbol{x}_n^{\top}\boldsymbol{x}_{n'}).$$
 
-has mean $$0$$ and variance $$\textcolor{teal}{d_k}$$ (a sum of $$d_k$$ independent unit-variance terms), so its **standard deviation grows like $$\sqrt{d_k}$$**. For large $$d_k$$ the logits become huge in magnitude, pushing the softmax into a saturated, nearly one-hot regime where its gradient is almost zero — learning stalls. Dividing the scores by $$\textcolor{purple}{\sqrt{d_k}}$$ rescales the variance back to $$1$$:
+This already gives self-attention, but the similarity is **entangled with content**: the same features must simultaneously represent *what a token is* and *how it relates to others*.
 
-$$\mathrm{Var}\!\left(\frac{\boldsymbol{q}^{\top}\boldsymbol{k}}{\sqrt{d_k}}\right) = \frac{d_k}{d_k} = 1,$$
+**Step 2 — linear projection.** Apply a shared linear map $$U$$ before comparing: $$A_{n,n'} \propto \exp\big((U\boldsymbol{x}_n)^{\top}(U\boldsymbol{x}_{n'})\big)$$. Now only a $$K$$-dimensional subspace (typically $$K\ll D$$) is used for similarity; the rest of the features are free to carry content.
 
-keeping the softmax in a well-conditioned region. That single normalization is the difference between a Transformer that trains and one that does not.
+**Step 3 — queries and keys (asymmetry).** Symmetric similarity cannot express directional associations. Turner gives the example: *"caulking iron"* should strongly attend to *"tool"*, but *"tool"* need not strongly attend to *"caulking iron"*. Use **two** linear maps:
 
-## 5. The Transformer
+$$\boldsymbol{q}_n = U_q \boldsymbol{x}_n,\qquad \boldsymbol{k}_n = U_k \boldsymbol{x}_n,\qquad A_{n,n'} = \frac{\exp(\boldsymbol{q}_n^{\top}\boldsymbol{k}_{n'})}{\sum_{n''}\exp(\boldsymbol{q}_n^{\top}\boldsymbol{k}_{n''})}.$$
 
-### 5.1 Self-attention
+Together with $$Y=XA$$, this is the complete self-attention mechanism; the only learnable parameters are $$U_q, U_k\in\mathbb{R}^{K\times D}$$.
 
-> In **self-attention**, the queries, keys, and values are all linear projections of the *same* sequence: every position attends to every position, mixing information across the whole sequence in a single layer.
+![Content-based addressing: a query is compared to keys by similarity, then normalised with a softmax (UCL L8).](/assets/figures/day05/attn_content.png)
+
+In the standard $$Q,K,V$$ presentation (Vaswani et al.), we additionally introduce **values** $$\boldsymbol{v}_n=U_v\boldsymbol{x}_n$$ and output $$\sum_{n'} A_{n,n'}\boldsymbol{v}_{n'}$$. Turner notes this is equivalent to his formulation with extra projection matrices $$V_h$$ in the multi-head case — both are correct; the value matrix is not redundant once multi-head projection is included.
+
+### 4.4 Multi-head attention, the MLP stage, and the full block
+
+> A Transformer **block** = (multi-head self-attention across the sequence) + (shared MLP across features), each wrapped in **residual connections** and **LayerNorm**: $$X^{(m)} = X^{(m-1)} + \mathrm{res}_\text{MLP}\!\big(\mathrm{LN}(X^{(m-1)} + \mathrm{res}_\text{MHSA}(\mathrm{LN}(X^{(m-1)})))\big).$$
 {:.lead}
 
-![Attention learned by a translation model implicitly reorders words, attending across the sentence as needed (UCL L8).](/assets/figures/day05/attn_implicit.png)
+**Multi-head self-attention (MHSA).** One $$N\times N$$ attention matrix can be a bottleneck — pairs of tokens might be similar in one sense (syntax) but not another (semantics). The Transformer runs $$H$$ self-attention operations in parallel with different $$(U_{q,h}, U_{k,h})$$, then projects down:
 
-Given an input sequence $$X\in\mathbb{R}^{n\times d}$$, self-attention forms $$Q=XW_Q$$, $$K=XW_K$$, $$V=XW_V$$ and applies scaled dot-product attention. Two enormous advantages over recurrence:
+$$Y^{(m)} = \sum_{h=1}^{H} V_h\, X^{(m-1)} A_h,\qquad A_{h,n,n'} = \mathrm{softmax}_{n'}\big(\boldsymbol{q}_{h,n}^{\top}\boldsymbol{k}_{h,n'}\big).$$
 
-- **Constant path length.** Any two positions interact *directly* in one layer, whereas an RNN must pass information through $$O(n)$$ intermediate steps. Long-range dependencies are no harder than short-range ones.
-- **Parallelism.** There is no sequential dependence across positions — the whole sequence is processed at once, so training parallelizes across positions on modern hardware. This is what made training on internet-scale data feasible.
+This is directly analogous to **multiple convolution filters** in a CNN (Turner): several "relevance maps" in parallel, each capturing a different relation.
 
-The cost is $$O(n^2)$$ in sequence length (every pair of positions), the main scaling concern for long contexts.
+**Stage 2 — MLP across features.** After mixing across the sequence, each token's $$D$$-dimensional vector is refined independently by the *same* MLP: $$\boldsymbol{x}_n \leftarrow \mathrm{MLP}(\boldsymbol{y}_n)$$. This acts down each column of $$X$$. After $$M$$ stacked blocks, information at token $$n$$ and feature $$d$$ can depend on any $$(n', d')$$ in the input — horizontal then vertical mixing, repeated.
 
-### 5.2 Multi-head attention
+**Residuals and LayerNorm.** Rather than $$X^{(m)}=f(X^{(m-1)})$$, the block learns a **residual** correction $$X^{(m)}=X^{(m-1)}+\mathrm{res}(X^{(m-1)})$$ — the same identity-path idea as ResNet (Day 4). **LayerNorm** standardises each feature dimension across the sequence:
 
-> **Multi-head attention** runs $$h$$ attention operations in parallel on different learned projections, then concatenates and projects the results: $$\mathrm{MHA}(X) = [\,\mathrm{head}_1,\dots,\mathrm{head}_h\,]\,W_O.$$
+$$\bar{x}_{d,n} = \frac{x_{d,n}-\mathrm{mean}_n(x_d)}{\sqrt{\mathrm{var}_n(x_d)}},$$
+
+preventing activations from blowing up through depth. Both MHSA and MLP stages use pre-norm or post-norm variants of this pattern.
+
+### 4.5 Position encoding, causal masking, and the RNN comparison
+
+> Because $$Y=XA$$ is **permutation-equivariant**, order must be injected via **position encodings** added to $$X^{(0)}$$. For autoregressive training, an **upper-triangular mask** on $$A$$ prevents future tokens from affecting past ones.
 {:.lead}
 
-A single attention layer produces one weighting per position — one "kind" of relationship. But language has many simultaneous relations (subject–verb agreement, coreference, local phrasing). Multi-head attention lets the model attend to several at once:
+**Position.** Without position information, "herbivores eat plants" and "plants eat herbivores" receive the same representation up to permutation. The fix is to add (or concatenate) a position embedding to each token — fixed sinusoids $$\mathrm{PE}_{(p,2i)}=\sin(p/10000^{2i/D})$$ or learned vectors.
 
-$$\mathrm{head}_i = \mathrm{Attention}(XW_Q^i,\,XW_K^i,\,XW_V^i),\qquad \mathrm{MHA}(X)=[\,\mathrm{head}_1,\dots,\mathrm{head}_h\,]\,W_O.$$
+**Causal masking (Turner's batching trick).** Training an autoregressive model naïvely requires $$N$$ forward passes. Instead, apply the Transformer to the *whole* sequence and zero out $$A_{n,n'}=0$$ whenever $$n'>n$$ (upper-triangular $$A$$). Every next-token prediction is evaluated in **one parallel forward pass** — critical for LLM training at scale.
 
-Each head works in a lower-dimensional subspace ($$d/h$$), so the total cost is similar to a single full-dimensional attention, but the model can specialize different heads to different patterns. Inspecting individual heads often reveals interpretable behavior (one tracks the previous token, another links pronouns to their referents).
+**Transformers vs RNNs (Turner's comparison).** An RNN updates $$\boldsymbol{h}_n=f(\boldsymbol{h}_{n-1},\boldsymbol{x}_n)$$: nearby observations are treated differently from distant ones because information must propagate through $$f$$ repeatedly. Self-attention treats **all** time-points identically regardless of distance — one reason Transformers learn long-range dependencies more easily. The trade-off is $$O(N^2)$$ memory and compute in sequence length, versus $$O(N)$$ for RNNs.
 
-### 5.3 Positional encoding and the Transformer block
+![Attention in translation: the model learns to reorder words by attending across the sentence (UCL L8).](/assets/figures/day05/attn_implicit.png)
 
-> Because attention is **permutation-equivariant**, the Transformer injects order via **positional encodings** added to the inputs, and stacks **blocks** of (multi-head attention + MLP), each wrapped in a residual connection and LayerNorm.
+### 4.6 Standard batch notation and scaled dot-product attention
+
+> In the usual ML convention with $$X\in\mathbb{R}^{N\times d}$$ (rows = tokens), self-attention is $$\mathrm{Attention}(Q,K,V)=\mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V,$$ identical to Turner's $$Y=XA$$ once transposes and values are included.
 {:.lead}
 
-**Position.** Self-attention treats its input as a *set* — shuffle the tokens and the outputs shuffle identically, with no notion of order. We restore order by adding a **positional encoding** to each token embedding, either fixed sinusoids of varying frequency,
+Turner's $$Y=XA$$ with $$\boldsymbol{q}_n=U_q\boldsymbol{x}_n$$, $$\boldsymbol{k}_n=U_k\boldsymbol{x}_n$$ is exactly the **scaled dot-product attention** of Vaswani et al., written in $$D\times N$$ layout instead of $$N\times D$$. Stacking $$\boldsymbol{q}_n$$ into $$Q$$, $$\boldsymbol{k}_n$$ into $$K$$, and values $$\boldsymbol{v}_n=U_v\boldsymbol{x}_n$$ into $$V$$:
 
-$$\mathrm{PE}_{(p,2i)} = \sin\!\big(p/10000^{2i/d}\big),\qquad \mathrm{PE}_{(p,2i+1)} = \cos\!\big(p/10000^{2i/d}\big),$$
+$$\mathrm{Attention}(Q,K,V) = \mathrm{softmax}\!\left(\frac{QK^{\top}}{\sqrt{d_k}}\right)V.$$
 
-or learned position embeddings. The sinusoidal choice lets the model express relative offsets through linear combinations and extrapolate to unseen lengths.
+**Why scale by $$\sqrt{d_k}$$?** If entries of $$\boldsymbol{q},\boldsymbol{k}$$ have unit variance, then $$\boldsymbol{q}^{\top}\boldsymbol{k}=\sum_{i=1}^{d_k} q_i k_i$$ has variance $$d_k$$. Large logits saturate the softmax (gradient $$\approx 0$$). Dividing by $$\sqrt{d_k}$$ restores unit variance and keeps training stable.
 
-**The block.** A Transformer layer is
+**Seq2seq as a special case.** Encoder–decoder attention uses queries from the decoder and keys/values from the encoder — the same weighted-average mechanism, but $$A$$ compares *two different* sequences. This resolves the fixed-vector bottleneck from the previous section: the decoder forms $$\boldsymbol{c}_t=\sum_j A_{j,t}\boldsymbol{h}_j^{\text{enc}}$$ at each step instead of relying on a single $$\boldsymbol{c}$$.
 
-$$X' = \mathrm{LayerNorm}\big(X + \mathrm{MHA}(X)\big),\qquad X'' = \mathrm{LayerNorm}\big(X' + \mathrm{MLP}(X')\big).$$
+## 5. Why Transformers Won
 
-The **residual connections** (Day 4's idea) keep gradients flowing through deep stacks, and **LayerNorm** (Day 3) stabilizes the activations. The **encoder** stacks $$N$$ such blocks; the **decoder** adds *masked* self-attention — masking future positions so that, during training, a position can only attend to earlier ones, preserving the autoregressive property — plus cross-attention over the encoder outputs.
+### 5.1 Parallelism, path length, and scale
 
-### 5.4 Why Transformers won
-
-> The Transformer replaced recurrence entirely, trading sequential computation for parallel attention. Its scalability with data and compute made it the universal backbone of modern AI.
+> Transformers replaced RNNs because they **parallelise** over sequence length, give **constant interaction depth** between any two tokens, and **scale** predictably with data and compute — the foundation of modern LLMs.
 {:.lead}
 
-Putting the pieces together, the Transformer dominates because it is:
+The three practical advantages:
 
-- **Parallelizable.** No step waits for the previous one, so training uses hardware far more efficiently than RNNs.
-- **Short-pathed.** Constant interaction distance between any two tokens makes long-range dependencies learnable.
-- **Scalable.** Performance keeps improving predictably with more data, parameters, and compute — the empirical "scaling laws" behind large language models.
-- **General.** The same architecture powers text (BERT, GPT), vision (ViT splits an image into patch "tokens"), audio, and biology (AlphaFold). One toolbox, many domains.
+1. **Parallel training.** No step waits for the previous hidden state; the whole sequence is processed at once (with causal masking for autoregressive models). GPUs utilisation is far higher than for RNNs.
+2. **Short paths.** Any two tokens interact directly in one layer; an RNN needs $$O(N)$$ steps. Long-range agreement ("The keys that I left … *are* gone") is no harder than local agreement.
+3. **Scaling laws.** Performance keeps improving with more parameters, data, and compute — the empirical basis of GPT, PaLM, and protein language models such as ESM.
 
-This sets up the rest of the course: **Days 9–10** scale this architecture into pretrained language models, while the generative-modeling thread (Days 6–8) shows how to *sample* high-dimensional data — where Transformers also serve as the workhorse denoiser.
+The cost is $$O(N^2)$$ attention, motivating sparse attention, linear attention, and state-space models for very long contexts. But for the sequence lengths that dominated NLP and protein modelling (hundreds to a few thousand tokens), the Transformer remains the default.
+
+**Connections.** Day 9–10 cover LLM pretraining and inference. For sequence alignment, evolutionary conservation, and protein language models, the [structural bioinformatics course](https://structural-bioinformatics.netlify.app/blog/proteins/2023-08-02-lesson4/) (Lesson 4: Evolution, Language and Bioinformatics; Lesson 7: Generative Modelling) provides complementary biological motivation and references.
 
 ## Checkpoint summary
 
@@ -232,6 +246,7 @@ Before moving to the practical, confirm you can:
 - Write the RNN recurrence, unroll it, and explain backpropagation through time.
 - Show why repeated Jacobian products cause vanishing/exploding gradients, and how LSTM gates fix it.
 - Describe the seq2seq bottleneck and how attention removes it.
-- Define query/key/value attention and derive why scores are divided by sqrt(d_k).
-- Assemble a Transformer block (multi-head attention, MLP, residual + LayerNorm, positional encoding) and explain masking.
+- Starting from Turner's $$Y=XA$$, explain attention as a weighted linear combination and build up to query–key self-attention.
+- Assemble a Transformer block (multi-head attention, MLP, residual + LayerNorm, position encoding) and explain causal masking.
+- Connect Turner's $$D\times N$$ layout to standard $$Q,K,V$$ batch notation and derive the $$1/\sqrt{d_k}$$ scaling.
 - Contrast RNNs and Transformers on path length, parallelism, and scalability.

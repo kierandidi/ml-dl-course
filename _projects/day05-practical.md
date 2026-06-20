@@ -1,13 +1,13 @@
 ---
 layout: project
-title: Day 5 Practical — Sequences & Attention
+title: Day 5 Exercise — Sequences & Attention
 caption: RNN and attention
 description: >
   Sentiment RNN and manual scaled dot-product attention on short sequences.
 date: '21-08-2026'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day05.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day05.pdf
@@ -15,21 +15,21 @@ links:
     url: /blog/lectures/2026/08/21/day05-rnns-and-transformers/
 ---
 
-# Day 5 Practical — Sequences & Attention
+# Day 5 Exercise — Sequences & Attention
 
 
 ## Figures from lecture materials
 
-![Source illustration — Day 5 (extracted from course PDFs/PPTX)](/assets/figures/day05/L6_LSTM_00.png)
+![Source illustration — Day 5 (extracted from course PDFs/PPTX)](/assets/figures/day05/attn_alignment.png)
 *Source illustration — Day 5 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 5 (extracted from course PDFs/PPTX)](/assets/figures/day05/L6_LSTM_02.png)
+![Source illustration — Day 5 (extracted from course PDFs/PPTX)](/assets/figures/day05/attn_content.png)
 *Source illustration — Day 5 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 5 (extracted from course PDFs/PPTX)](/assets/figures/day05/L6_LSTM_04.png)
+![Source illustration — Day 5 (extracted from course PDFs/PPTX)](/assets/figures/day05/attn_implicit.png)
 *Source illustration — Day 5 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 5 (extracted from course PDFs/PPTX)](/assets/figures/day05/L6_LSTM_06.png)
+![Source illustration — Day 5 (extracted from course PDFs/PPTX)](/assets/figures/day05/rnn_pixelrnn.png)
 *Source illustration — Day 5 (extracted from course PDFs/PPTX)*
 
 

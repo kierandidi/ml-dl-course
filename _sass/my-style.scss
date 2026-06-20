@@ -12,6 +12,39 @@ applause-button {
 
   // Fancy Codeblock Scrollbar
 
+// Collapsible optional derivations (Days 7–8 SDE material)
+details.optional-derivation {
+  margin: 1.25rem 0;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--gray, #ccc);
+  border-radius: 6px;
+  background: var(--gray-bg, rgba(0, 0, 0, 0.03));
+
+  summary {
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.95rem;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: "▸ ";
+      display: inline-block;
+      transition: transform 0.15s ease;
+    }
+  }
+
+  &[open] summary::before {
+    transform: rotate(90deg);
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+}
+
 pre {
   border-color: transparent;
   transition: border-color 0.5s ease;

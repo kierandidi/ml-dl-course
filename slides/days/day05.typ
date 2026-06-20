@@ -15,8 +15,8 @@
 - Sequence Modeling
 - Recurrent Neural Networks
 - Sequence to Sequence
-- Attention
-- The Transformer
+- Building Intuition for Attention
+- Standard Notation and Why Transformers Won
 
 = 1 · Sequence Modeling
 
@@ -100,77 +100,116 @@
 - Fix: let the decoder attend to *all* encoder states
 - This is attention — the bridge to Transformers
 
-= 4 · Attention
+= 4 · Building Intuition for Attention
 
-== 4.1  Alignment: a Soft Lookup
+== 4.1  Tokens as a D x N Matrix
 
-- At each output step, learn which inputs to focus on
-- Alignment matrix = soft correspondence input$arrow.l.r$output
-- Differentiable 'soft' lookup, trained end-to-end
-- No fixed bottleneck: direct access to every source state
-- Interpretable: the weights show what the model used
+- Input: $N$ tokens, each a $D$-dimensional vector
+- Collect into $X^(0) in RR^(D times N)$: features *down*, sequence *across*
+- Words, image patches, amino-acid embeddings — all tokenise the same way
+- Transformer returns $X^(M)$, another $D times N$ representation
+- Source: Turner, *An Introduction to Transformers* (arXiv:2304.10557)
 
-== 4.1  Alignment: a Soft Lookup
+== 4.2  Attention = Weighted Linear Combination
+
+- At position $n$, form a new vector by *averaging* all tokens
+- $y_n = sum_(j=1)^N x_j A_(j n)$ — a convex combination
+- Weights $A_(j n) >= 0$, columns sum to 1: $sum_j A_(j n)=1$
+- High $A_(j n)$ = position $j$ is *relevant* for updating $n$
+- Nothing exotic yet — just a learned weighted sum
+
+== 4.3  Matrix Form: Y = X A
+
+- Stack all positions: $Y = X A$ ($D times N$)
+- Each column of $A$ is a softmax-normalised weight vector
+- Stage 1 of the block: mix information *across the sequence*
+- Operates row-wise on $X$ (each feature independently)
+- Stage 2 will refine features *down* each column
+
+== 4.3  Matrix Form: Y = X A
 
 #align(center + horizon)[#image("/assets/figures/day05/attn_alignment.png", width: 92%, height: 82%, fit: "contain")]
 
-== 4.2  Content-Based Addressing
+== 4.4  Self-Attention: Where Does A Come From?
 
-- A query $q$ is compared to each key $k_j$ by a similarity
-- Normalize similarities with a softmax $arrow.r$ weights $a_j$
-- Output = weighted sum of values: $sum_j a_j v_j$
-- $a_j = "softmax"_j (q dot.op k_j)$
-- Query/key/value: the vocabulary of attention
+- Naive: $A_(n j) prop exp(x_n^T x_j)$ — similarity of raw features
+- Problem: similarity is entangled with content
+- Fix: compare *projected* features $U x_n$ instead
+- Still symmetric — 'caulking iron' $arrow.l.r$ 'tool' but not vice versa
+- Need *asymmetric* queries and keys (next slide)
 
-== 4.2  Content-Based Addressing
+== 4.5  Queries and Keys
+
+- $q_n = U_q x_n$, $k_n = U_k x_n$ — two linear maps of the input
+- $A_(n j) = "softmax"_j exp(q_n^T k_j)$
+- Only parameters so far: $U_q, U_k$ ($K times D$ each)
+- Query = what position $n$ is looking for
+- Key = what position $j$ offers; value = content (standard view)
+
+== 4.5  Queries and Keys
 
 #align(center + horizon)[#image("/assets/figures/day05/attn_content.png", width: 92%, height: 82%, fit: "contain")]
 
-== 4.3  Derivation: Scaled Dot-Product Attention
+== 4.6  Multi-Head Self-Attention
 
-- Stack queries, keys, values into $Q, K, V$
-- Scores $S = Q K^T$ (all query-key dot products)
-- Scale by $sqrt(d_k)$ to keep softmax gradients healthy
-- $"Attention"(Q,K,V) = "softmax"(Q K^T \\/ sqrt(d_k)) V$
-- Full derivation of the scaling in the notes
+- One $N times N$ attention map can be a bottleneck
+- Run $H$ attention heads in parallel (different $U_(q,h), U_(k,h)$)
+- Each head learns a different notion of 'relevance'
+- Concatenate and project: $Y = sum_h V_h X A_h$
+- Analogous to multiple convolution filters (Turner)
 
-= 5 · The Transformer
+== 4.7  Stage 2: MLP Across Features
 
-== 5.1  Self-Attention
+- Second stage refines each token's feature vector independently
+- $x_n = "MLP"(y_n)$ — same MLP weights at every position $n$
+- Acts *vertically* down each column of $X$
+- After $M$ blocks, token $n$, feature $d$ uses info from $(j, k)$ anywhere
+- Horizontal (attention) + vertical (MLP) = full mixing
 
-- Each token attends to *every* token in the sequence
-- $Q, K, V$ are all linear projections of the *same* input
-- Captures long-range dependencies in *one* step
-- Fully parallel over positions (unlike RNNs)
-- Attention maps are interpretable alignments
+== 4.8  Residual Connections and LayerNorm
 
-== 5.1  Self-Attention
+- Parameterise updates as *residuals*: $x^(m) = x^(m-1) + "res"(x^(m-1))$
+- Each stage applies a mild correction; depth composes large transforms
+- LayerNorm standardises each feature dimension: zero mean, unit variance
+- Prevents activations blowing up through deep stacks
+- Full block: LN $arrow.r$ MHSA $arrow.r$ residual $arrow.r$ LN $arrow.r$ MLP $arrow.r$ residual
+
+== 4.9  Position Encoding and Causal Masking
+
+- Attention alone is permutation-equivariant — order is lost
+- Fix: add (or concatenate) a position embedding to each token
+- Autoregressive training: mask $A$ so $j > n$ gets weight 0
+- Upper-triangular mask $arrow.r$ train on full sequence in one pass
+- Contrast RNNs: all time-points treated identically in attention
+
+= 5 · Standard Notation and Why Transformers Won
+
+== 5.1  Self-Attention in Translation
+
+- Seq2seq attention = special case: decoder queries, encoder keys/values
+- Self-attention: $Q, K, V$ all from the same sequence
+- Alignment matrix shows which source words each output used
+- Interpretable, differentiable, no fixed bottleneck
+
+== 5.1  Self-Attention in Translation
 
 #align(center + horizon)[#image("/assets/figures/day05/attn_implicit.png", width: 92%, height: 82%, fit: "contain")]
 
-== 5.2  Multi-Head Attention
+== 5.2  Scaled Dot-Product Attention (Batch Form)
 
-- Run $h$ attention heads in parallel on projected subspaces
-- Each head learns a different relation (syntax, coref, ...)
-- Concatenate heads, then project: $W_O [h_1, dots.h, h_n]$
-- More expressive than a single attention at the same cost
-- Heads attend to different positions simultaneously
+- Standard ML notation: $X in RR^(N times d)$ (rows = tokens)
+- $"Attention"(Q,K,V) = "softmax"(Q K^T \\/ sqrt(d_k)) V$
+- Same math as Turner; $1\\/sqrt(d_k)$ keeps softmax gradients healthy
+- Fully parallel over $N$ — unlike sequential RNNs
+- Cost: $O(N^2)$ in sequence length
 
-== 5.3  Positional Encoding & the Block
+== 5.3  Transformers vs RNNs
 
-- Attention is permutation-equivariant $arrow.r$ inject position
-- Sinusoidal or learned positional encodings added to inputs
-- Block: (multi-head attn $arrow.r$ MLP), each with residual + LayerNorm
-- Decoder uses *masked* self-attention (no peeking ahead)
-- Stack $N$ blocks; same template for encoder & decoder
-
-== 5.4  Why Transformers Won
-
-- Parallel training: no sequential recurrence
-- Constant path length between any two tokens
-- Scales with data and compute — the basis of LLMs
-- One architecture for text, vision (ViT), audio, proteins
-- Day 9-10: pretraining and large language models
+- RNN: nearby inputs treated differently from distant ones (recurrence)
+- Transformer: every pair interacts in one layer, same treatment
+- Constant path length $arrow.r$ long-range deps no harder than short
+- Parallel training $arrow.r$ scales to internet-scale data (LLMs)
+- Day 9-10: pretraining; proteins/sequences: see structural-bioinformatics course
 
 == Summary
 

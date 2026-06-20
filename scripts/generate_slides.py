@@ -7,6 +7,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from content_day01 import FIGURES as DAY01_FIGURES, SLIDES as DAY01_SLIDES
+from content_day02 import FIGURES as DAY02_FIGURES, SLIDES as DAY02_SLIDES
 from content_day03 import FIGURES as DAY03_FIGURES, SLIDES as DAY03_SLIDES
 from content_day04 import FIGURES as DAY04_FIGURES, SLIDES as DAY04_SLIDES
 from content_day05 import FIGURES as DAY05_FIGURES, SLIDES as DAY05_SLIDES
@@ -15,7 +16,7 @@ from content_day07 import FIGURES as DAY07_FIGURES, SLIDES as DAY07_SLIDES
 from content_day08 import FIGURES as DAY08_FIGURES, SLIDES as DAY08_SLIDES
 
 # Days with hand-curated figure lists (aligned one-per-slide, None allowed).
-CURATED_FIGURES = {1: DAY01_FIGURES, 3: DAY03_FIGURES, 4: DAY04_FIGURES, 5: DAY05_FIGURES, 6: DAY06_FIGURES, 7: DAY07_FIGURES, 8: DAY08_FIGURES}
+CURATED_FIGURES = {1: DAY01_FIGURES, 2: DAY02_FIGURES, 3: DAY03_FIGURES, 4: DAY04_FIGURES, 5: DAY05_FIGURES, 6: DAY06_FIGURES, 7: DAY07_FIGURES, 8: DAY08_FIGURES}
 
 ROOT = Path(__file__).resolve().parents[1]
 DAYS_DIR = ROOT / "slides" / "days"
@@ -38,7 +39,10 @@ def typst_escape(text: str) -> str:
 
 def fix_typst_math(text: str) -> str:
     """Normalize a few LaTeX-isms for Typst math mode."""
+    text = text.replace("$$", "$")
     replacements = [
+        (" ge ", " >= "),
+        ("$propto ", "$prop "),
         (" propto ", " prop "),
         (" odot ", " dot.op "),
         ("arg max", '"arg max"'),
@@ -1415,6 +1419,7 @@ COURSE: list[tuple[str, str, list[tuple[str, list[tuple[str, list[str]]]]]]] = [
 
 
 # Use hand-authored decks for upgraded days (override the inline placeholders).
+COURSE[1] = DAY02_SLIDES  # Day 2 — Statistical Learning (MML Ch. 8–12)
 COURSE[2] = DAY03_SLIDES  # Day 3 — Deep Neural Networks
 COURSE[3] = DAY04_SLIDES  # Day 4 — Convolutional Neural Networks
 COURSE[4] = DAY05_SLIDES  # Day 5 — Sequence Models & Transformers

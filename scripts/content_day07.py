@@ -15,6 +15,8 @@ Interactive widgets are referenced by ``{{viz:KEY}}`` markers expanded by
 generate_lectures.py.
 """
 
+from diffusion_appendix import DAY07_OPTIONAL
+
 # Curated figures aligned to each content slide (in order). None => no figure slide.
 FIGURES = [
     # The score function
@@ -166,13 +168,24 @@ SLIDES = (
                     ],
                 ),
                 (
+                    "Heuristic: Reversing an SDE",
+                    [
+                        "Chain rule: $p_(t,delta)(x,y) = p_(t+delta|t)(y|x) p_t(x) = p_(t|t+delta)(x|y) p_(t+delta)(y)$",
+                        "Forward step (Euler): $p_(t+delta|t)(y|x) = N(y | x + f delta, delta g^2)$",
+                        "Taylor on $log p_t$ around $y$: factor $exp((x-y)^T s(y,t))$ with $s = nabla log p_t$",
+                        "Complete the square $arrow.r$ reverse drift $f - g^2 s$",
+                        "Full step-by-step derivation: optional notes block",
+                    ],
+                ),
+                (
                     "Reverse SDE & Probability-Flow ODE",
                     [
-                        "Reverse SDE (Anderson): run time backward using the score",
-                        "$dif x = [f - g^2 nabla log p_t] dif t + g dif macron(w)$",
+                        "Anderson (1982): rigorous reverse-time SDE with score term",
+                        "$dif x = [f - g^2 s] dif t + g dif macron(w)$, $s = nabla log p_t approx s_theta$",
                         "Probability-flow ODE: *same marginals*, no noise",
-                        "$dif x = [f - 1/2 g^2 nabla log p_t] dif t$",
+                        "$dif x = [f - 1/2 g^2 s] dif t$",
                         "SDE = stochastic sampler; ODE = deterministic + likelihood",
+                        "PF-ODE from FPE: Day 8 (optional derivation block)",
                     ],
                 ),
                 (
@@ -266,10 +279,12 @@ LECTURE = {
     "title": "Score-Based Models, SDEs, and Flow Matching",
     "description": "The continuous-time view of diffusion: score functions, the score SDE and probability-flow ODE, and flow matching.",
     "reading": [
-        "[The Principles of Diffusion Models](https://arxiv.org/abs/2510.21890), Ch. 3–6",
+        "[The Principles of Diffusion Models](https://arxiv.org/abs/2510.21890), Ch. 3–6; Appendices B–D (optional deep dives in notes)",
         "[Song et al. — Score-Based Generative Modeling through SDEs (2021)](https://arxiv.org/abs/2011.13456)",
         "[Lipman et al. — Flow Matching for Generative Modeling (2023)](https://arxiv.org/abs/2210.02747)",
         "[Interactive companion — The Principles of Diffusion Models](https://the-principles-of-diffusion-models.github.io/)",
+        "[SDE course — Lesson 2: FPE, time reversal (Nelson/Anderson), DSM proof, PF-ODE](/material/sde-course/) (local notes; see also [Generative Modelling with SDEs](https://kierandidi.github.io/))",
+        "[Ludwig Winkler — Simple sketch of the reverse SDE](https://ludwigwinkler.github.io/blog/SimpleReverseSDE/)",
     ],
     "intro": (
         "Day 6 built diffusion from the variational, discrete-time DDPM viewpoint. Today we take the "
@@ -473,45 +488,65 @@ $$J(\\theta) = \\mathbb{E}_{t}\\,\\lambda(t)\\,\\mathbb{E}_{\\boldsymbol{x}_0,\\
 with a time-weighting $$\\lambda(t)$$. One network, trained once, gives the score at every noise level — everything we need to run the dynamics below.""",
                 },
                 {
-                    "heading": "The reverse SDE and the probability-flow ODE",
+                    "heading": "Heuristic: reversing an SDE",
                     "definition": (
-                        "Anderson's theorem gives a **reverse-time SDE** that undoes the forward process, "
-                        "and there is a deterministic **probability-flow ODE** with the *same marginals*: "
-                        "$$\\mathrm{d}\\boldsymbol{x} = \\big[\\boldsymbol{f}-g^2\\nabla\\log p_t\\big]\\mathrm{d}t + g\\,\\mathrm{d}\\bar{\\boldsymbol{w}}"
-                        "\\quad\\text{vs}\\quad "
-                        "\\mathrm{d}\\boldsymbol{x} = \\big[\\boldsymbol{f}-\\tfrac12 g^2\\nabla\\log p_t\\big]\\mathrm{d}t.$$"
+                        "To reverse the forward SDE, factor the joint density with the chain rule "
+                        "and approximate forward transitions by Euler–Maruyama; a Taylor expansion "
+                        "of $$\\log p_t$$ reveals the **score** $$\\boldsymbol{s}=\\nabla\\log p_t$$ "
+                        "in the reverse drift $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$."
+                    ),
+                    "body": """The forward SDE (Principles notation)
+
+$$\\mathrm{d}\\boldsymbol{x} = \\boldsymbol{f}(\\boldsymbol{x},t)\\,\\mathrm{d}t + g(t)\\,\\mathrm{d}\\boldsymbol{w}$$
+
+has Euler–Maruyama transitions $$p_{t+\\delta\\mid t}(\\boldsymbol{y}\\mid\\boldsymbol{x})=\\mathcal{N}(\\boldsymbol{y}\\mid\\boldsymbol{x}+\\boldsymbol{f}\\delta,\\,\\delta\\,g^2 I)$$. The chain rule gives $$p_{t\\mid t+\\delta}(\\boldsymbol{x}\\mid\\boldsymbol{y})\\propto p_{t+\\delta\\mid t}(\\boldsymbol{y}\\mid\\boldsymbol{x})\\,p_t(\\boldsymbol{x})/p_{t+\\delta}(\\boldsymbol{y})$$; Taylor-expanding $$\\log p_t$$ around $$\\boldsymbol{y}$$ and **completing the square** in the reverse kernel yields drift $$\\boldsymbol{f}(\\boldsymbol{x},t)-g(t)^2\\,\\boldsymbol{s}(\\boldsymbol{x},t)$$ — the same score we train with DSM.
+
+At sampling time replace $$\\boldsymbol{s}$$ with $$\\boldsymbol{s}_\\theta(\\boldsymbol{x},t)$$. The expanded step-by-step derivation (Winkler; SDE course §2.1) is in the optional block below.""",
+                    "optional": [DAY07_OPTIONAL[0]],
+                },
+                {
+                    "heading": "Anderson's reverse-time SDE",
+                    "definition": (
+                        "Anderson (1982): the time-reversal of "
+                        "$$\\mathrm{d}\\boldsymbol{x} = \\boldsymbol{f}\\,\\mathrm{d}t + g\\,\\mathrm{d}\\boldsymbol{w}$$ "
+                        "is $$\\mathrm{d}\\boldsymbol{x} = [\\boldsymbol{f}-g^2\\boldsymbol{s}]\\,\\mathrm{d}t + g\\,\\mathrm{d}\\bar{\\boldsymbol{w}}$$ "
+                        "with $$\\boldsymbol{s}=\\nabla\\log p_t$$ — the rigorous form of the heuristic above."
+                    ),
+                    "body": """Running this SDE from $$\\boldsymbol{x}_T\\sim\\mathcal{N}(\\mathbf{0},I)$$ to $$t=0$$ generates samples from $$p_{\\text{data}}$$ once $$\\boldsymbol{s}$$ is replaced by the learned $$\\boldsymbol{s}_\\theta(\\boldsymbol{x},t)$$. Two sign conventions appear in the literature (reverse Wiener vs. $$t\\mapsto T-t$$); they agree on the **score term** $$g^2\\boldsymbol{s}$$.
+
+The reverse SDE generalizes annealed Langevin dynamics and DDPM ancestral sampling. Anderson's proof via forward/backward Kolmogorov equations is optional below.""",
+                    "optional": [DAY07_OPTIONAL[1]],
+                },
+                {
+                    "heading": "The probability-flow ODE (same marginals, no noise)",
+                    "definition": (
+                        "Every SDE admits a deterministic **probability-flow ODE** with the *same* "
+                        "marginals $$\\{p_t\\}$$: "
+                        "$$\\mathrm{d}\\boldsymbol{x} = \\big[\\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}\\big]\\mathrm{d}t.$$ "
+                        "The $$\\tfrac12$$ factor and absence of noise follow from the FPE (Day 8)."
                     ),
                     "body": """![Three dynamics with identical time marginals: the forward SDE, the reverse SDE, and the probability-flow ODE (Principles Fig 4.5).](/assets/figures/day07/pdm_three_dynamics.png)
 
-This is the payoff of the whole machinery. Running the **reverse SDE** from $$\\boldsymbol{x}_T\\sim\\mathcal{N}(\\mathbf{0},I)$$ back to $$t=0$$ produces a sample from $$p_{\\text{data}}$$ — a stochastic sampler that generalizes annealed Langevin and DDPM ancestral sampling. The only unknown in the reverse drift is the score, which we have learned.
+The reverse SDE is a **stochastic** sampler; the **probability-flow ODE** is deterministic ($$\\tilde{\\boldsymbol{\\mu}}=\\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}$$, no $$\\mathrm{d}\\bar{\\boldsymbol{w}}$$). Practical uses: reproducible sampling, exact likelihoods (CNF), fast ODE solvers (Day 8).
 
-The **probability-flow ODE** is a deterministic process that, remarkably, has the *same marginal distribution* $$p_t$$ at every time. It gives:
-
-- **Deterministic sampling** — fix the initial noise and you fix the output (useful for editing, interpolation, reproducibility).
-- **Exact likelihoods** — being an ODE (a continuous normalizing flow), you can compute $$\\log p_0(\\boldsymbol{x})$$ via the instantaneous change-of-variables.
-- **Fast solvers** — ODEs admit high-order integrators, the focus of Day 8.
-
-Compare all three dynamics side by side:
+Compare all three dynamics:
 
 {{viz:score_sde_three_dynamics}}""",
                 },
                 {
-                    "heading": "Derivation: the denoising score matching objective",
+                    "heading": "The denoising score matching objective",
                     "definition": (
-                        "The marginal score equals the conditional expectation of the (closed-form) "
+                        "The marginal score equals the conditional expectation of the closed-form "
                         "conditional score: $$\\nabla\\log p_t(\\boldsymbol{x}_t) = "
-                        "\\mathbb{E}\\big[\\nabla\\log p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0)\\,\\big|\\,\\boldsymbol{x}_t\\big].$$ "
-                        "Hence regressing on the conditional score trains the marginal score."
+                        "\\mathbb{E}[\\nabla\\log p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0)\\,\\big|\\,\\boldsymbol{x}_t]$$. "
+                        "Hence regressing on $$-\\boldsymbol{\\epsilon}/\\sigma_t$$ trains the marginal score."
                     ),
-                    "body": """Write the marginal as $$p_t(\\boldsymbol{x}_t)=\\int p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0)\\,p_{\\text{data}}(\\boldsymbol{x}_0)\\,\\mathrm{d}\\boldsymbol{x}_0$$ and differentiate its log:
+                    "body": """With $$\\boldsymbol{x}_t=\\alpha_t\\boldsymbol{x}_0+\\sigma_t\\boldsymbol{\\epsilon}$$,
 
-$$\\nabla_{\\boldsymbol{x}_t}\\log p_t(\\boldsymbol{x}_t) = \\frac{\\nabla_{\\boldsymbol{x}_t} p_t(\\boldsymbol{x}_t)}{p_t(\\boldsymbol{x}_t)} = \\frac{\\int \\textcolor{teal}{\\nabla_{\\boldsymbol{x}_t} p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0)}\\,p_{\\text{data}}(\\boldsymbol{x}_0)\\,\\mathrm{d}\\boldsymbol{x}_0}{p_t(\\boldsymbol{x}_t)}.$$
+$$\\nabla_{\\boldsymbol{x}_t}\\log p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0) = -\\frac{\\boldsymbol{\\epsilon}}{\\sigma_t}.$$
 
-Use $$\\nabla p_t(\\cdot\\mid\\boldsymbol{x}_0)=p_t(\\cdot\\mid\\boldsymbol{x}_0)\\,\\nabla\\log p_t(\\cdot\\mid\\boldsymbol{x}_0)$$ in the numerator and recognize the posterior $$p_t(\\boldsymbol{x}_0\\mid\\boldsymbol{x}_t)=p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0)p_{\\text{data}}(\\boldsymbol{x}_0)/p_t(\\boldsymbol{x}_t)$$:
-
-$$\\nabla_{\\boldsymbol{x}_t}\\log p_t(\\boldsymbol{x}_t) = \\int p_t(\\boldsymbol{x}_0\\mid\\boldsymbol{x}_t)\\,\\nabla_{\\boldsymbol{x}_t}\\log p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0)\\,\\mathrm{d}\\boldsymbol{x}_0 = \\textcolor{purple}{\\mathbb{E}_{\\boldsymbol{x}_0\\mid\\boldsymbol{x}_t}\\big[\\nabla\\log p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0)\\big]}.$$
-
-So the marginal score is the conditional-mean of a quantity we know in closed form. Since the minimizer of a squared-error regression is exactly the conditional mean, regressing $$\\boldsymbol{s}_\\theta(\\boldsymbol{x}_t,t)$$ onto the **conditional** score trains it to equal the **marginal** score. With the Gaussian kernel, $$\\nabla\\log p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0) = -(\\boldsymbol{x}_t-\\alpha_t\\boldsymbol{x}_0)/\\sigma_t^2 = -\\boldsymbol{\\epsilon}/\\sigma_t$$, recovering the DSM/noise-prediction loss — and proving rigorously that **predicting the score is predicting the noise**. This connects directly to **Tweedie's formula**, $$\\mathbb{E}[\\boldsymbol{x}_0\\mid\\boldsymbol{x}_t] = (\\boldsymbol{x}_t+\\sigma_t^2\\,\\nabla\\log p_t(\\boldsymbol{x}_t))/\\alpha_t$$, the optimal denoiser.""",
+Minimizing $$\\mathbb{E}\\|\\boldsymbol{s}_\\theta(\\boldsymbol{x}_t,t)-\\nabla\\log p_t(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0)\\|^2$$ is squared-error regression whose optimum is $$\\mathbb{E}[\\nabla\\log p_t(\\cdot\\mid\\boldsymbol{x}_0)\\mid\\boldsymbol{x}_t]=\\nabla\\log p_t(\\boldsymbol{x}_t)$$ — so **predicting the score is predicting the noise** (Day 6). Full proof and Tweedie's formula: optional block below.""",
+                    "optional": [DAY07_OPTIONAL[2]] + DAY07_OPTIONAL[3:],
                 },
             ],
         },

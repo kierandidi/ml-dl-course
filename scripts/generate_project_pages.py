@@ -17,6 +17,12 @@ FIGURE_OVERRIDES: dict[int, list[str]] = {
         "/assets/figures/day01/mml_gaussian.png",
         "/assets/figures/day01/ode_vectorfield.png",
     ],
+    2: [
+        "/assets/figures/day02/ml_taxonomy.png",
+        "/assets/figures/day02/mml_linear_regression.png",
+        "/assets/figures/day02/mml_pca_illustration.png",
+        "/assets/figures/day02/mml_svm_margin.png",
+    ],
 }
 
 
@@ -51,7 +57,7 @@ LECTURE_URLS = {
 PAGES: list[dict] = [
     {
         "file": "day01-practical.md",
-        "title": "Day 1 Practical — Math Foundations",
+        "title": "Day 1 Exercise — Math Foundations",
         "caption": "Gradients, probability, and MLE",
         "date": "17-08-2026",
         "desc": "Numerical gradients, Gaussian MLE, and probability exercises with worked derivations.",
@@ -93,37 +99,43 @@ Open [`notebooks/practicals/day01.ipynb`](/notebooks/practicals/day01.ipynb) (al
     },
     {
         "file": "day02-practical.md",
-        "title": "Day 2 Practical — Statistical Learning",
-        "caption": "Regression and classification",
+        "title": "Day 2 Exercise — Statistical Learning",
+        "caption": "Regression, PCA, GMM, and SVM",
         "date": "18-08-2026",
-        "desc": "Ridge regression, logistic classification, cross-validation, and bias–variance experiments.",
+        "desc": "MML Ch. 8–12 exercises: OLS/ridge, PCA, GMM with EM, and SVM on synthetic data.",
         "body": """
 ## Learning objectives
 
-- Fit linear and ridge regression; interpret regularization path
-- Train logistic regression; report cross-entropy and accuracy
-- Observe bias–variance tradeoff via train/validation curves
+- Fit linear and ridge regression; relate OLS to Gaussian MLE
+- Run PCA for visualization and reconstruction; report explained variance
+- Fit a 2-component GMM with EM; interpret responsibilities
+- Train a linear SVM; compare margin to logistic regression
 
 ## Key derivations
 
-**Ridge regression (closed form).**
+**OLS / MLE.**
 
-$$\\hat{\\mathbf{w}} = (\\mathbf{X}^T\\mathbf{X} + \\lambda \\mathbf{I})^{-1} \\mathbf{X}^T \\mathbf{y}.$$
+$$\\hat{\\boldsymbol{\\theta}} = (\\Phi^{\\top}\\Phi)^{-1}\\Phi^{\\top}\\mathbf{y}.$$
 
-**Logistic loss.** For label $$y \\in \\{0,1\\}$$ and probability $$\\hat{p} = \\sigma(\\mathbf{w}^T\\mathbf{x})$$,
+**Ridge regression.**
 
-$$\\mathcal{L} = -\\big[ y \\log \\hat{p} + (1-y)\\log(1-\\hat{p}) \\big].$$
+$$\\hat{\\boldsymbol{\\theta}} = (\\Phi^{\\top}\\Phi + \\lambda \\mathbf{I})^{-1}\\Phi^{\\top}\\mathbf{y}.$$
 
-**Bias–variance decomposition (squared loss).**
+**PCA (top-$M$ eigenvectors of sample covariance).**
 
-$$\\mathbb{E}[(y - \\hat{f})^2] = \\mathrm{Bias}^2 + \\mathrm{Var}(\\hat{f}) + \\sigma^2.$$
+$$\\mathbf{S} = \\frac{1}{N}\\sum_n \\tilde{\\mathbf{x}}_n \\tilde{\\mathbf{x}}_n^{\\top}, \\quad \\mathbf{z}_n = \\mathbf{B}^{\\top}\\tilde{\\mathbf{x}}_n.$$
+
+**GMM responsibility (E-step).**
+
+$$r_{nk} = \\frac{\\pi_k\\,\\mathcal{N}(\\mathbf{x}_n\\mid\\boldsymbol{\\mu}_k, \\boldsymbol{\\Sigma}_k)}{\\sum_j \\pi_j\\,\\mathcal{N}(\\mathbf{x}_n\\mid\\boldsymbol{\\mu}_j, \\boldsymbol{\\Sigma}_j)}.$$
 
 ## Exercises
 
-1. OLS vs ridge on polynomial features — plot validation MSE vs $$\\lambda$$
-2. Logistic regression on synthetic 2D data — decision boundary plot
-3. k-fold cross-validation for model selection
-4. **Reflection:** when does high variance dominate in deep learning?
+1. **Regression** — polynomial features on 1D data; plot train/validation MSE vs degree and vs ridge $$\\lambda$$
+2. **PCA** — project 2D/3D data to 2 components; plot reconstruction error vs $$M$$
+3. **GMM** — fit $$K=2$$ on a bimodal 1D dataset; plot fitted density and responsibilities
+4. **SVM** — linearly separable 2D points; plot decision boundary and support vectors; sweep soft-margin $$C$$
+5. **Reflection** — where does each method sit in the ML taxonomy (supervised vs unsupervised)?
 
 ## Notebook
 
@@ -133,7 +145,7 @@ $$\\mathbb{E}[(y - \\hat{f})^2] = \\mathrm{Bias}^2 + \\mathrm{Var}(\\hat{f}) + \
     },
     {
         "file": "day03-practical.md",
-        "title": "Day 3 Practical — Deep Neural Networks",
+        "title": "Day 3 Exercise — Deep Neural Networks",
         "caption": "MLP and autograd",
         "date": "19-08-2026",
         "desc": "Train an MLP on MNIST; verify backprop with PyTorch autograd.",
@@ -172,7 +184,7 @@ v_t = \\beta_2 v_{t-1} + (1-\\beta_2) g_t^2, \\quad
     },
     {
         "file": "day04-practical.md",
-        "title": "Day 4 Practical — Convolutional Networks",
+        "title": "Day 4 Exercise — Convolutional Networks",
         "caption": "Fashion-MNIST CNN",
         "date": "20-08-2026",
         "desc": "Implement a CNN for image classification; visualize filters and receptive fields.",
@@ -210,7 +222,7 @@ $$\\mathcal{L} = -\\sum_{k=1}^K y_k \\log \\hat{p}_k.$$
     },
     {
         "file": "day05-practical.md",
-        "title": "Day 5 Practical — Sequences & Attention",
+        "title": "Day 5 Exercise — Sequences & Attention",
         "caption": "RNN and attention",
         "date": "21-08-2026",
         "desc": "Sentiment RNN and manual scaled dot-product attention on short sequences.",
@@ -246,7 +258,7 @@ $$\\mathrm{Attention}(Q,K,V) = \\mathrm{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}
     },
     {
         "file": "day06-practical.md",
-        "title": "Day 6 Practical — Generative Modeling",
+        "title": "Day 6 Exercise — Generative Modeling",
         "caption": "KL, ELBO, and VAE",
         "date": "24-08-2026",
         "desc": "Derive ELBO, compute KL for Gaussians, train a 1D VAE.",
@@ -284,7 +296,7 @@ $$\\log p(x) \\geq \\mathbb{E}_{q(z|x)}[\\log p(x|z)] - D_{\\mathrm{KL}}(q(z|x)\
     },
     {
         "file": "day07-practical.md",
-        "title": "Day 7 Practical — Flow & Diffusion Training",
+        "title": "Day 7 Exercise — Flow & Diffusion Training",
         "caption": "Flow matching and denoising",
         "date": "25-08-2026",
         "desc": "1D flow matching and denoising score targets (MIT Lab 2 inspired).",
@@ -322,7 +334,7 @@ $$\\mathcal{L} = \\mathbb{E}_{t,x_0,\\epsilon}\\big[ \\| s_\\theta(x_t, t) + \\s
     },
     {
         "file": "day08-practical.md",
-        "title": "Day 8 Practical — SDE vs ODE Sampling",
+        "title": "Day 8 Exercise — SDE vs ODE Sampling",
         "caption": "Simulate generative dynamics",
         "date": "26-08-2026",
         "desc": "Euler–Maruyama vs probability-flow ODE on 2D moons (MIT Lab 1 inspired).",
@@ -360,7 +372,7 @@ $$x_{t-\\Delta} \\approx x_t + \\tfrac{1}{2}\\beta_t \\nabla \\log p_t(x_t) + \\
     },
     {
         "file": "day09-practical.md",
-        "title": "Day 9 Practical — Train a Tiny GPT",
+        "title": "Day 9 Exercise — Train a Tiny GPT",
         "caption": "Decoder-only language model",
         "date": "27-08-2026",
         "desc": "Character-level decoder-only transformer; cross-entropy training loop.",
@@ -398,7 +410,7 @@ $$h' = h + \\mathrm{MHA}(\\mathrm{LN}(h)), \\quad h'' = h' + \\mathrm{MLP}(\\mat
     },
     {
         "file": "day10-practical.md",
-        "title": "Day 10 Practical — KV Cache & Inference",
+        "title": "Day 10 Exercise — KV Cache & Inference",
         "caption": "Efficient autoregressive decoding",
         "date": "28-08-2026",
         "desc": "KV cache memory formula, timed generation with/without cache.",
@@ -456,7 +468,7 @@ description: >
 date: '{meta['date']}'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day{day:02d}.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day{day:02d}.pdf

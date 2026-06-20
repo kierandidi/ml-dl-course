@@ -1,13 +1,13 @@
 ---
 layout: project
-title: Day 3 Practical — Deep Neural Networks
+title: Day 3 Exercise — Deep Neural Networks
 caption: MLP and autograd
 description: >
   Train an MLP on MNIST; verify backprop with PyTorch autograd.
 date: '19-08-2026'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day03.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day03.pdf
@@ -15,21 +15,21 @@ links:
     url: /blog/lectures/2026/08/19/day03-deep-neural-networks/
 ---
 
-# Day 3 Practical — Deep Neural Networks
+# Day 3 Exercise — Deep Neural Networks
 
 
 ## Figures from lecture materials
 
-![Source illustration — Day 3 (extracted from course PDFs/PPTX)](/assets/figures/day03/L1_introduct_00.png)
+![Source illustration — Day 3 (extracted from course PDFs/PPTX)](/assets/figures/day03/dnn_compgraph.png)
 *Source illustration — Day 3 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 3 (extracted from course PDFs/PPTX)](/assets/figures/day03/L1_introduct_06.png)
+![Source illustration — Day 3 (extracted from course PDFs/PPTX)](/assets/figures/day03/dnn_overfitting.png)
 *Source illustration — Day 3 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 3 (extracted from course PDFs/PPTX)](/assets/figures/day03/L1_introduct_08.png)
+![Source illustration — Day 3 (extracted from course PDFs/PPTX)](/assets/figures/day03/dnn_playground.png)
 *Source illustration — Day 3 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 3 (extracted from course PDFs/PPTX)](/assets/figures/day03/L5- CNN_00.png)
+![Source illustration — Day 3 (extracted from course PDFs/PPTX)](/assets/figures/day03/dnn_train_objective.png)
 *Source illustration — Day 3 (extracted from course PDFs/PPTX)*
 
 

@@ -58,6 +58,16 @@ MML_PLOT_BOX = {
     "5.3": (160, 124, 300, 262),   # average incline / secant slope
     "5.8": (140, 122, 418, 185),   # forward-pass NN diagram (thin wide row)
     "6.4": (115, 255, 348, 508),   # mean/mode/median over a contour density
+    # Day 2 — margin-caption layouts where auto-detection fails (verified visually).
+    "10.4": (125, 120, 495, 245),  # PCA subspace + margin caption (p327)
+}
+
+# Full-page crop overrides: (pdf_page_0based, (x0, y0, x1, y1) in PDF points).
+# Used when caption detection or cluster scoring fails; box includes plot + caption.
+MML_MANUAL_CROP = {
+    "9.2": (297, (55, 105, 480, 200)),   # linear regression example, 3 panels + caption (p298)
+    "10.4": (326, (125, 120, 495, 245)),  # PCA lower-dim subspace (p327)
+    "12.8": (387, (55, 120, 410, 220)),   # hinge loss vs zero-one (p388)
 }
 # (figure_no, pdf_page, output_name) — cropped via largest cluster
 DAY01_INTEG_FIGURES = [
@@ -66,7 +76,26 @@ DAY01_INTEG_FIGURES = [
 ]
 
 # ---------------------------------------------------------------------------
-# Week 2 — Principles of Diffusion Models (caption-anchored crops).
+# Day 2 — MML Part II (Ch. 8–12): statistical learning pillars.
+# Page indices 0-based; figures use crop_book_figure (caption below plot).
+# ---------------------------------------------------------------------------
+DAY02_MML_FIGURES = [
+    ("8.1", 259, "mml_toy_regression"),
+    ("8.4", 269, "mml_cross_validation"),
+    ("8.5", 273, "mml_model_capacity"),
+    ("9.2", 297, "mml_linear_regression"),
+    ("9.6", 305, "mml_poly_overfit"),
+    ("10.2", 324, "mml_pca_illustration"),
+    ("10.4", 326, "mml_pca_lowdim"),
+    ("10.6", 330, "mml_pca_projection"),
+    ("11.3", 355, "mml_gmm_1d"),
+    ("11.6", 363, "mml_gmm_em"),
+    ("12.1", 376, "mml_svm_2d"),
+    ("12.3", 379, "mml_svm_hyperplane"),
+    ("12.7", 385, "mml_svm_margin"),
+    ("12.8", 387, "mml_soft_margin"),
+]
+
 # The book is single-column with centred captions *below* each figure, so we
 # grow the figure region upward from the detected caption. Page indices 0-based.
 # (figure_id, pdf_page, output_name)
@@ -537,17 +566,87 @@ def extract_day01_materials() -> None:
         doc.close()
 
 
+def _crop_mml_manual(page, box):
+    """Render a fixed PDF-point rectangle to a trimmed PIL image."""
+    if Image is None:
+        return None
+    return _pil_trim(_render_pil(page, box))
+
+
+def extract_day02_mml() -> None:
+    """Crop curated MML Part II figures for Day 2 (Ch. 8–12)."""
+    src = COURSE_MATERIAL / "mml-book.pdf"
+    if not src.exists():
+        print(f"skip missing: {src}")
+        return
+    if fitz is None or Image is None:
+        print("pymupdf/PIL not installed, skipping Day 2 MML crops")
+        return
+    day_dir = OUT / "day02"
+    day_dir.mkdir(parents=True, exist_ok=True)
+    doc = fitz.open(src)
+    ok = 0
+    for fig_id, pno, name in DAY02_MML_FIGURES:
+        manual = MML_MANUAL_CROP.get(fig_id)
+        if manual is not None:
+            pidx, box = manual
+            img = _crop_mml_manual(doc[pidx], box)
+            if img is not None and img.width > 20 and img.height > 20:
+                img.save(str(day_dir / f"{name}.png"))
+                ok += 1
+            else:
+                print(f"  ! MML Fig {fig_id} (manual p{pidx + 1}) crop failed")
+            continue
+        pidx = _find_figure_page(doc, fig_id, pno)
+        if pidx is None:
+            print(f"  ! MML Fig {fig_id}: caption not found")
+            continue
+        img = crop_mml_figure_image(doc[pidx], fig_id)
+        if img is not None and img.width > 20 and img.height > 20:
+            img.save(str(day_dir / f"{name}.png"))
+            ok += 1
+        else:
+            print(f"  ! MML Fig {fig_id} (p{pidx + 1}) crop failed")
+    doc.close()
+    print(f"day02: {ok}/{len(DAY02_MML_FIGURES)} MML figures cropped")
+
+
+def _caption_rect_any(page, fig_id):
+    """Locate a figure caption block (below-figure or margin layout)."""
+    import re
+
+    cap = _book_caption_rect(page, fig_id)
+    if cap is not None:
+        return cap
+    cap = _caption_rect(page, rf"Figure {re.escape(fig_id)}\b")
+    if cap is not None:
+        return cap
+    # Margin captions: narrow block starting with "Figure X.Y" (no colon required).
+    pat = re.compile(rf"Figure\s+{re.escape(fig_id)}\b")
+    best = None
+    for b in page.get_text("dict")["blocks"]:
+        if "lines" not in b:
+            continue
+        s = _norm_ws(" ".join(sp["text"] for l in b["lines"] for sp in l["spans"]))
+        if not pat.search(s):
+            continue
+        r = fitz.Rect(b["bbox"])
+        if best is None or r.width * r.height < best.width * best.height:
+            best = r
+    return best
+
+
 def _find_figure_page(doc, fig_id, hint=None):
     """Locate the page index whose caption is 'Figure X.Y:' (search if needed)."""
     import re
 
     if hint is not None and hint < len(doc):
-        if _book_caption_rect(doc[hint], fig_id) is not None:
+        if _caption_rect_any(doc[hint], fig_id) is not None:
             return hint
     pat = re.compile(rf"Figure {re.escape(fig_id)}[:.]")
     for p in range(len(doc)):
         if pat.search(_norm_ws(doc[p].get_text())):
-            if _book_caption_rect(doc[p], fig_id) is not None:
+            if _caption_rect_any(doc[p], fig_id) is not None:
                 return p
     return None
 
@@ -716,6 +815,7 @@ def render_pdf_pages(pdf_path: Path, pages: list[int], out_dir: Path, prefix: st
 
 def main():
     extract_day01_materials()
+    extract_day02_mml()
     if fitz is not None:
         extract_ucl_decks()           # Week 1: days 3–5 (UCL x DeepMind)
         extract_principles_figures()  # Week 2: days 6–8 (Principles of Diffusion)

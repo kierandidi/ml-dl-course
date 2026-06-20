@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Day 8 - Guidance, Solvers, and Few-Step Sampling
-image: /assets/img/sampling_space.png
+image: /assets/img/lessons/day08.png
 accent_image: 
-  background: url('/assets/img/sampling_space.png') center/cover
+  background: url('/assets/img/lessons/day08.png') center/cover
   overlay: false
 accent_color: '#ccc'
 theme_color: '#ccc'
@@ -15,15 +15,16 @@ invert_sidebar: true
 # Day 8 - Guidance, Solvers, and Few-Step Sampling
 
 ### Optional reading for this lesson
-- [The Principles of Diffusion Models](https://arxiv.org/abs/2510.21890), Ch. 8–11
+- [The Principles of Diffusion Models](https://arxiv.org/abs/2510.21890), Ch. 8–11; Appendix B (FPE), D.2.6 (PF-ODE proof)
 - [Ho & Salimans — Classifier-Free Diffusion Guidance (2022)](https://arxiv.org/abs/2207.12598)
 - [Song et al. — Denoising Diffusion Implicit Models (DDIM, 2021)](https://arxiv.org/abs/2010.02502)
 - [Karras et al. — Elucidating the Design Space of Diffusion Models (EDM, 2022)](https://arxiv.org/abs/2206.00364)
 - [Song et al. — Consistency Models (2023)](https://arxiv.org/abs/2303.01469)
+- [SDE course — Lesson 2 §4: PF-ODE derivation from the FPE](/material/sde-course/) (local notes)
 
 ### [Slides](/assets/slides/day08.pdf)
 
-### [Practical](/projects/day08-practical/)
+### [Exercise](/projects/day08-practical/)
 
 Days 6–7 built diffusion models and showed that sampling means running a learned dynamics backward in time. Today we make them **useful and fast**. First, **guidance** lets us steer generation toward a condition — a class label or a text prompt — and trade diversity for fidelity. Second, we recognize sampling as **numerical integration** of the probability-flow ODE (or reverse SDE), which lets us import centuries of numerical-analysis wisdom: DDIM is just Euler's method, and high-order and exponential integrators reach high quality in a handful of steps. Finally, **flow maps** and **consistency models** collapse the trajectory into a single learned jump, pushing toward real-time, few-step generation.
 
@@ -103,7 +104,93 @@ On Day 7 we derived two dynamics with the right marginals — the reverse SDE an
 
 This reframing is liberating: the quality–speed trade-off becomes a classic **numerical-analysis** question. A more accurate integrator reaches the same quality in fewer steps. Everything in this lecture is an answer to "how do we integrate this ODE well in as few NFEs as possible?".
 
-### 2.2 DDIM as Euler on the probability-flow ODE
+### 2.2 The probability-flow ODE from the Fokker–Planck equation
+
+> Rewriting the FPE with the log-derivative trick yields a **Liouville equation** for an ODE with drift $$\tilde{\boldsymbol{\mu}} = \boldsymbol{f} - \tfrac12 g^2\boldsymbol{s}$$ — the probability-flow ODE, sharing marginals with the forward/reverse SDE.
+{:.lead}
+
+The forward SDE $$\mathrm{d}\boldsymbol{x}=\boldsymbol{f}\,\mathrm{d}t+g\,\mathrm{d}\boldsymbol{w}$$ evolves $$p_t$$ by the Fokker–Planck equation. Applying the **log-derivative trick** $$\nabla p_t=p_t\boldsymbol{s}$$ and factoring $$p_t$$ outside the divergence gives
+
+$$\partial_t p_t = -\nabla\cdot\Big(p_t\,\big(\boldsymbol{f}-\tfrac12 g^2\boldsymbol{s}\big)\Big),$$
+
+which is the FPE of a process with **zero diffusion** — an ODE $$\mathrm{d}\boldsymbol{x}=[\boldsymbol{f}-\tfrac12 g^2\boldsymbol{s}]\,\mathrm{d}t$$. Compare the **reverse SDE** drift $$\boldsymbol{f}-g^2\boldsymbol{s}$$: same $$\{p_t\}$$, but half the score coefficient and no noise. That is why DDIM (Euler on the PF-ODE) and DDPM share one trained $$\boldsymbol{s}_\theta$$.
+
+Step-by-step algebra: optional block below ([SDE course §4](https://kierandidi.github.io/), Principles D.2.6).
+
+<details class="optional-derivation" markdown="1">
+<summary><strong>PF-ODE from the Fokker–Planck equation (full derivation)</strong> (optional — click to expand)</summary>
+
+**Setup.** Forward SDE $$\mathrm{d}\boldsymbol{x}=\boldsymbol{f}(\boldsymbol{x},t)\,\mathrm{d}t+g(t)\,\mathrm{d}\boldsymbol{w}$$ with $$\boldsymbol{s}=\nabla_{\boldsymbol{x}}\log p_t$$.
+
+**Step 1 — Fokker–Planck (Appendix B.1.3).**
+
+$$\partial_t p_t = -\nabla\cdot(\boldsymbol{f}\,p_t) + \tfrac12 g(t)^2 \Delta p_t.$$
+
+**Step 2 — product rule on the diffusion term.**
+
+$$\partial_t p_t = -\nabla\cdot(\boldsymbol{f}\,p_t) + \tfrac12 g(t)^2\nabla\cdot\nabla p_t + \tfrac12 \nabla(g(t)^2)\cdot\nabla p_t.$$
+
+For state-independent $$g(t)$$, the last term vanishes.
+
+**Step 3 — log-derivative trick.** Use $$\nabla p_t = p_t\,\boldsymbol{s}$$:
+
+$$\tfrac12 g(t)^2 \Delta p_t = \tfrac12 g(t)^2 \nabla\cdot(p_t\,\boldsymbol{s}) = \nabla\cdot\Big(\tfrac12 g(t)^2\,p_t\,\boldsymbol{s}\Big) - \tfrac12 g(t)^2\,p_t\,\nabla\cdot\boldsymbol{s}.$$
+
+The $$\nabla\cdot\boldsymbol{s}$$ term cancels when combining all pieces (Principles D.2.6); equivalently, expand $$\nabla\cdot(\boldsymbol{f}p_t - \tfrac12 g^2 p_t \boldsymbol{s})$$ directly.
+
+**Step 4 — Liouville form.** Factor out $$p_t$$:
+
+$$\partial_t p_t = -\nabla\cdot\Big(p_t\,\underbrace{\Big(\boldsymbol{f} - \tfrac12 g(t)^2\,\boldsymbol{s}\Big)}_{\tilde{\boldsymbol{\mu}}(\boldsymbol{x},t)}\Big).$$
+
+This is the FPE of an SDE with **zero diffusion** — the **Liouville equation** — hence the density is transported by the ODE
+
+$$\mathrm{d}\boldsymbol{x} = \tilde{\boldsymbol{\mu}}(\boldsymbol{x},t)\,\mathrm{d}t = \big[\boldsymbol{f} - \tfrac12 g(t)^2\,\boldsymbol{s}(\boldsymbol{x},t)\big]\,\mathrm{d}t.$$
+
+**Compare reverse SDE:** drift $$\boldsymbol{f}-g^2\boldsymbol{s}$$ (full score coefficient) plus noise $$g\,\mathrm{d}\bar{\boldsymbol{w}}$$. Same $$\{p_t\}$$, different sample paths.
+
+*Reference:* Principles Appendix B.1.3, D.2.6; SDE course Lesson 2 §4; Song et al. (2021) Eq. (4.1.7).
+
+</details>
+
+<details class="optional-derivation" markdown="1">
+<summary><strong>Appendix B — density evolution (continuity → FPE)</strong> (optional — click to expand)</summary>
+
+*Condensed from [Principles of Diffusion Models](https://arxiv.org/abs/2510.21890), Appendix B.*
+
+**B.1 — Change of variables → continuity → FPE.**
+
+1. **Single bijection** $$\boldsymbol{x}_1=\Psi(\boldsymbol{x}_0)$$: $$p_1(\boldsymbol{x}_1)=p_0(\Psi^{-1}(\boldsymbol{x}_1))\,\vert \det\partial\Psi^{-1}/\partial\boldsymbol{x}_1\vert $$.
+2. **Composition** of maps: log-density accumulates $$-\sum_k \log\vert \det\partial\Psi_k/\partial\boldsymbol{x}_{k-1}\vert $$ (normalizing flows, Eq. B.1.2).
+3. **Continuous limit** $$\boldsymbol{x}_{t+\delta}=\boldsymbol{x}_t+\delta\,\boldsymbol{f}(\boldsymbol{x}_t,t)$$: Jacobian $$\det(I+\delta\nabla\boldsymbol{f})=1+\delta\,\nabla\cdot\boldsymbol{f}+\mathcal{O}(\delta^2)$$ gives the **continuity equation**
+
+$$\partial_t p_t + \nabla\cdot(p_t\,\boldsymbol{f}) = 0.$$
+
+4. **Add noise** $$\mathrm{d}\boldsymbol{x}=\boldsymbol{f}\,\mathrm{d}t+g(t)\,\mathrm{d}\boldsymbol{w}$$: spreading term $$\tfrac12 g(t)^2\Delta p_t$$ yields the **Fokker–Planck equation**
+
+$$\partial_t p_t = -\nabla\cdot(\boldsymbol{f}\,p_t) + \tfrac12 g(t)^2 \Delta p_t = -\nabla\cdot\Big(\big(\boldsymbol{f}-\tfrac12 g(t)^2\,\boldsymbol{s}\big)\,p_t\Big).$$
+
+**B.2 — Intuition.** In a small box, mass changes only through net flux $$\boldsymbol{j}=p_t\boldsymbol{v}$$; conservation $$\partial_t p_t + \nabla\cdot\boldsymbol{j}=0$$ is the continuity equation. The divergence theorem upgrades the box argument to arbitrary control volumes.
+
+</details>
+
+<details class="optional-derivation" markdown="1">
+<summary><strong>Appendix D.2.6 — PF-ODE and reverse SDE share marginals</strong> (optional — click to expand)</summary>
+
+*Selected proofs from Principles Appendix D.*
+
+**D.2.1 — Score matching via integration by parts (Prop. 3.2.1).** Expand
+
+$$\tfrac12\mathbb{E}\Vert \boldsymbol{s}_\theta-\boldsymbol{s}\Vert ^2 = \tfrac12\mathbb{E}\Vert \boldsymbol{s}_\theta\Vert ^2 - \mathbb{E}[\boldsymbol{s}_\theta^{\top}\boldsymbol{s}] + \text{const}.$$
+
+Use $$\boldsymbol{s}=\nabla\log p_{\text{data}}$$ and $$\mathbb{E}[\boldsymbol{s}_\theta^{\top}\nabla p/p]=-\mathbb{E}[\nabla\cdot\boldsymbol{s}_\theta]$$ (integration by parts, vanishing boundary) to obtain the tractable objective with Jacobian trace.
+
+**D.2.2 — Denoising score matching (Prop. 3.3.1 / 4.3.1).** Add noise $$\tilde{\boldsymbol{x}}=\boldsymbol{x}+\sigma\boldsymbol{\epsilon}$$; the cross term becomes an expectation under $$p_\sigma(\tilde{\boldsymbol{x}}\mid\boldsymbol{x})$$, which integrates by parts to remove $$\nabla\log p_{\text{data}}$$. The minimizer is the **marginal** noisy score — the DSM proof in the block above.
+
+**D.2.6 — PF-ODE shares marginals (Prop. 4.1.1).** Part 1: verify that $$\tilde{\boldsymbol{\mu}}=\boldsymbol{f}-\tfrac12 g^2\boldsymbol{s}$$ reproduces the FPE. Part 2: show the reverse SDE with drift $$\boldsymbol{f}-g^2\boldsymbol{s}$$ has the same $$p_t$$ when time is reversed — connecting Anderson, PF-ODE, and FPE in one proof chain.
+
+</details>
+
+### 2.3 DDIM as Euler on the probability-flow ODE
 
 > **DDIM** is the deterministic sampler obtained by applying the **Euler method** to the probability-flow ODE. It is non-Markovian, so it can take large steps with the *same* trained model.
 {:.lead}
@@ -117,7 +204,7 @@ Euler's method (Day 1) approximates $$\boldsymbol{x}(t-\Delta t)\approx\boldsymb
 
 DDIM is **first-order**: its local error per step is $$O(\Delta t^2)$$, which is why very few steps still show artifacts. Higher-order solvers do better.
 
-### 2.3 Discretization error and step count
+### 2.4 Discretization error and step count
 
 > **Discretization error** is the gap between the exact ODE solution and its numerical approximation. It shrinks as steps increase and grows with trajectory curvature, accumulating along the path.
 {:.lead}
@@ -131,7 +218,7 @@ This diagnosis points to exactly two remedies, which structure the rest of the d
 1. **Use a better integrator** — higher-order or exponential solvers that take the curvature into account (next section).
 2. **Make the trajectory straighter** — so even a crude integrator suffices (rectified flow from Day 7, and flow maps below).
 
-### 2.4 Stochastic versus deterministic samplers
+### 2.5 Stochastic versus deterministic samplers
 
 > **SDE (stochastic)** samplers inject fresh noise each step and can self-correct errors; **ODE (deterministic)** samplers are noise-free and need fewer steps. Both share the same marginals $$p_t$$ by the Fokker–Planck equation.
 {:.lead}

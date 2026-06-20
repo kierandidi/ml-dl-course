@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Day 1 - Math Foundations
-image: /assets/img/sampling_space.png
+image: /assets/img/lessons/day01.png
 accent_image: 
-  background: url('/assets/img/sampling_space.png') center/cover
+  background: url('/assets/img/lessons/day01.png') center/cover
   overlay: false
 accent_color: '#ccc'
 theme_color: '#ccc'
@@ -22,7 +22,7 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day01.pdf)
 
-### [Practical](/projects/day01-practical/)
+### [Exercise](/projects/day01-practical/)
 
 Machine learning rests on four mathematical pillars laid out in Part I of *Mathematics for Machine Learning* (MML): we represent data as vectors and matrices (linear algebra); measure similarity with norms and inner products (analytic geometry); exploit matrix structure and gradients (decompositions and vector calculus); and quantify uncertainty with probability. Today we also cover integration and differentiation as complementary tools for expectations and optimization, and finish with an ODE/SDE crash course that foreshadows diffusion models in Week 2.
 

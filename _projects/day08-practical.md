@@ -1,13 +1,13 @@
 ---
 layout: project
-title: Day 8 Practical — SDE vs ODE Sampling
+title: Day 8 Exercise — SDE vs ODE Sampling
 caption: Simulate generative dynamics
 description: >
   Euler–Maruyama vs probability-flow ODE on 2D moons (MIT Lab 1 inspired).
 date: '26-08-2026'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day08.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day08.pdf
@@ -15,21 +15,21 @@ links:
     url: /blog/lectures/2026/08/26/day08-diffusion-flow-inference/
 ---
 
-# Day 8 Practical — SDE vs ODE Sampling
+# Day 8 Exercise — SDE vs ODE Sampling
 
 
 ## Figures from lecture materials
 
-![Source illustration — Day 8 (extracted from course PDFs/PPTX)](/assets/figures/day08/pdf0_page015.png)
+![Source illustration — Day 8 (extracted from course PDFs/PPTX)](/assets/figures/day08/pdm_cfg.png)
 *Source illustration — Day 8 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 8 (extracted from course PDFs/PPTX)](/assets/figures/day08/pdf0_page018.png)
+![Source illustration — Day 8 (extracted from course PDFs/PPTX)](/assets/figures/day08/pdm_ddim_euler.png)
 *Source illustration — Day 8 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 8 (extracted from course PDFs/PPTX)](/assets/figures/day08/pdf0_page021.png)
+![Source illustration — Day 8 (extracted from course PDFs/PPTX)](/assets/figures/day08/pdm_deis.png)
 *Source illustration — Day 8 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 8 (extracted from course PDFs/PPTX)](/assets/figures/day08/pdf0_page024.png)
+![Source illustration — Day 8 (extracted from course PDFs/PPTX)](/assets/figures/day08/pdm_flowmap.png)
 *Source illustration — Day 8 (extracted from course PDFs/PPTX)*
 
 

@@ -1,13 +1,13 @@
 ---
 layout: project
-title: Day 4 Practical — Convolutional Networks
+title: Day 4 Exercise — Convolutional Networks
 caption: Fashion-MNIST CNN
 description: >
   Implement a CNN for image classification; visualize filters and receptive fields.
 date: '20-08-2026'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day04.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day04.pdf
@@ -15,21 +15,21 @@ links:
     url: /blog/lectures/2026/08/20/day04-convolutional-networks/
 ---
 
-# Day 4 Practical — Convolutional Networks
+# Day 4 Exercise — Convolutional Networks
 
 
 ## Figures from lecture materials
 
-![Source illustration — Day 4 (extracted from course PDFs/PPTX)](/assets/figures/day04/pdf0_page000.png)
+![Source illustration — Day 4 (extracted from course PDFs/PPTX)](/assets/figures/day04/cnn_alexnet.png)
 *Source illustration — Day 4 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 4 (extracted from course PDFs/PPTX)](/assets/figures/day04/pdf0_page003.png)
+![Source illustration — Day 4 (extracted from course PDFs/PPTX)](/assets/figures/day04/cnn_batchnorm.png)
 *Source illustration — Day 4 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 4 (extracted from course PDFs/PPTX)](/assets/figures/day04/pdf0_page006.png)
+![Source illustration — Day 4 (extracted from course PDFs/PPTX)](/assets/figures/day04/cnn_convop.png)
 *Source illustration — Day 4 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 4 (extracted from course PDFs/PPTX)](/assets/figures/day04/pdf0_page008.png)
+![Source illustration — Day 4 (extracted from course PDFs/PPTX)](/assets/figures/day04/cnn_detection.png)
 *Source illustration — Day 4 (extracted from course PDFs/PPTX)*
 
 

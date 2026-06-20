@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Day 4 - Convolutional Neural Networks
-image: /assets/img/sampling_space.png
+image: /assets/img/lessons/day04.png
 accent_image: 
-  background: url('/assets/img/sampling_space.png') center/cover
+  background: url('/assets/img/lessons/day04.png') center/cover
   overlay: false
 accent_color: '#ccc'
 theme_color: '#ccc'
@@ -22,7 +22,7 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day04.pdf)
 
-### [Practical](/projects/day04-practical/)
+### [Exercise](/projects/day04-practical/)
 
 Fully-connected networks treat an image as an unordered bag of pixels — throwing away the very structure that makes vision tractable. Convolutional neural networks instead bake three priors directly into the architecture: locality, weight sharing, and hierarchy. Today we build the convolution operation from these priors, count its parameters and receptive field, assemble the conv–norm–nonlinearity block, trace the architectures that won ImageNet (AlexNet, VGG, ResNet), and see how the same backbone extends to detection and segmentation.
 

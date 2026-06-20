@@ -1,9 +1,9 @@
 ---
 layout: post
 title: Day 3 - Deep Neural Networks
-image: /assets/img/sampling_space.png
+image: /assets/img/lessons/day03.png
 accent_image: 
-  background: url('/assets/img/sampling_space.png') center/cover
+  background: url('/assets/img/lessons/day03.png') center/cover
   overlay: false
 accent_color: '#ccc'
 theme_color: '#ccc'
@@ -22,7 +22,7 @@ invert_sidebar: true
 
 ### [Slides](/assets/slides/day03.pdf)
 
-### [Practical](/projects/day03-practical/)
+### [Exercise](/projects/day03-practical/)
 
 Yesterday we fit linear and logistic models; today we make them deep. A neural network is nothing more than a *composition* of simple parameterized maps, but composition buys an enormous amount: the ability to learn features rather than hand-craft them. We will build the multilayer perceptron from scratch, derive backpropagation as reverse-mode automatic differentiation, understand why deep gradients vanish or explode, and study the optimization and regularization tricks that turn a pile of matrix multiplies into a model that generalizes.
 

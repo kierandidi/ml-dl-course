@@ -1,13 +1,13 @@
 ---
 layout: project
-title: Day 1 Practical — Math Foundations
+title: Day 1 Exercise — Math Foundations
 caption: Gradients, probability, and MLE
 description: >
   Numerical gradients, Gaussian MLE, and probability exercises with worked derivations.
 date: '17-08-2026'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day01.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day01.pdf
@@ -15,7 +15,7 @@ links:
     url: /blog/lectures/2026/08/17/day01-math-foundations/
 ---
 
-# Day 1 Practical — Math Foundations
+# Day 1 Exercise — Math Foundations
 
 
 ## Figures from lecture materials

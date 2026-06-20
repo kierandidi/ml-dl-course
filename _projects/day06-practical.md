@@ -1,13 +1,13 @@
 ---
 layout: project
-title: Day 6 Practical — Generative Modeling
+title: Day 6 Exercise — Generative Modeling
 caption: KL, ELBO, and VAE
 description: >
   Derive ELBO, compute KL for Gaussians, train a 1D VAE.
 date: '24-08-2026'
 sitemap: false
 links:
-  - title: Jupyter notebook
+  - title: Exercise notebook
     url: /notebooks/practicals/day06.ipynb
   - title: Lecture slides (PDF)
     url: /assets/slides/day06.pdf
@@ -15,21 +15,21 @@ links:
     url: /blog/lectures/2026/08/24/day06-generative-modeling/
 ---
 
-# Day 6 Practical — Generative Modeling
+# Day 6 Exercise — Generative Modeling
 
 
 ## Figures from lecture materials
 
-![Source illustration — Day 6 (extracted from course PDFs/PPTX)](/assets/figures/day06/pdf0_page000.png)
+![Source illustration — Day 6 (extracted from course PDFs/PPTX)](/assets/figures/day06/pdm_ddpm_conditioning.png)
 *Source illustration — Day 6 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 6 (extracted from course PDFs/PPTX)](/assets/figures/day06/pdf0_page002.png)
+![Source illustration — Day 6 (extracted from course PDFs/PPTX)](/assets/figures/day06/pdm_ddpm_forward.png)
 *Source illustration — Day 6 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 6 (extracted from course PDFs/PPTX)](/assets/figures/day06/pdf0_page004.png)
+![Source illustration — Day 6 (extracted from course PDFs/PPTX)](/assets/figures/day06/pdm_ddpm_overview.png)
 *Source illustration — Day 6 (extracted from course PDFs/PPTX)*
 
-![Source illustration — Day 6 (extracted from course PDFs/PPTX)](/assets/figures/day06/pdf0_page005.png)
+![Source illustration — Day 6 (extracted from course PDFs/PPTX)](/assets/figures/day06/pdm_ddpm_reverse.png)
 *Source illustration — Day 6 (extracted from course PDFs/PPTX)*
 
 
