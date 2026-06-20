@@ -37,7 +37,7 @@ Day 9 left us with a **base language model**: a decoder-only Transformer that pr
 > **Autoregressive decoding** generates a sequence by repeatedly sampling the next token from $$p_\theta(x_t\mid x_{<t})$$ and feeding it back as input. It runs in two phases: a parallel **prefill** of the prompt, then serial **decode** of one token at a time.
 {:.lead}
 
-![Generation proceeds one token at a time: the model's output is appended to the input and fed back in (Beyer-style deck).](/assets/figures/day10/llmks_generation.png)
+![Generation proceeds one token at a time: the model's output is appended to the input and fed back in.](/assets/figures/day10/llmks_generation.png)
 
 A trained LM is a function from a context to a distribution over the next token. To **generate**, we sample a token from that distribution, append it to the context, and run the model again — over and over. This loop has a structure worth naming:
 
@@ -60,7 +60,7 @@ In practice, large models trained on large, clean corpora are fairly robust to i
 > **Greedy** decoding takes the argmax at each step; **sampling** draws from the predicted distribution; **beam search** keeps the $$k$$ highest-probability partial sequences. The right choice depends on whether the task is precise or open-ended.
 {:.lead}
 
-![Beam search expands several high-probability partial sequences in parallel and keeps the best (Beyer-style deck).](/assets/figures/day10/llmks_beam.png)
+![Beam search expands several high-probability partial sequences in parallel and keeps the best.](/assets/figures/day10/llmks_beam.png)
 
 Three classic strategies, then the modern default:
 
@@ -88,7 +88,7 @@ The crucial observation: the key and value vectors for a past token are a **fixe
 > The **KV cache** stores the key and value vectors of every past token, for every layer. Each new token computes only its own $$q,k,v$$, appends $$k,v$$ to the cache, and attends over the cache — turning per-step attention from recompute into an $$\mathcal{O}(1)$$ append plus a read.
 {:.lead}
 
-![With a KV cache, only the new token's query/key/value are computed; past keys and values are read from the cache instead of recomputed (Hugging Face / Beyer-style deck).](/assets/figures/day10/llmks_kvcache.png)
+![With a KV cache, only the new token's query/key/value are computed; past keys and values are read from the cache instead of recomputed.](/assets/figures/day10/llmks_kvcache.png)
 
 The fix follows directly. Maintain, for each layer, a growing buffer of the keys and values seen so far. At each decode step:
 
@@ -103,7 +103,7 @@ Now each step does a constant amount of *new* attention work (one query against 
 > The KV cache trades compute for **memory**: its size scales as $$\approx 2\,L\,n_{\text{kv}}\,d_{\text{head}}\,T$$ per sequence. Grouped-query attention reduces $$n_{\text{kv}}$$, and PagedAttention manages the cache without fragmentation.
 {:.lead}
 
-![As context and batch grow, the KV cache — not compute — becomes the bottleneck; multi-query and grouped-query attention shrink it (Beyer-style deck).](/assets/figures/day10/llmks_kv_bottleneck.png)
+![As context and batch grow, the KV cache — not compute — becomes the bottleneck; multi-query and grouped-query attention shrink it.](/assets/figures/day10/llmks_kv_bottleneck.png)
 
 The cache is not free. Storing keys and values for every layer and position costs, per sequence, on the order of
 
@@ -120,7 +120,7 @@ Two responses connect back to Day 9 and forward to systems. **Grouped-query atte
 > **Temperature** $$T$$ rescales the logits before the softmax, $$p_i \propto \exp(z_i / T)$$, controlling how peaked the next-token distribution is: $$T<1$$ sharpens, $$T>1$$ flattens, and $$T\to 0$$ recovers greedy decoding.
 {:.lead}
 
-![Temperature reshapes the next-token distribution before sampling, trading determinism for diversity (Beyer-style deck).](/assets/figures/day10/llmks_sampling.png)
+![Temperature reshapes the next-token distribution before sampling, trading determinism for diversity.](/assets/figures/day10/llmks_sampling.png)
 
 The model outputs logits $$z$$; the sampling distribution is $$p_i = \mathrm{softmax}(z/T)_i \propto \exp(z_i/T)$$. The **temperature** $$T$$ is the simplest quality/diversity knob:
 
@@ -135,7 +135,7 @@ Temperature alone still leaves a long tail of low-probability tokens in play, wh
 > **Top-k** sampling restricts the draw to the $$k$$ most probable tokens; **top-p (nucleus)** sampling restricts it to the smallest set of tokens whose cumulative probability exceeds $$p$$. Both truncate the unreliable tail.
 {:.lead}
 
-![Top-k keeps a fixed number of candidates; top-p keeps a dynamic set covering probability mass p (Beyer-style deck).](/assets/figures/day10/llmks_topk_topp.png)
+![Top-k keeps a fixed number of candidates; top-p keeps a dynamic set covering probability mass p.](/assets/figures/day10/llmks_topk_topp.png)
 
 Holtzman et al. showed that the long tail of the distribution is where text degeneration comes from: even a tiny per-step probability of a bad token, accumulated over hundreds of steps, produces incoherent output. Two truncations fix this:
 
@@ -172,7 +172,7 @@ All of these chip away at the same problem: autoregressive decode is serial and 
 > A **base LM** predicts internet text; it is not intrinsically helpful or safe. The path to an assistant is **pretrain → supervised fine-tuning (SFT) → preference tuning**, followed by a system prompt and safety layer — each stage using far less data than pretraining.
 {:.lead}
 
-![Transformers enabled a change of paradigm: one scalable, general model adapted to many uses (Beyer-style deck).](/assets/figures/day10/llmks_paradigm_shift.png)
+![Transformers enabled a change of paradigm: one scalable, general model adapted to many uses.](/assets/figures/day10/llmks_paradigm_shift.png)
 
 The base model from Day 9 is extraordinarily knowledgeable but only knows how to *continue text*. Ask it a question and it might continue with more questions. Turning it into a helpful, harmless assistant is **post-training**, a pipeline of comparatively small steps on top of pretraining:
 
@@ -220,7 +220,7 @@ DPO reaches similar alignment quality with a far simpler, more stable training r
 > **Preference tuning** aligns the SFT model with human judgments using preference comparisons, via RLHF (reward model + PPO) or DPO (a direct classification loss). It is the final stage that makes a model feel like a helpful assistant.
 {:.lead}
 
-![Week 2 in one picture: a single Transformer backbone, trained as a generator, serves text, vision, audio, and biology (Beyer-style deck).](/assets/figures/day10/llmks_summary.png)
+![Week 2 in one picture: a single Transformer backbone, trained as a generator, serves text, vision, audio, and biology.](/assets/figures/day10/llmks_summary.png)
 
 **Preference tuning** is stage 3 of the pipeline. We gather comparisons — humans (or a model) judging which of two responses is better — and use them to push the model toward preferred behavior. **RLHF** does this with a learned reward model optimized by PPO; **DPO** does it with a single direct loss and no RL loop (objectives in the optional block above). Benchmarks such as MMLU are named here only as further reading; evaluating aligned models is its own large topic.
 

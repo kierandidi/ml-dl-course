@@ -22,7 +22,7 @@ invert_sidebar: true
 
 [Download the notebook](/notebooks/practicals/day06.ipynb) · [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kierandidi/ml-dl-course/blob/main/notebooks/practicals/day06.ipynb)
 
-Week 2 turns to **generative modeling**: instead of predicting a label from an input, we want to model the data distribution itself and draw new samples from it. Today we build the **variational view of diffusion**. We start from variational autoencoders (VAEs) and the evidence lower bound, then show that a *denoising diffusion probabilistic model* (DDPM) is essentially a deep, fixed-encoder hierarchical VAE. We will derive the forward noising process and its closed-form marginal, the Gaussian reverse posterior that makes training tractable, and the surprisingly simple noise-prediction loss. Throughout we use the unified notation of *The Principles of Diffusion Models* ($x_t = \alpha_t x_0 + \sigma_t \epsilon$) so that everything connects cleanly to the score-based and flow-based views in Day 7.
+Week 2 turns to **generative modeling**: instead of predicting a label from an input, we want to model the data distribution itself and draw new samples from it. Today we build the **variational view of diffusion**. We start from variational autoencoders (VAEs) and the evidence lower bound, then show that a *denoising diffusion probabilistic model* (DDPM) is essentially a deep, fixed-encoder hierarchical VAE. We will derive the forward noising process and its closed-form marginal, the Gaussian reverse posterior that makes training tractable, and the surprisingly simple noise-prediction loss. Throughout we use a unified notation ($x_t = \alpha_t x_0 + \sigma_t \epsilon$) so that everything connects cleanly to the score-based and flow-based views in Day 7.
 
 * toc
 {:toc}
@@ -36,7 +36,7 @@ Week 2 turns to **generative modeling**: instead of predicting a label from an i
 
 We never see $$p_{\text{data}}$$ directly — only a finite set of examples (images, audio, molecules). The model is a procedure that maps the *simple side* (noise we can generate at will) to the *complex side* (structured data).
 
-![The target of deep generative modeling: transport a simple distribution to the data distribution (Principles Fig 1.1)](/assets/figures/day06/pdm_dgm_target.png)
+![The target of deep generative modeling: transport a simple distribution to the data distribution](/assets/figures/day06/pdm_dgm_target.png)
 
 Generative models differ in **what they make tractable**:
 
@@ -44,7 +44,7 @@ Generative models differ in **what they make tractable**:
 - **Likelihood-based, bounded**: VAEs and diffusion optimize a *lower bound* on $$\log p_\theta(\boldsymbol{x})$$.
 - **Implicit**: GANs sample well but expose no tractable density.
 
-![Computation graphs of prominent deep generative models (Principles Fig 1.2)](/assets/figures/day06/pdm_dgm_zoo.png)
+![Computation graphs of prominent deep generative models](/assets/figures/day06/pdm_dgm_zoo.png)
 
 Diffusion models sit in the second group: they are likelihood-based (so training is stable and principled) and produce state-of-the-art samples, at the cost of **iterative** sampling — the central tension we resolve in Day 8.
 
@@ -81,7 +81,7 @@ The bound is **exact** when $$q_\phi(\boldsymbol{z}\mid\boldsymbol{x}) = p_\thet
 
 $$\log p_\theta(\boldsymbol{x}) - \mathcal{L}_{\text{ELBO}} = \textcolor{purple}{D_{\mathrm{KL}}\!\big(q_\phi(\boldsymbol{z}\mid\boldsymbol{x})\,\Vert \,p_\theta(\boldsymbol{z}\mid\boldsymbol{x})\big)} \ge 0.$$
 
-![A variational autoencoder: stochastic encoder, latent bottleneck, decoder (Principles Fig 2.1)](/assets/figures/day06/pdm_vae.png)
+![A variational autoencoder: stochastic encoder, latent bottleneck, decoder](/assets/figures/day06/pdm_vae.png)
 
 The two ELBO terms have clean interpretations: the first is a **reconstruction** term (the decoder should reproduce $$\boldsymbol{x}$$ from $$\boldsymbol{z}$$), the second is a **regularizer** pulling the encoder's posterior toward the prior.
 
@@ -119,7 +119,7 @@ $$\mathrm{SNR}(t) = \frac{\alpha_t^2}{\sigma_t^2}, \qquad \lambda_t := \log \mat
 
 which decreases monotonically from $$+\infty$$ (clean data) to $$-\infty$$ (pure noise). We will reuse $$\lambda_t$$ (log-SNR) as the natural "clock" for solvers in Day 8.
 
-![The DDPM forward process: Gaussian noise is added step by step until the sample is indistinguishable from noise (Principles Fig 2.4)](/assets/figures/day06/pdm_ddpm_forward.png)
+![The DDPM forward process: Gaussian noise is added step by step until the sample is indistinguishable from noise](/assets/figures/day06/pdm_ddpm_forward.png)
 
 ### 3.2 From step kernel to closed-form marginal
 
@@ -168,7 +168,7 @@ The schedule controls **where the model spends capacity**: it determines how fas
 </div>
 
 
-![DDPM as a fixed forward chain and a learned reverse chain (Principles Fig 2.3)](/assets/figures/day06/pdm_ddpm_overview.png)
+![DDPM as a fixed forward chain and a learned reverse chain](/assets/figures/day06/pdm_ddpm_overview.png)
 
 ## 4. The Reverse (Denoising) Process
 
@@ -179,13 +179,13 @@ The schedule controls **where the model spends capacity**: it determines how fas
 
 Generation runs the chain backward: start from $$\boldsymbol{x}_T\sim\mathcal{N}(\mathbf{0},\mathbf{I})$$ and repeatedly sample $$\boldsymbol{x}_{t-1}\sim p_\theta(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t)$$.
 
-![The learned reverse process gradually removes noise to recover data (Principles Fig 2.5)](/assets/figures/day06/pdm_ddpm_reverse.png)
+![The learned reverse process gradually removes noise to recover data](/assets/figures/day06/pdm_ddpm_reverse.png)
 
 The marginal reverse kernel $$p(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t)$$ would require integrating over all data — intractable. But by Bayes' rule, *conditioning on $$\boldsymbol{x}_0$$* turns it into a ratio of known Gaussians:
 
 $$q(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_t,\boldsymbol{x}_0) = \frac{q(\boldsymbol{x}_t\mid\boldsymbol{x}_{t-1})\,q(\boldsymbol{x}_{t-1}\mid\boldsymbol{x}_0)}{q(\boldsymbol{x}_t\mid\boldsymbol{x}_0)}.$$
 
-![The conditioning trick: conditioning on $x_0$ makes the reverse step a tractable Gaussian (Principles Fig 2.6)](/assets/figures/day06/pdm_ddpm_conditioning.png)
+![The conditioning trick: conditioning on $x_0$ makes the reverse step a tractable Gaussian](/assets/figures/day06/pdm_ddpm_conditioning.png)
 
 Use the interactive panel to see how conditioning on $$\boldsymbol{x}_0$$ pins down the otherwise-ambiguous reverse step:
 
@@ -276,7 +276,7 @@ $$\boldsymbol{x}_{t-1} = \underbrace{\frac{1}{\sqrt{a_t}}\Big(\boldsymbol{x}_t -
 
 with $$\boldsymbol{z}=\mathbf{0}$$ at the final step.
 
-![The denoise-then-re-noise view of DDPM sampling (Principles Fig 2.7)](/assets/figures/day06/pdm_denoise_renoise.png)
+![The denoise-then-re-noise view of DDPM sampling](/assets/figures/day06/pdm_denoise_renoise.png)
 
 This is **ancestral sampling** down the Markov chain — accurate but slow ($$T$$ network calls). The deep reason it works is the **change-of-variables / transport** picture: each step moves probability mass a little, and the whole chain transports the prior onto the data distribution. Explore that mass transport here:
 
@@ -293,13 +293,13 @@ $$\textcolor{blue}{\underbrace{\mathrm{d}\boldsymbol{x} = \boldsymbol{f}(\boldsy
 
 where the **score** $$\nabla_{\boldsymbol{x}}\log p_t(\boldsymbol{x})$$ plays the role our $$\boldsymbol{\epsilon}_\theta$$ learned. DDPM is exactly the discretization of the variance-preserving case of this SDE.
 
-![Forward and reverse diffusion as SDEs, with the shared probability-flow ODE (Song et al., 2020; via the SDE course)](/assets/figures/day06/sde_song_diffusion.png)
+![Forward and reverse diffusion as SDEs, with the shared probability-flow ODE](/assets/figures/day06/sde_song_diffusion.png)
 
 To *simulate* such an SDE we use the simplest stochastic solver, **Euler–Maruyama** — the stochastic analogue of Euler's method from Day 1, with the noise entering at scale $$\sqrt{\Delta t}$$ (because a Brownian increment has variance $$\Delta t$$):
 
-![The Euler–Maruyama discretization of an SDE (SDE course)](/assets/figures/day06/sde_euler_maruyama.png)
+![The Euler–Maruyama discretization of an SDE](/assets/figures/day06/sde_euler_maruyama.png)
 
-The full continuous-time derivations — Brownian motion, Itô calculus, the time-reversal formula, and Girsanov's theorem — are developed step by step in the companion [SDE course notes](https://kierandidi.github.io/). In **Day 7** we make this score/SDE view precise (score matching, flow matching); in **Day 8** we replace the $$T$$ tiny stochastic steps with a handful of ODE/SDE solver steps.
+The full continuous-time derivations — Brownian motion, Itô calculus, the time-reversal formula, and Girsanov's theorem — are developed step by step in the optional deep dives. In **Day 7** we make this score/SDE view precise (score matching, flow matching); in **Day 8** we replace the $$T$$ tiny stochastic steps with a handful of ODE/SDE solver steps.
 
 ## Checkpoint summary
 

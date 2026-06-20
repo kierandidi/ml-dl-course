@@ -59,7 +59,6 @@ SLIDES = (
                         "A *vector field* pointing toward higher probability",
                         "Day 6 learned to denoise; today we learn this field",
                         "Knowing the score is enough to *sample* (Langevin, SDE, ODE)",
-                        "Source: Principles of Diffusion Models, Ch. 3–6",
                     ],
                 ),
                 (
@@ -310,7 +309,7 @@ LECTURE = {
                     ),
                     "body": """**Why this matters.** On Day 6 we trained a network to *denoise*. Today we reveal what that network is really learning — the score — and why the score is exactly the quantity you need to turn noise into data. Note this is **not** the "score" of maximum-likelihood statistics (the gradient w.r.t. *parameters*); here the gradient is w.r.t. the *input* $$\\boldsymbol{x}$$.
 
-![The score field of a distribution: arrows point toward regions of higher probability density (Principles Fig 3.2).](/assets/figures/day07/pdm_score_field.png)
+![The score field of a distribution: arrows point toward regions of higher probability density.](/assets/figures/day07/pdm_score_field.png)
 
 Geometrically, the score is a map $$\\boldsymbol{x}\\mapsto\\nabla\\log p(\\boldsymbol{x})$$ that, like a gravitational field, pulls points toward the modes of the distribution and is zero at stationary points. If we know this field, we can "flow" or "diffuse" random points into samples from $$p$$ — no normalized density required. Explore how the field relates to the density:
 
@@ -328,7 +327,7 @@ The local arrows tell you which way to nudge a sample to make it more probable; 
                         "\\qquad Z_\\theta = \\int e^{-E_\\theta(\\boldsymbol{x})}\\,\\mathrm{d}\\boldsymbol{x},$$ "
                         "where the **partition function** $$Z_\\theta$$ is generally intractable."
                     ),
-                    "body": """![Training an energy-based model shapes the energy landscape so that data sits in low-energy basins (Principles Fig 3.1).](/assets/figures/day07/pdm_ebm_training.png)
+                    "body": """![Training an energy-based model shapes the energy landscape so that data sits in low-energy basins.](/assets/figures/day07/pdm_ebm_training.png)
 
 EBMs are maximally flexible: any nonnegative function defines a distribution after normalization. The catch is precisely that normalization. Maximum-likelihood training needs $$\\nabla_\\theta\\log p_\\theta = -\\nabla_\\theta E_\\theta - \\nabla_\\theta\\log Z_\\theta$$, and the second term involves an expectation under the model that requires expensive MCMC to estimate.
 
@@ -360,7 +359,7 @@ The term $$\\log Z_\\theta$$ is a number — it does not depend on $$\\boldsymbo
                         "\\nabla\\log p_{\\text{data}}(\\boldsymbol{x})$$ by minimizing the expected squared "
                         "difference between the model and the true score."
                     ),
-                    "body": """![Score matching learns a vector field that agrees with the data score across space (Principles Fig 3.4).](/assets/figures/day07/pdm_score_matching.png)
+                    "body": """![Score matching learns a vector field that agrees with the data score across space.](/assets/figures/day07/pdm_score_matching.png)
 
 The obvious objective,
 
@@ -402,7 +401,7 @@ which no longer references the true score. The price is the **trace of the Jacob
                         "$$\\nabla_{\\boldsymbol{x}_t}\\log p(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0) = "
                         "-\\frac{\\boldsymbol{x}_t-\\boldsymbol{x}_0}{\\sigma^2} = -\\frac{\\boldsymbol{\\epsilon}}{\\sigma}.$$"
                     ),
-                    "body": """![Denoising score matching: the score of the noised distribution points from the noisy sample back toward the clean data (Principles Fig 4.6).](/assets/figures/day07/pdm_dsm_trick.png)
+                    "body": """![Denoising score matching: the score of the noised distribution points from the noisy sample back toward the clean data.](/assets/figures/day07/pdm_dsm_trick.png)
 
 The perturbation kernel is Gaussian, $$p(\\boldsymbol{x}_t\\mid\\boldsymbol{x}_0)=\\mathcal{N}(\\boldsymbol{x}_0,\\sigma^2 I)$$, whose log-gradient we can write down exactly (differentiate $$-\\|\\boldsymbol{x}_t-\\boldsymbol{x}_0\\|^2/2\\sigma^2$$). Vincent's identity shows that matching the *conditional* score also matches the *marginal* noisy score, so the trainable objective is just a regression:
 
@@ -420,7 +419,7 @@ No Jacobian trace, no MCMC — just predict the (scaled) noise that was added. T
                         "$$\\boldsymbol{s}_\\theta(\\boldsymbol{x},\\sigma)$$ across a range of noise "
                         "scales $$\\sigma$$."
                     ),
-                    "body": """![Training across many noise scales covers both the data manifold and the empty regions far from it (Principles Fig 3.7).](/assets/figures/day07/pdm_ncsn.png)
+                    "body": """![Training across many noise scales covers both the data manifold and the empty regions far from it.](/assets/figures/day07/pdm_ncsn.png)
 
 The difficulty with DSM at a single $$\\sigma$$ is a coverage problem:
 
@@ -442,7 +441,7 @@ The fix is to use **many** noise scales and a single network conditioned on $$\\
                         "$$\\boldsymbol{x}_{k+1} = \\boldsymbol{x}_k + \\tau\\,\\boldsymbol{s}_\\theta(\\boldsymbol{x}_k) "
                         "+ \\sqrt{2\\tau}\\,\\boldsymbol{z}_k,\\quad \\boldsymbol{z}_k\\sim\\mathcal{N}(\\mathbf{0},I).$$"
                     ),
-                    "body": """![Langevin sampling: noisy gradient ascent on the log-density converges to samples from $$p$$ (Principles Fig 3.3).](/assets/figures/day07/pdm_langevin.png)
+                    "body": """![Langevin sampling: noisy gradient ascent on the log-density converges to samples from $$p$$.](/assets/figures/day07/pdm_langevin.png)
 
 The update has two parts: a **drift** $$\\tau\\,\\boldsymbol{s}_\\theta$$ that climbs toward high-probability regions, and a **diffusion** $$\\sqrt{2\\tau}\\,\\boldsymbol{z}_k$$ that keeps the chain exploring rather than collapsing onto a single mode. Under mild conditions, as $$\\tau\\to0$$ and the number of steps grows, the iterates converge in distribution to $$p$$ — the noise is exactly calibrated so that $$p$$ is the **stationary distribution**.
 
@@ -462,7 +461,7 @@ Pure Langevin mixes slowly between far-apart modes. Combining it with the NCSN a
                         "g(t)\\,\\mathrm{d}\\boldsymbol{w},$$ with **drift** $$\\boldsymbol{f}$$ and "
                         "**diffusion** $$g$$, driven by a Wiener process $$\\boldsymbol{w}$$."
                     ),
-                    "body": """![The forward process as a continuous-time SDE: a 1-D density smoothly transported from data to noise (Principles Fig 4.3).](/assets/figures/day07/pdm_forward_1d.png)
+                    "body": """![The forward process as a continuous-time SDE: a 1-D density smoothly transported from data to noise.](/assets/figures/day07/pdm_forward_1d.png)
 
 The discrete DDPM update $$\\boldsymbol{x}_t=\\sqrt{1-\\beta_t}\\,\\boldsymbol{x}_{t-1}+\\sqrt{\\beta_t}\\,\\boldsymbol{\\epsilon}$$ is the Euler–Maruyama discretization (Day 1) of an SDE. Two standard families:
 
@@ -479,7 +478,7 @@ Crucially the marginal at each time stays Gaussian in the conditioning variable,
                         "\\nabla_{\\boldsymbol{x}}\\log p_t(\\boldsymbol{x}).$$ A single network "
                         "$$\\boldsymbol{s}_\\theta(\\boldsymbol{x},t)$$ learns it for all $$t$$."
                     ),
-                    "body": """![The score landscape changes with time: smooth and easy at high noise, sharp and detailed at low noise (Principles Fig 4.1).](/assets/figures/day07/pdm_score_landscape.png)
+                    "body": """![The score landscape changes with time: smooth and easy at high noise, sharp and detailed at low noise.](/assets/figures/day07/pdm_score_landscape.png)
 
 This is the NCSN idea recast in continuous time: instead of a discrete set of noise levels, there is a continuum $$t\\in[0,T]$$, and the network is conditioned on $$t$$. At large $$t$$ the density $$p_t$$ is a broad, smooth Gaussian whose score is easy to learn; at small $$t$$ it concentrates on the data manifold and the score becomes sharp and hard. Training is denoising score matching at every time:
 
@@ -495,7 +494,7 @@ with a time-weighting $$\\lambda(t)$$. One network, trained once, gives the scor
                         "of $$\\log p_t$$ reveals the **score** $$\\boldsymbol{s}=\\nabla\\log p_t$$ "
                         "in the reverse drift $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$."
                     ),
-                    "body": """The forward SDE (Principles notation)
+                    "body": """The forward SDE
 
 $$\\mathrm{d}\\boldsymbol{x} = \\boldsymbol{f}(\\boldsymbol{x},t)\\,\\mathrm{d}t + g(t)\\,\\mathrm{d}\\boldsymbol{w}$$
 
@@ -513,7 +512,7 @@ The reverse kernel is therefore again Gaussian, $$p_{t\\mid t+\\delta}(\\boldsym
 
 $$\\boldsymbol{x} \\;=\\; \\boldsymbol{y} - \\big[\\,\\textcolor{blue}{\\boldsymbol{f}(\\boldsymbol{y},t)} - \\textcolor{purple}{g^2\\,\\boldsymbol{s}(\\boldsymbol{y},t)}\\,\\big]\\delta \\;+\\; g\\sqrt{\\delta}\\,\\boldsymbol{z},\\qquad \\boldsymbol{z}\\sim\\mathcal{N}(\\mathbf{0},I).$$
 
-Reading off the drift, the reverse process moves with $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$ — the **score** appears exactly where DSM trains it. Letting $$\\delta\\to0$$ turns this into the reverse-time SDE, and at sampling time we replace $$\\boldsymbol{s}$$ with the learned $$\\boldsymbol{s}_\\theta(\\boldsymbol{x},t)$$. The fully rigorous version (Anderson's theorem) is next; an even longer step-by-step expansion (Winkler; SDE course §2.1) is in the optional block below.""",
+Reading off the drift, the reverse process moves with $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$ — the **score** appears exactly where DSM trains it. Letting $$\\delta\\to0$$ turns this into the reverse-time SDE, and at sampling time we replace $$\\boldsymbol{s}$$ with the learned $$\\boldsymbol{s}_\\theta(\\boldsymbol{x},t)$$. The fully rigorous version (Anderson's theorem) is next; an even longer step-by-step expansion is in the optional block below.""",
                     "optional": [DAY07_OPTIONAL[0]],
                 },
                 {
@@ -538,7 +537,7 @@ Comparing with the target FPE $$\\partial_\\tau q_\\tau=-\\nabla\\cdot(\\boldsym
 
 $$\\boxed{\\;\\mathrm{d}\\boldsymbol{x} = \\big[\\,\\textcolor{teal}{\\boldsymbol{f}(\\boldsymbol{x},t)} - g(t)^2\\,\\textcolor{purple}{\\boldsymbol{s}(\\boldsymbol{x},t)}\\,\\big]\\,\\mathrm{d}t + g(t)\\,\\mathrm{d}\\bar{\\boldsymbol{w}}\\;}$$
 
-— exactly the reverse-time SDE, with $$\\bar{\\boldsymbol{w}}$$ a reverse Wiener process. The crucial step is purely algebraic: converting **one of the two halves** of the diffusion term into a drift via $$\\nabla q=q\\,\\boldsymbol{s}$$, which is where the score enters. Running this SDE from $$\\boldsymbol{x}_T\\sim\\mathcal{N}(\\mathbf{0},I)$$ down to $$t=0$$ (with $$\\boldsymbol{s}\\to\\boldsymbol{s}_\\theta$$) generates samples from $$p_{\\text{data}}$$. Two conventions appear in the literature (reverse Wiener vs. $$t\\mapsto T-t$$); they agree on the score term $$g^2\\boldsymbol{s}$$. The reverse SDE generalizes annealed Langevin dynamics and DDPM ancestral sampling; the textbook proof via forward/backward Kolmogorov equations is in the optional block below.""",
+— exactly the reverse-time SDE, with $$\\bar{\\boldsymbol{w}}$$ a reverse Wiener process. The crucial step is purely algebraic: converting **one of the two halves** of the diffusion term into a drift via $$\\nabla q=q\\,\\boldsymbol{s}$$, which is where the score enters. Running this SDE from $$\\boldsymbol{x}_T\\sim\\mathcal{N}(\\mathbf{0},I)$$ down to $$t=0$$ (with $$\\boldsymbol{s}\\to\\boldsymbol{s}_\\theta$$) generates samples from $$p_{\\text{data}}$$. Two conventions appear in the literature (reverse Wiener vs. $$t\\mapsto T-t$$); they agree on the score term $$g^2\\boldsymbol{s}$$. The reverse SDE generalizes annealed Langevin dynamics and DDPM ancestral sampling; the full proof via forward/backward Kolmogorov equations is in the optional block below.""",
                     "optional": [DAY07_OPTIONAL[1]],
                 },
                 {
@@ -549,7 +548,7 @@ $$\\boxed{\\;\\mathrm{d}\\boldsymbol{x} = \\big[\\,\\textcolor{teal}{\\boldsymbo
                         "$$\\mathrm{d}\\boldsymbol{x} = \\big[\\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}\\big]\\mathrm{d}t.$$ "
                         "The $$\\tfrac12$$ factor and absence of noise follow from the FPE (Day 8)."
                     ),
-                    "body": """![Three dynamics with identical time marginals: the forward SDE, the reverse SDE, and the probability-flow ODE (Principles Fig 4.5).](/assets/figures/day07/pdm_three_dynamics.png)
+                    "body": """![Three dynamics with identical time marginals: the forward SDE, the reverse SDE, and the probability-flow ODE.](/assets/figures/day07/pdm_three_dynamics.png)
 
 **Where does the $$\\tfrac12$$ come from?** Take the *same* forward Fokker–Planck equation, but this time convert the **entire** diffusion term into a transport (drift) term using $$\\nabla p_t=p_t\\boldsymbol{s}$$:
 
@@ -610,7 +609,7 @@ So the network trained on the cheap conditional target converges to the true mar
                         "whose **velocity field** $$\\boldsymbol{v}$$ moves a base distribution into the data "
                         "distribution as $$t$$ goes from $$0$$ to $$1$$."
                     ),
-                    "body": """![A normalizing flow transports a simple base density to the data density along a learned path (Principles Fig 5.2).](/assets/figures/day07/pdm_nf.png)
+                    "body": """![A normalizing flow transports a simple base density to the data density along a learned path.](/assets/figures/day07/pdm_nf.png)
 
 If samples move with velocity $$\\boldsymbol{v}$$, their density evolves by the **continuity equation** $$\\partial_t p_t + \\nabla\\cdot(p_t\\,\\boldsymbol{v}_t)=0$$ (conservation of probability mass). Classical CNFs trained this velocity by maximizing likelihood, which requires integrating the ODE — and its divergence — during training. That is slow and unstable.
 
@@ -624,7 +623,7 @@ If samples move with velocity $$\\boldsymbol{v}$$, their density evolves by the 
                         "path $$\\boldsymbol{x}_t=(1-t)\\boldsymbol{x}_0+t\\,\\boldsymbol{x}_1$$, the velocity "
                         "is the constant $$\\boldsymbol{u}_t=\\boldsymbol{x}_1-\\boldsymbol{x}_0.$$"
                     ),
-                    "body": """![A conditional transition path interpolates a single noise sample to a single data sample; its velocity is known in closed form (Principles Fig 5.5).](/assets/figures/day07/pdm_cond_transition.png)
+                    "body": """![A conditional transition path interpolates a single noise sample to a single data sample; its velocity is known in closed form.](/assets/figures/day07/pdm_cond_transition.png)
 
 Pick a base sample $$\\boldsymbol{x}_0\\sim\\mathcal{N}(\\mathbf{0},I)$$ and a data sample $$\\boldsymbol{x}_1\\sim p_{\\text{data}}$$, and connect them with a simple path — for the straight line, $$\\boldsymbol{x}_t=(1-t)\\boldsymbol{x}_0+t\\boldsymbol{x}_1$$, the velocity is simply $$\\dot{\\boldsymbol{x}}_t=\\boldsymbol{x}_1-\\boldsymbol{x}_0$$. The objective is a plain regression:
 
@@ -640,7 +639,7 @@ No ODE simulation during training, no divergence term — just sample a pair, sa
                         "$$\\boldsymbol{v}(\\boldsymbol{x},t) = "
                         "\\mathbb{E}\\big[\\boldsymbol{u}_t(\\boldsymbol{x}\\mid\\boldsymbol{x}_1)\\,\\big|\\,\\boldsymbol{x}_t=\\boldsymbol{x}\\big].$$"
                     ),
-                    "body": """![Many conditional paths cross any given point; the marginal velocity is their average, and that is what the network learns (Principles Fig 5.6).](/assets/figures/day07/pdm_cond_vs_marginal.png)
+                    "body": """![Many conditional paths cross any given point; the marginal velocity is their average, and that is what the network learns.](/assets/figures/day07/pdm_cond_vs_marginal.png)
 
 A subtlety: many different $$(\\boldsymbol{x}_0,\\boldsymbol{x}_1)$$ pairs route their straight-line paths through the *same* point $$\\boldsymbol{x}_t=\\boldsymbol{x}$$, each with its own velocity. The single-valued field the network must learn is their **average**. Because the minimizer of the squared-error CFM loss at each point is the conditional mean of the target, the network automatically converges to this marginal velocity:
 
@@ -659,7 +658,7 @@ The two objectives differ only by a constant, so optimizing the tractable condit
                         "**marginal** trajectories are generally curved. **Reflow** retrains on the model's "
                         "own (noise, sample) pairs to straighten them, enabling few-step sampling."
                     ),
-                    "body": """![Marginal ODE trajectories are curved even when conditional paths are straight, which forces many integration steps (Principles Fig 5.9).](/assets/figures/day07/pdm_curved_paths.png)
+                    "body": """![Marginal ODE trajectories are curved even when conditional paths are straight, which forces many integration steps.](/assets/figures/day07/pdm_curved_paths.png)
 
 The number of function evaluations a deterministic sampler needs is governed by how *curved* the marginal trajectories are: a straight path can be integrated exactly in one Euler step, while a curved one needs many. Reflow is an elegant fix: generate pairs $$(\\boldsymbol{x}_0,\\boldsymbol{x}_1=\\text{ODE}(\\boldsymbol{x}_0))$$ from the trained model, then *retrain* flow matching using those coupled pairs as the new conditional endpoints. The resulting flow is **straighter**, and iterating drives it toward straight marginal paths that can be sampled in very few — even one — steps. This is one of the routes to the fast samplers of Day 8.""",
                 },
@@ -676,7 +675,7 @@ The number of function evaluations a deterministic sampler needs is governed by 
                         "**data** $$\\boldsymbol{x}_0$$, the **score** $$\\boldsymbol{s}$$, or the "
                         "**velocity** $$\\boldsymbol{v}$$ are all linearly interchangeable."
                     ),
-                    "body": """![The four common prediction targets are equivalent reparameterizations of the same network output (Principles Fig 6.1).](/assets/figures/day07/pdm_param_equiv.png)
+                    "body": """![The four common prediction targets are equivalent reparameterizations of the same network output.](/assets/figures/day07/pdm_param_equiv.png)
 
 From the single relation $$\\boldsymbol{x}_t=\\alpha_t\\boldsymbol{x}_0+\\sigma_t\\boldsymbol{\\epsilon}$$ we can solve for any target in terms of any other:
 
@@ -695,7 +694,7 @@ So a single network can be trained to output any one of them, and the others fol
                         "**same** time-indexed field over the same family of marginals $$p_t$$, and differ "
                         "only in parameterization and sampler."
                     ),
-                    "body": """![The variational, score-SDE, and flow-matching formulations are three views of one underlying model (Principles Fig 6.2).](/assets/figures/day07/pdm_unified.png)
+                    "body": """![The variational, score-SDE, and flow-matching formulations are three views of one underlying model.](/assets/figures/day07/pdm_unified.png)
 
 Stepping back, every approach this week shares the same skeleton:
 

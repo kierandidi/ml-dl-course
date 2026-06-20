@@ -46,7 +46,7 @@ The cure is to **constrain** the architecture using two facts that are true of e
 > **Locality**: pixels close together are statistically far more correlated than distant ones, so a useful feature can be computed from a small **local patch**. **Translation invariance**: a meaningful pattern (an edge, an eye) means the same thing wherever it appears.
 {:.lead}
 
-![Two priors about images: nearby pixels are correlated (locality), and patterns are meaningful regardless of position (translation invariance) (UCL L3).](/assets/figures/day04/cnn_locality.png)
+![Two priors about images: nearby pixels are correlated (locality), and patterns are meaningful regardless of position (translation invariance).](/assets/figures/day04/cnn_locality.png)
 
 These two observations translate directly into two architectural constraints:
 
@@ -60,7 +60,7 @@ A layer that connects locally **and** shares weights across positions is exactly
 > **Weight sharing** means one filter (kernel) scans the entire image, giving **translation equivariance**: shift the input, and the feature map shifts the same way. Stacking such layers builds a **hierarchy** of increasingly abstract features.
 {:.lead}
 
-![Weight sharing reuses one set of parameters across the image; stacking layers composes low-level features (edges, textures) into high-level ones (parts, objects) (UCL L3).](/assets/figures/day04/cnn_topology.png)
+![Weight sharing reuses one set of parameters across the image; stacking layers composes low-level features (edges, textures) into high-level ones (parts, objects).](/assets/figures/day04/cnn_topology.png)
 
 Two payoffs:
 
@@ -76,7 +76,7 @@ The second payoff is **compositional**. Early layers detect oriented edges; the 
 > A **convolutional layer** computes each output by applying one shared kernel $$\boldsymbol{w}$$ over a sliding local window of the input: $$y = \boldsymbol{w} * \boldsymbol{x} + b.$$
 {:.lead}
 
-![Going from a locally-connected layer (local but with position-specific weights) to a convolution (local *and* weight-shared): a single $$3\times3$$ kernel with a $$3\times3$$ receptive field (UCL L3).](/assets/figures/day04/cnn_receptive.png)
+![Going from a locally-connected layer (local but with position-specific weights) to a convolution (local *and* weight-shared): a single $$3\times3$$ kernel with a $$3\times3$$ receptive field.](/assets/figures/day04/cnn_receptive.png)
 
 Start from a fully-connected layer and impose the two priors in turn. First **locality**: zero out all connections except those to a small patch — now each output depends on a $$3\times3$$ receptive field. Second **weight sharing**: force the patch weights to be identical at every position. What remains is a convolution with a single small kernel.
 
@@ -87,13 +87,13 @@ Start from a fully-connected layer and impose the two priors in turn. First **lo
 > **2-D convolution** slides a kernel over the input; at each position it computes an elementwise product with the underlying patch and sums: $$(\boldsymbol{w} * \boldsymbol{x})_{i,j} = \sum_{u,v} w_{u,v}\,x_{i+u,\,j+v}.$$ With multiple channels the kernel spans all of them.
 {:.lead}
 
-![The kernel slides across the image and produces one output value at each position, forming a feature map (UCL L3).](/assets/figures/day04/cnn_convop.png)
+![The kernel slides across the image and produces one output value at each position, forming a feature map.](/assets/figures/day04/cnn_convop.png)
 
 The output is a **feature map**: a 2-D array recording how strongly the kernel's pattern is present at each location. Bright spots are where the feature "fires". Because the same kernel is used everywhere, the feature map is translation-equivariant.
 
 Real images have **channels** (RGB has 3), so inputs and outputs are *tensors* of shape height $$\times$$ width $$\times$$ channels:
 
-![Inputs and outputs are tensors with a channel dimension; a filter spans all input channels (UCL L3).](/assets/figures/day04/cnn_tensors.png)
+![Inputs and outputs are tensors with a channel dimension; a filter spans all input channels.](/assets/figures/day04/cnn_tensors.png)
 
 - A single filter has shape $$K\times K\times C_{\text{in}}$$ — it spans **all** input channels and produces **one** output channel.
 - Using $$C_{\text{out}}$$ such filters yields $$C_{\text{out}}$$ output channels, each a different learned feature.
@@ -119,7 +119,7 @@ Real images have **channels** (RGB has 3), so inputs and outputs are *tensors* o
 > **Stride** controls how far the kernel hops (and thus downsampling); **padding** controls border handling and output size; **dilation** spreads the kernel to enlarge the receptive field without extra parameters.
 {:.lead}
 
-![Variants of the convolution: strided convolution downsamples, dilated convolution enlarges the receptive field at the same parameter cost (UCL L3).](/assets/figures/day04/cnn_variants.png)
+![Variants of the convolution: strided convolution downsamples, dilated convolution enlarges the receptive field at the same parameter cost.](/assets/figures/day04/cnn_variants.png)
 
 - **Strided convolution** ($$S>1$$) computes outputs at every $$S$$-th position, downsampling the map — an alternative to pooling that *learns* its downsampling.
 - **Dilated (atrous) convolution** inserts gaps of size $$d$$ between kernel taps. A $$3\times3$$ kernel with dilation $$d$$ covers a $$(2d+1)\times(2d+1)$$ region but still has only $$9$$ weights — ideal for segmentation where large context matters at full resolution.
@@ -133,7 +133,7 @@ Real images have **channels** (RGB has 3), so inputs and outputs are *tensors* o
 > **Pooling** aggregates each small window of a feature map into a single value (max or mean), reducing spatial resolution while retaining the strongest responses.
 {:.lead}
 
-![Pooling computes a mean or max over small windows to reduce resolution (UCL L3).](/assets/figures/day04/cnn_pooling.png)
+![Pooling computes a mean or max over small windows to reduce resolution.](/assets/figures/day04/cnn_pooling.png)
 
 Why downsample at all? Three reasons:
 
@@ -148,7 +148,7 @@ Why downsample at all? Three reasons:
 > The basic repeating unit of a CNN is the **conv block**: a convolution, a normalization layer, and a nonlinearity, stacked and periodically downsampled.
 {:.lead}
 
-![Batch normalization speeds and stabilizes training, reaching higher accuracy faster than the same network without it (UCL L3).](/assets/figures/day04/cnn_batchnorm.png)
+![Batch normalization speeds and stabilizes training, reaching higher accuracy faster than the same network without it.](/assets/figures/day04/cnn_batchnorm.png)
 
 A typical block is `conv → BatchNorm → ReLU`, repeated, with the channel count growing as spatial resolution shrinks. **Batch normalization** standardizes each channel's activations over the minibatch, $$\hat z = (z-\mu_{\mathcal B})/\sqrt{\sigma_{\mathcal B}^2+\epsilon}$$, then rescales with learned $$\gamma,\beta$$. The figure shows the practical effect: faster convergence, tolerance of larger learning rates, and higher final accuracy. (Variants — GroupNorm, LayerNorm — are used when batches are small.)
 
@@ -178,7 +178,7 @@ $$\text{RF}_{\ell} = \text{RF}_{\ell-1} + \textcolor{teal}{(K-1)},\qquad \text{R
 > The ImageNet benchmark drove a rapid drop in top-5 error — from ~26% in 2011 to under 3% by 2017 — almost entirely by making convolutional networks **deeper** (and learning how to train them).
 {:.lead}
 
-![ImageNet top-5 error rate of the winning entries by year; each major drop came from a deeper, better-trained CNN, culminating in ResNet (UCL L3).](/assets/figures/day04/cnn_imagenet.png)
+![ImageNet top-5 error rate of the winning entries by year; each major drop came from a deeper, better-trained CNN, culminating in ResNet.](/assets/figures/day04/cnn_imagenet.png)
 
 Milestones:
 
@@ -194,7 +194,7 @@ The throughline is that **depth, trained correctly, is what wins** — with each
 > The classic CNN template is a sequence of **conv–pool stages** that progressively reduce spatial size and increase channels, followed by a small fully-connected **head** for classification.
 {:.lead}
 
-![AlexNet as a computational graph: alternating convolution and pooling stages feeding a fully-connected classifier (UCL L3).](/assets/figures/day04/cnn_alexnet.png)
+![AlexNet as a computational graph: alternating convolution and pooling stages feeding a fully-connected classifier.](/assets/figures/day04/cnn_alexnet.png)
 
 **LeNet-5 (1998)** introduced the template for handwritten-digit recognition: two conv+pool stages then fully-connected layers. **AlexNet (2012)** is essentially LeNet scaled up — more layers, more channels, ReLU, dropout, and GPU training — and it won ImageNet by a wide margin.
 
@@ -225,7 +225,7 @@ Residual connections made networks with hundreds of layers trainable, and the id
 > **Object detection** predicts both *what* (a class) and *where* (a bounding box) for every object in an image — multiple structured outputs per image.
 {:.lead}
 
-![Object detection: localize and classify every object with bounding boxes (UCL L4).](/assets/figures/day04/cnn_detection.png)
+![Object detection: localize and classify every object with bounding boxes.](/assets/figures/day04/cnn_detection.png)
 
 Detection reuses a CNN **backbone** (often an ImageNet-pretrained ResNet) and adds task-specific heads. Two families:
 
@@ -239,7 +239,7 @@ Common ingredients are **anchors** (reference boxes of various sizes/aspect rati
 > **Semantic segmentation** assigns a class label to **every pixel**, producing a dense map at (near) the input resolution.
 {:.lead}
 
-![Dense pixel-level prediction (semantic segmentation) on a street scene (UCL L4).](/assets/figures/day04/cnn_segmentation.png)
+![Dense pixel-level prediction (semantic segmentation) on a street scene.](/assets/figures/day04/cnn_segmentation.png)
 
 The challenge is that classification CNNs *downsample* aggressively, but segmentation needs full-resolution output. Two standard solutions:
 

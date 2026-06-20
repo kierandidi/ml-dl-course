@@ -33,10 +33,10 @@ FIGURES = [
 
 SLIDES = (
     "Statistical Learning",
-    "MML Part II — regression, PCA, density estimation, classification",
+    "Regression, PCA, density estimation, classification",
     [
         (
-            "When Models Meet Data (MML Ch. 8)",
+            "When Models Meet Data",
             [
                 (
                     "Machine Learning: A Taxonomy",
@@ -45,17 +45,17 @@ SLIDES = (
                         "Supervised: regression (continuous $y$) and classification (discrete labels)",
                         "Unsupervised: clustering, density estimation, dimensionality reduction",
                         "Reinforcement: sequential decisions from reward signals",
-                        "Today maps each pillar to one MML chapter (9–12)",
+                        "Today covers each of the four pillars in turn",
                     ],
                 ),
                 (
-                    "Four Pillars of Part II",
+                    "Four Pillars of Statistical Learning",
                     [
-                        "Ch. 9 — *Linear regression*: predict continuous targets from features",
-                        "Ch. 10 — *Dimensionality reduction* (PCA): find compact representations",
-                        "Ch. 11 — *Density estimation* (GMM): model $p(x)$ and discover structure",
-                        "Ch. 12 — *Classification* (SVM): separate classes with margins",
-                        "Ch. 8 provides the shared vocabulary: data, models, learning, evaluation",
+                        "*Linear regression*: predict continuous targets from features",
+                        "*Dimensionality reduction* (PCA): find compact representations",
+                        "*Density estimation* (GMM): model $p(x)$ and discover structure",
+                        "*Classification* (SVM): separate classes with margins",
+                        "A shared vocabulary underlies all four: data, models, learning, evaluation",
                     ],
                 ),
                 (
@@ -101,13 +101,13 @@ SLIDES = (
             ],
         ),
         (
-            "Linear Regression (MML Ch. 9)",
+            "Linear Regression",
             [
                 (
                     "Problem Setup",
                     [
                         "Given $(x_n, y_n)$, find $f: RR^D to RR$ with $y_n approx f(x_n) + epsilon_n$",
-                        "Noise $epsilon_n tilde cal(N)(0, sigma^2)$ (i.i.d. Gaussian in MML)",
+                        "Noise $epsilon_n tilde cal(N)(0, sigma^2)$ (i.i.d. Gaussian)",
                         "Training fits $f$; we care about prediction at *new* inputs (generalization)",
                         "Vector data lets us use linear algebra from Day 1",
                     ],
@@ -154,7 +154,7 @@ SLIDES = (
             ],
         ),
         (
-            "Dimensionality Reduction / PCA (MML Ch. 10)",
+            "Dimensionality Reduction / PCA",
             [
                 (
                     "Why Reduce Dimensionality?",
@@ -196,7 +196,7 @@ SLIDES = (
             ],
         ),
         (
-            "Density Estimation / GMM (MML Ch. 11)",
+            "Density Estimation / GMM",
             [
                 (
                     "Learning $p(x)$",
@@ -229,7 +229,7 @@ SLIDES = (
             ],
         ),
         (
-            "Classification / SVM (MML Ch. 12)",
+            "Classification / SVM",
             [
                 (
                     "Classification Setting",
@@ -278,7 +278,7 @@ LECTURE = {
     "slug": "statistical-learning",
     "title": "Statistical Learning",
     "description": (
-        "MML Part II: the supervised/unsupervised framework, linear regression, "
+        "The supervised/unsupervised framework, linear regression, "
         "PCA, Gaussian mixture models, and support vector machines."
     ),
     "reading": [
@@ -288,15 +288,15 @@ LECTURE = {
     ],
     "intro": (
         "Day 1 built the mathematical language; today we use it to design learning algorithms. "
-        "Following MML Part II, we start with the **framework** for how data, models, and learning "
-        "fit together (Chapter 8), then work through the four central pillars: **linear regression** "
-        "(Ch. 9), **PCA** for dimensionality reduction (Ch. 10), **Gaussian mixture models** for "
-        "density estimation (Ch. 11), and **support vector machines** for classification (Ch. 12). "
+        "We start with the **framework** for how data, models, and learning "
+        "fit together, then work through the four central pillars: **linear regression**, "
+        "**PCA** for dimensionality reduction, **Gaussian mixture models** for "
+        "density estimation, and **support vector machines** for classification. "
         "Each section connects back to the linear-algebra and probability tools from Day 1."
     ),
     "sections": [
         {
-            "title": "When Models Meet Data (Chapter 8)",
+            "title": "When Models Meet Data",
             "subsections": [
                 {
                     "heading": "A taxonomy of machine learning",
@@ -311,7 +311,7 @@ LECTURE = {
 
 This map is the roadmap for the rest of the course. **Regression** (continuous targets) and **classification** (discrete labels) dominate supervised learning and reappear inside deep networks (Days 3–5). **Dimensionality reduction** and **density estimation** are unsupervised tools we use for visualization, preprocessing, and generative modeling. **Reinforcement learning** sits outside today's scope but shares the same ERM spirit: optimize an expected objective from finite samples.
 
-MML Part II organizes the core methods into four pillars — regression, PCA, GMM, SVM — all introduced through the common lens of Chapter 8.""",
+We organize the core methods into four pillars — regression, PCA, GMM, SVM — all introduced through this common lens of data, models, and learning.""",
                 },
                 {
                     "heading": "Data as vectors, models as hypotheses",
@@ -322,9 +322,9 @@ MML Part II organizes the core methods into four pillars — regression, PCA, GM
                         "$$f_{\\boldsymbol{\\theta}}(\\mathbf{x})$$ — and **learning** selects "
                         "$$\\boldsymbol{\\theta}$$ from $$\\mathcal{D}$$."
                     ),
-                    "body": """![Toy regression data: salary vs age with a query point at age 60 (MML Fig. 8.1).](/assets/figures/day02/mml_toy_regression.png)
+                    "body": """![Toy regression data: salary vs age with a query point at age 60.](/assets/figures/day02/mml_toy_regression.png)
 
-Representing examples as vectors lets us reuse linear algebra (Day 1): design matrices, projections, eigen-decompositions. **Similarity** between examples — via inner products or distances — is the geometric backbone of both regression (Ch. 9) and classification (Ch. 12): nearby points should receive similar predictions.
+Representing examples as vectors lets us reuse linear algebra (Day 1): design matrices, projections, eigen-decompositions. **Similarity** between examples — via inner products or distances — is the geometric backbone of both regression and classification: nearby points should receive similar predictions.
 
 The figure shows a concrete regression task: predict salary from age using $$N$$ training pairs, then query at a new age (60) not in the training set. Success is measured on that *held-out* input, not on memorizing training salaries.""",
                 },
@@ -340,9 +340,9 @@ The figure shows a concrete regression task: predict salary from age using $$N$$
                     "body": """We never observe the true data distribution — only a finite sample — so we minimize the **empirical** average loss instead. Common choices:
 
 - **Squared error** $$\\ell = (y - \\hat{y})^2$$ for regression (leads to least squares under Gaussian noise).
-- **Cross-entropy** for classification (leads to logistic regression; see also SVM hinge loss in Ch. 12).
+- **Cross-entropy** for classification (leads to logistic regression; the SVM later uses the hinge loss instead).
 
-ERM is the workhorse of machine learning, but minimizing training loss alone is dangerous: a large enough model can drive empirical risk to zero while **test** error explodes. Chapters 9–12 show both the power of ERM and the tools to control it (regularization, validation, margins).""",
+ERM is the workhorse of machine learning, but minimizing training loss alone is dangerous: a large enough model can drive empirical risk to zero while **test** error explodes. The sections below show both the power of ERM and the tools to control it (regularization, validation, margins).""",
                 },
                 {
                     "heading": "Validation, cross-validation, and model selection",
@@ -352,24 +352,24 @@ ERM is the workhorse of machine learning, but minimizing training loss alone is 
                         "$$\\frac{1}{K}\\sum_k R(f^{(k)}, \\mathcal{V}^{(k)})$$ as an estimate of "
                         "generalization error."
                     ),
-                    "body": """![K-fold cross-validation: the dataset is partitioned into $$K$$ chunks; each chunk serves once as validation while the rest train the model (MML Fig. 8.4).](/assets/figures/day02/mml_cross_validation.png)
+                    "body": """![K-fold cross-validation: the dataset is partitioned into $$K$$ chunks; each chunk serves once as validation while the rest train the model.](/assets/figures/day02/mml_cross_validation.png)
 
 **Hyperparameters** — ridge penalty $$\\lambda$$, polynomial degree, number of GMM components $$K$$, SVM slack $$C$$ — are tuned on validation data only. The **test** set is touched once, at the end, for an unbiased performance estimate.
 
-**Model selection** balances fit and complexity. MML emphasizes **Occam's razor**: among models with similar validation error, prefer the simpler one. Information criteria make this explicit:
+**Model selection** balances fit and complexity. A useful guiding principle is **Occam's razor**: among models with similar validation error, prefer the simpler one. Information criteria make this explicit:
 
 $$\\mathrm{BIC} = -2\\,\\ell + p\\log N,$$
 
 where $$p$$ is the number of free parameters and $$\\ell$$ is the maximized log-likelihood. Lower BIC favors parsimony.
 
-![Training and validation error vs model capacity: training error decreases monotonically while validation error has a sweet spot (MML Fig. 8.5 — see textbook).](/assets/figures/day02/mml_poly_overfit.png)
+![Training and validation error vs model capacity: training error decreases monotonically while validation error has a sweet spot.](/assets/figures/day02/mml_poly_overfit.png)
 
 The capacity curve is the picture to remember: more flexible $$\\mathcal{H}$$ reduces **bias** but increases **variance**; validation error is the practical guide to the sweet spot.""",
                 },
             ],
         },
         {
-            "title": "Linear Regression (Chapter 9)",
+            "title": "Linear Regression",
             "subsections": [
                 {
                     "heading": "Problem setup and the linear model",
@@ -380,7 +380,7 @@ The capacity curve is the picture to remember: more flexible $$\\mathcal{H}$$ re
                         "where $$\\boldsymbol{\\phi}$$ maps inputs to features and the model is "
                         "**linear in** $$\\boldsymbol{\\theta}$$."
                     ),
-                    "body": """![Linear regression example: candidate lines, training data, and MLE fit (MML Fig. 9.2).](/assets/figures/day02/mml_linear_regression.png)
+                    "body": """![Linear regression example: candidate lines, training data, and MLE fit.](/assets/figures/day02/mml_linear_regression.png)
 
 The key phrase is *linear in the parameters*. A polynomial $$y = \\theta_0 + \\theta_1 x + \\theta_2 x^2$$ is still linear regression because $$\\boldsymbol{\\phi}(x) = (1, x, x^2)^{\\top}$$. Stacking $$N$$ examples gives the **design matrix** $$\\Phi \\in \\mathbb{R}^{N \\times M}$$ and predictions $$\\hat{\\mathbf{y}} = \\Phi\\boldsymbol{\\theta}$$.
 
@@ -394,23 +394,35 @@ We assume i.i.d. Gaussian noise — a probabilistic model, not just curve fittin
                         "\\sigma^2)$$, the **MLE** of $$\\boldsymbol{\\theta}$$ minimizes "
                         "$$\\|\\Phi\\boldsymbol{\\theta} - \\mathbf{y}\\|_2^2$$."
                     ),
-                    "body": """The log-likelihood for one observation is
+                    "body": """Least squares is usually presented as "minimize the sum of squared errors", but that choice is not arbitrary: it is the **maximum-likelihood estimator under Gaussian noise**. Making that link explicit is the cleanest way to understand *where losses come from* — and why a different noise assumption gives a different loss.
 
-$$\\log p(y_n\\mid\\mathbf{x}_n, \\boldsymbol{\\theta}) = -\\tfrac{1}{2\\sigma^2}(y_n - \\boldsymbol{\\phi}(\\mathbf{x}_n)^{\\top}\\boldsymbol{\\theta})^2 + \\text{const}.$$
+**From the noise model to the loss.** Assume the targets are generated as $$y_n = \\boldsymbol{\\phi}(\\mathbf{x}_n)^{\\top}\\boldsymbol{\\theta} + \\epsilon_n$$ with i.i.d. $$\\epsilon_n\\sim\\mathcal{N}(0,\\sigma^2)$$. Then each $$y_n$$ is Gaussian about the model prediction, and because the samples are independent the likelihood factorizes. Take its log:
 
-Summing over $$n$$ and dropping constants, MLE maximizes
+$$\\begin{aligned}
+\\log p(\\mathbf{y}\\mid\\Phi,\\boldsymbol{\\theta})
+&= \\log \\prod_{n=1}^N \\frac{1}{\\sqrt{2\\pi\\sigma^2}}\\exp\\!\\Big(\\textcolor{teal}{-\\tfrac{1}{2\\sigma^2}\\big(y_n-\\boldsymbol{\\phi}(\\mathbf{x}_n)^{\\top}\\boldsymbol{\\theta}\\big)^2}\\Big) \\\\
+&= \\sum_{n=1}^N \\Big[\\textcolor{teal}{-\\tfrac{1}{2\\sigma^2}\\big(y_n-\\boldsymbol{\\phi}(\\mathbf{x}_n)^{\\top}\\boldsymbol{\\theta}\\big)^2} \\;\\underbrace{-\\tfrac12\\log(2\\pi\\sigma^2)}_{\\text{const in }\\boldsymbol{\\theta}}\\Big] \\\\
+&= -\\frac{1}{2\\sigma^2}\\,\\big\\|\\Phi\\boldsymbol{\\theta}-\\mathbf{y}\\big\\|_2^2 + \\text{const}.
+\\end{aligned}$$
 
-$$-\\tfrac{1}{2\\sigma^2}\\|\\Phi\\boldsymbol{\\theta} - \\mathbf{y}\\|_2^2,$$
+Maximizing the log-likelihood is therefore **identical** to minimizing the sum of squared residuals $$\\|\\Phi\\boldsymbol{\\theta}-\\mathbf{y}\\|_2^2$$ — the noise variance $$\\sigma^2$$ only rescales the objective and drops out of the argmin. So "least squares" is not a modeling choice we make for convenience; it is *implied* by the Gaussian assumption.
 
-equivalent to minimizing the **mean squared error**. Setting the gradient to zero yields the **normal equations**
+**Solving it.** Using the gradient identity $$\\nabla_{\\boldsymbol{\\theta}}\\|\\Phi\\boldsymbol{\\theta}-\\mathbf{y}\\|_2^2 = 2\\Phi^{\\top}(\\Phi\\boldsymbol{\\theta}-\\mathbf{y})$$ (Day 1) and setting it to zero gives the **normal equations** and, when $$\\Phi^{\\top}\\Phi$$ is invertible, the closed form:
 
-$$\\Phi^{\\top}\\Phi\\,\\boldsymbol{\\theta} = \\Phi^{\\top}\\mathbf{y}.$$
+$$\\Phi^{\\top}\\Phi\\,\\boldsymbol{\\theta} = \\Phi^{\\top}\\mathbf{y} \\qquad\\Longrightarrow\\qquad \\boldsymbol{\\theta}^{\\star} = (\\Phi^{\\top}\\Phi)^{-1}\\Phi^{\\top}\\mathbf{y}.$$
 
-When $$\\Phi^{\\top}\\Phi$$ is invertible,
+Geometrically, $$\\Phi\\boldsymbol{\\theta}^{\\star} = \\Phi(\\Phi^{\\top}\\Phi)^{-1}\\Phi^{\\top}\\mathbf{y}$$ is the **orthogonal projection** of $$\\mathbf{y}$$ onto the column space of $$\\Phi$$ — the residual is perpendicular to every feature, so no direction in the model's span can reduce the error further.
 
-$$\\boldsymbol{\\theta}^{\\star} = (\\Phi^{\\top}\\Phi)^{-1}\\Phi^{\\top}\\mathbf{y}.$$
+**Different noise model $$\\Rightarrow$$ different loss.** The general principle is that the loss is the **negative log-likelihood** of the assumed noise, $$\\ell(y,\\hat y) = -\\log p(y\\mid\\hat y)$$. Changing the noise changes the loss:
 
-Geometrically, $$\\Phi\\boldsymbol{\\theta}^{\\star}$$ is the **orthogonal projection** of $$\\mathbf{y}$$ onto the column space of $$\\Phi$$ — the closest point in the model's span.""",
+| Noise / likelihood $$p(y\\mid\\hat y)$$ | Loss $$-\\log p$$ | Optimal point estimate |
+|---|---|---|
+| Gaussian $$\\mathcal{N}(\\hat y,\\sigma^2)$$ | squared error $$(y-\\hat y)^2$$ | conditional **mean** |
+| Laplace $$\\propto e^{-\\lvert y-\\hat y\\rvert/b}$$ | absolute error $$\\lvert y-\\hat y\\rvert$$ | conditional **median** |
+| Student-$$t$$ / heavy-tailed | robust loss (≈ Huber) | outlier-resistant |
+| Bernoulli $$\\hat p^{\\,y}(1-\\hat p)^{1-y}$$ | cross-entropy (next section) | class probability |
+
+**What this means in practice.** Squared error implicitly assumes symmetric, light-tailed Gaussian noise, so a single gross **outlier** — which is wildly unlikely under a Gaussian — can dominate the fit and drag the line toward it. If your noise is heavy-tailed, the matched negative-log-likelihood is the $$\\ell_1$$ (absolute) loss or the **Huber** loss (quadratic near zero, linear in the tails), which down-weight outliers and recover the median rather than the mean. Choosing a loss *is* choosing a noise model, whether or not you say so out loud.""",
                 },
                 {
                     "heading": "Ridge regression and the bias–variance trade-off",
@@ -420,18 +432,41 @@ Geometrically, $$\\Phi\\boldsymbol{\\theta}^{\\star}$$ is the **orthogonal proje
                         "(\\Phi^{\\top}\\Phi + \\lambda \\mathbf{I})^{-1}\\Phi^{\\top}\\mathbf{y}.$$ "
                         "It stabilizes inversion when features are collinear or $$N \\ll M$$."
                     ),
-                    "body": """When $$\\Phi^{\\top}\\Phi$$ is near-singular, OLS has enormous variance: small perturbations of $$\\mathbf{y}$$ swing $$\\boldsymbol{\\theta}^{\\star}$$ wildly. Adding $$\\lambda \\mathbf{I}$$ shrinks coefficients toward zero — trading a little **bias** for much lower **variance**.
+                    "body": """When $$\\Phi^{\\top}\\Phi$$ is near-singular — collinear features, or more parameters than data ($$M>N$$) — OLS has enormous variance: a tiny perturbation of $$\\mathbf{y}$$ swings $$\\boldsymbol{\\theta}^{\\star}$$ wildly, because we are dividing by near-zero directions of $$\\Phi^{\\top}\\Phi$$. Ridge regression fixes this by adding an $$\\ell_2$$ penalty to the objective.
 
-Equivalently, ridge is the **MAP estimate** under a Gaussian prior $$\\boldsymbol{\\theta} \\sim \\mathcal{N}(\\mathbf{0}, \\tau^2 \\mathbf{I})$$. The penalty $$\\lambda$$ is tuned by cross-validation (Ch. 8).
+**Closed form.** Minimize the penalized objective and set the gradient to zero:
 
-![Training and test error vs polynomial degree: training error falls while test error rises after the true degree — a classic overfitting picture (MML Fig. 9.6).](/assets/figures/day02/mml_poly_overfit.png)
+$$\\begin{aligned}
+L(\\boldsymbol{\\theta}) &= \\tfrac12\\|\\Phi\\boldsymbol{\\theta}-\\mathbf{y}\\|_2^2 + \\tfrac{\\lambda}{2}\\|\\boldsymbol{\\theta}\\|_2^2, \\\\
+\\nabla_{\\boldsymbol{\\theta}} L &= \\Phi^{\\top}(\\Phi\\boldsymbol{\\theta}-\\mathbf{y}) + \\lambda\\boldsymbol{\\theta} = \\big(\\textcolor{teal}{\\Phi^{\\top}\\Phi + \\lambda\\mathbf{I}}\\big)\\boldsymbol{\\theta} - \\Phi^{\\top}\\mathbf{y} \\overset{!}{=}\\mathbf{0}, \\\\
+\\Rightarrow\\quad \\hat{\\boldsymbol{\\theta}}_{\\text{ridge}} &= \\big(\\Phi^{\\top}\\Phi + \\lambda\\mathbf{I}\\big)^{-1}\\Phi^{\\top}\\mathbf{y}.
+\\end{aligned}$$
 
-Polynomial regression illustrates the capacity curve in action: high degree fits every training point but wiggles wildly between them. Ridge or early stopping on degree (via validation) restores generalization.""",
+The term $$\\lambda\\mathbf{I}$$ lifts every eigenvalue of $$\\Phi^{\\top}\\Phi$$ by $$\\lambda>0$$, so the matrix is **always invertible** — the inversion problem disappears.
+
+**Bayesian view (why it is a MAP estimate).** Put a Gaussian prior $$\\boldsymbol{\\theta}\\sim\\mathcal{N}(\\mathbf{0},\\tau^2\\mathbf{I})$$ on the weights and keep the Gaussian likelihood. The log-posterior is
+
+$$\\begin{aligned}
+\\log p(\\boldsymbol{\\theta}\\mid\\mathbf{y})
+&= \\underbrace{-\\tfrac{1}{2\\sigma^2}\\|\\Phi\\boldsymbol{\\theta}-\\mathbf{y}\\|_2^2}_{\\text{log-likelihood}} \\;\\underbrace{-\\tfrac{1}{2\\tau^2}\\|\\boldsymbol{\\theta}\\|_2^2}_{\\text{log-prior}} + \\text{const}.
+\\end{aligned}$$
+
+Maximizing it is exactly ridge with $$\\textcolor{purple}{\\lambda = \\sigma^2/\\tau^2}$$: the penalty strength is the ratio of noise variance to prior variance. A tighter prior (small $$\\tau^2$$) or noisier data (large $$\\sigma^2$$) means more shrinkage. The $$\\ell_2$$ penalty is the log of a Gaussian prior, just as squared error was the log of a Gaussian likelihood.
+
+**What shrinkage does (SVD view).** Write $$\\Phi = U\\Sigma V^{\\top}$$ with singular values $$d_i$$. Then OLS and ridge differ only by a per-direction **shrinkage factor**:
+
+$$\\hat{\\mathbf{y}}_{\\text{ridge}} = \\sum_i \\mathbf{u}_i\\,\\underbrace{\\frac{d_i^2}{d_i^2+\\lambda}}_{\\in(0,1)}\\,\\mathbf{u}_i^{\\top}\\mathbf{y}, \\qquad \\hat{\\mathbf{y}}_{\\text{OLS}} = \\sum_i \\mathbf{u}_i\\,\\mathbf{u}_i^{\\top}\\mathbf{y}.$$
+
+High-variance directions ($$d_i^2\\gg\\lambda$$) pass through almost untouched; low-variance directions ($$d_i^2\\ll\\lambda$$), the unstable ones, are damped toward zero. Ridge trades a little **bias** for a large drop in **variance** — the bias–variance trade-off made mechanical.
+
+![Training and test error vs polynomial degree: training error falls while test error rises after the true degree — a classic overfitting picture.](/assets/figures/day02/mml_poly_overfit.png)
+
+Polynomial regression shows why this matters: a high-degree fit passes through every training point but oscillates wildly between them (huge coefficients). The penalty $$\\lambda$$ — tuned by cross-validation — tames those coefficients and restores generalization. (Swapping the $$\\ell_2$$ penalty for $$\\ell_1$$ gives the **lasso**, whose diamond-shaped constraint drives coefficients exactly to zero, i.e. feature selection.)""",
                 },
             ],
         },
         {
-            "title": "Dimensionality Reduction with PCA (Chapter 10)",
+            "title": "Dimensionality Reduction with PCA",
             "subsections": [
                 {
                     "heading": "Motivation and problem setting",
@@ -455,9 +490,9 @@ Applications include visualization (project to 2D/3D), denoising, whitening feat
                         "$$\\sum_n \\|\\tilde{\\mathbf{x}}_n - \\mathbf{B}\\mathbf{B}^{\\top}\\tilde{\\mathbf{x}}_n\\|^2$$ "
                         "for rank-$$M$$ projection matrix $$\\mathbf{B}$$."
                     ),
-                    "body": """![PCA finds a lower-dimensional subspace that preserves variance when data are projected (MML Fig. 10.4).](/assets/figures/day02/mml_pca_lowdim.png)
+                    "body": """![PCA finds a lower-dimensional subspace that preserves variance when data are projected.](/assets/figures/day02/mml_pca_lowdim.png)
 
-![Orthogonal projection onto the principal subspace (MML Fig. 10.6).](/assets/figures/day02/mml_pca_projection.png)
+![Orthogonal projection onto the principal subspace.](/assets/figures/day02/mml_pca_projection.png)
 
 Both formulations lead to the same solution: **eigenvectors of the sample covariance**
 
@@ -470,7 +505,7 @@ Sort eigenvalues $$\\lambda_1 \\geq \\lambda_2 \\geq \\cdots$$; keep the top $$M
             ],
         },
         {
-            "title": "Density Estimation with Gaussian Mixture Models (Chapter 11)",
+            "title": "Density Estimation with Gaussian Mixture Models",
             "subsections": [
                 {
                     "heading": "Parametric density estimation",
@@ -484,7 +519,7 @@ Sort eigenvalues $$\\lambda_1 \\geq \\lambda_2 \\geq \\cdots$$; keep the top $$M
 
 A single Gaussian is unimodal; a mixture can approximate multimodal data. Each component has mean $$\\boldsymbol{\\mu}_k$$, covariance $$\\boldsymbol{\\Sigma}_k$$, and mixing weight $$\\pi_k$$.
 
-![One-dimensional GMM: sum of Gaussians approximates a complex density (MML Fig. 11.3).](/assets/figures/day02/mml_gmm_1d.png)""",
+![One-dimensional GMM: sum of Gaussians approximates a complex density.](/assets/figures/day02/mml_gmm_1d.png)""",
                 },
                 {
                     "heading": "EM algorithm: derivation sketch",
@@ -497,23 +532,75 @@ A single Gaussian is unimodal; a mixture can approximate multimodal data. Each c
                         "**M-step** — update $$\\pi_k, \\boldsymbol{\\mu}_k, \\boldsymbol{\\Sigma}_k$$ from "
                         "weighted sufficient statistics."
                     ),
-                    "body": """Introduce latent variables $$z_n \\in \\{1,\\ldots,K\\}$$ indicating which component generated $$\\mathbf{x}_n$$. The complete-data log-likelihood is easy to optimize; EM iterates:
+                    "body": """Why can't we just maximize the GMM log-likelihood directly? Because the density is a **sum** inside the log, $$\\log\\sum_k \\pi_k\\mathcal{N}(\\mathbf{x}_n\\mid\\boldsymbol{\\mu}_k,\\boldsymbol{\\Sigma}_k)$$, which does not separate into per-component terms — setting the gradient to zero gives coupled equations with no closed form. EM is the standard way around this, and it is far more general than GMMs.
 
-1. **E-step:** $$\\mathbb{E}[z_{nk}\\mid\\mathbf{x}_n] = r_{nk}$$ (posterior component membership).
-2. **M-step:** weighted MLE updates, e.g.
+**The general derivation (any latent-variable model).** Let $$\\mathbf{z}$$ be the latent variable and introduce *any* distribution $$q(\\mathbf{z})$$ over it. For every $$q$$, the marginal log-likelihood splits exactly:
 
-$$\\boldsymbol{\\mu}_k = \\frac{\\sum_n r_{nk}\\,\\mathbf{x}_n}{\\sum_n r_{nk}}, \\qquad
+$$\\begin{aligned}
+\\log p_{\\boldsymbol{\\theta}}(\\mathbf{x})
+&= \\underbrace{\\mathbb{E}_{q}\\!\\Big[\\log\\tfrac{p_{\\boldsymbol{\\theta}}(\\mathbf{x},\\mathbf{z})}{q(\\mathbf{z})}\\Big]}_{\\textcolor{teal}{\\mathcal{F}(q,\\,\\boldsymbol{\\theta})\\ =\\ \\text{ELBO}}} \\;+\\; \\underbrace{D_{\\mathrm{KL}}\\!\\big(q(\\mathbf{z})\\,\\|\\,p_{\\boldsymbol{\\theta}}(\\mathbf{z}\\mid\\mathbf{x})\\big)}_{\\textcolor{purple}{\\ \\geq\\ 0}} .
+\\end{aligned}$$
+
+(To verify: substitute $$p_{\\boldsymbol{\\theta}}(\\mathbf{x},\\mathbf{z}) = p_{\\boldsymbol{\\theta}}(\\mathbf{z}\\mid\\mathbf{x})p_{\\boldsymbol{\\theta}}(\\mathbf{x})$$ inside the ELBO and the $$\\log p_{\\boldsymbol{\\theta}}(\\mathbf{x})$$ term, being constant in $$\\mathbf{z}$$, pulls out.) Because the KL term is non-negative, the ELBO $$\\mathcal{F}$$ is a **lower bound** on the log-likelihood, tight exactly when $$q = p_{\\boldsymbol{\\theta}}(\\mathbf{z}\\mid\\mathbf{x})$$. EM is **coordinate ascent** on $$\\mathcal{F}$$:
+
+- **E-step** (maximize $$\\mathcal{F}$$ over $$q$$, holding $$\\boldsymbol{\\theta}$$): set $$q(\\mathbf{z}) = p_{\\boldsymbol{\\theta}^{\\text{old}}}(\\mathbf{z}\\mid\\mathbf{x})$$, driving the KL gap to zero so the bound **touches** the curve at $$\\boldsymbol{\\theta}^{\\text{old}}$$.
+- **M-step** (maximize $$\\mathcal{F}$$ over $$\\boldsymbol{\\theta}$$, holding $$q$$): since $$q$$ is fixed, this is $$\\boldsymbol{\\theta}^{\\text{new}} = \\arg\\max_{\\boldsymbol{\\theta}} \\mathbb{E}_{q}[\\log p_{\\boldsymbol{\\theta}}(\\mathbf{x},\\mathbf{z})]$$ — the **expected complete-data log-likelihood**, which (with a sum *outside* the log) usually has a closed form.
+
+**Why it monotonically improves.** Chaining the two steps,
+
+$$\\log p_{\\boldsymbol{\\theta}^{\\text{new}}}(\\mathbf{x}) \\;\\geq\\; \\mathcal{F}(q,\\boldsymbol{\\theta}^{\\text{new}}) \\;\\geq\\; \\mathcal{F}(q,\\boldsymbol{\\theta}^{\\text{old}}) \\;=\\; \\log p_{\\boldsymbol{\\theta}^{\\text{old}}}(\\mathbf{x}),$$
+
+where the first inequality is the bound, the second is the M-step's improvement, and the equality is the E-step's tightness. The likelihood **never decreases** — EM climbs to a local optimum.
+
+**Specializing to the GMM.** Here $$z_n\\in\\{1,\\dots,K\\}$$ says which component generated $$\\mathbf{x}_n$$. The E-step posterior is the **responsibility**
+
+$$r_{nk} = p(z_n=k\\mid\\mathbf{x}_n) = \\frac{\\pi_k\\,\\mathcal{N}(\\mathbf{x}_n\\mid\\boldsymbol{\\mu}_k,\\boldsymbol{\\Sigma}_k)}{\\sum_j \\pi_j\\,\\mathcal{N}(\\mathbf{x}_n\\mid\\boldsymbol{\\mu}_j,\\boldsymbol{\\Sigma}_j)},$$
+
+and maximizing the expected complete-data log-likelihood gives **responsibility-weighted** MLE updates:
+
+$$\\pi_k = \\frac{1}{N}\\sum_n r_{nk}, \\quad
+\\boldsymbol{\\mu}_k = \\frac{\\sum_n r_{nk}\\,\\mathbf{x}_n}{\\sum_n r_{nk}}, \\quad
 \\boldsymbol{\\Sigma}_k = \\frac{\\sum_n r_{nk}(\\mathbf{x}_n - \\boldsymbol{\\mu}_k)(\\mathbf{x}_n - \\boldsymbol{\\mu}_k)^{\\top}}{\\sum_n r_{nk}}.$$
 
-Each iteration increases the data log-likelihood (never decreases). EM finds **local** optima — initialization matters (k-means++ is standard).
-
-Choose $$K$$ via BIC or cross-validated held-out log-likelihood. GMMs connect forward to **latent-variable models** and VAEs on Day 6.""",
+These are just the usual Gaussian MLEs with each point counted *fractionally* by how much it belongs to component $$k$$ — a **soft** version of k-means (which is the $$\\boldsymbol{\\Sigma}_k\\to 0$$, hard-assignment limit). EM finds **local** optima, so initialization matters (k-means++ is standard), and $$K$$ is chosen by BIC or held-out log-likelihood. The same ELBO machinery returns on Day 6 as the training objective for **VAEs**, where $$q$$ is an *amortized* neural encoder instead of the exact posterior.""",
                 },
             ],
         },
         {
-            "title": "Classification with Support Vector Machines (Chapter 12)",
+            "title": "Classification: Logistic Regression and Support Vector Machines",
             "subsections": [
+                {
+                    "heading": "Logistic regression: cross-entropy from a Bernoulli model",
+                    "definition": (
+                        "**Logistic regression** models the class probability as a sigmoid of a "
+                        "linear score, $$p(y=1\\mid\\mathbf{x}) = \\sigma(\\mathbf{w}^{\\top}\\mathbf{x}+b)$$ "
+                        "with $$\\sigma(z) = 1/(1+e^{-z})$$. Maximum likelihood under this **Bernoulli** "
+                        "model is exactly minimization of the **cross-entropy** (log) loss."
+                    ),
+                    "body": """Regression assumed Gaussian noise and got squared error. Classification assumes a **Bernoulli** label and gets cross-entropy — the same recipe (loss $$= -\\log$$ likelihood), a different distribution. This is the second half of "different assumptions $$\\Rightarrow$$ different losses".
+
+**The model.** A linear score $$z=\\mathbf{w}^{\\top}\\mathbf{x}+b$$ is squashed through the **sigmoid** into a probability $$\\hat p = \\sigma(z)\\in(0,1)$$. A single label is Bernoulli, $$p(y\\mid\\mathbf{x}) = \\hat p^{\\,y}(1-\\hat p)^{1-y}$$ for $$y\\in\\{0,1\\}$$.
+
+**From likelihood to cross-entropy.** Take the negative log-likelihood over the dataset:
+
+$$\\begin{aligned}
+\\mathcal{L}(\\mathbf{w},b)
+&= -\\sum_{n=1}^N \\log\\Big[\\hat p_n^{\\,y_n}(1-\\hat p_n)^{1-y_n}\\Big] \\\\
+&= -\\sum_{n=1}^N \\Big[\\textcolor{teal}{y_n\\log\\hat p_n} + \\textcolor{purple}{(1-y_n)\\log(1-\\hat p_n)}\\Big].
+\\end{aligned}$$
+
+This is the **binary cross-entropy**: it is precisely $$\\sum_n H(\\text{one-hot } y_n,\\ \\hat p_n)$$, the cross-entropy between the true label and the predicted distribution. Unlike least squares there is **no closed form**, but the loss is **convex** in $$(\\mathbf{w},b)$$, so gradient descent finds the global optimum.
+
+**The gradient is beautifully simple.** Using $$\\sigma'(z)=\\sigma(z)(1-\\sigma(z))$$, the per-example gradient telescopes to the *same* form as linear regression — prediction minus target, times the input:
+
+$$\\nabla_{\\mathbf{w}}\\mathcal{L} = \\sum_{n=1}^N \\big(\\textcolor{orange}{\\hat p_n - y_n}\\big)\\,\\mathbf{x}_n = \\Phi^{\\top}(\\hat{\\mathbf{p}}-\\mathbf{y}).$$
+
+That shared "(prediction − target) · input" structure is no coincidence: both squared error and cross-entropy belong to the **exponential family / generalized linear model** framework, where the matched loss always yields this gradient. (Newton's method on this objective is **iteratively reweighted least squares**.)
+
+**Multiclass.** For $$K$$ classes, replace the sigmoid with the **softmax** $$\\hat p_k = e^{z_k}/\\sum_j e^{z_j}$$ and the Bernoulli with a **categorical** likelihood; the negative log-likelihood becomes the multiclass cross-entropy $$-\\sum_n \\log \\hat p_{n,y_n}$$. This is the exact loss used to train every classifier and language model later in the course.
+
+**What this means in practice.** Cross-entropy outputs **calibrated probabilities** and punishes confident-and-wrong predictions heavily (the $$-\\log$$ blows up as $$\\hat p\\to 0$$ for the true class), which is why it trains faster than squared error on classification: squared error on top of a sigmoid is non-convex and has vanishing gradients when saturated. Logistic regression uses the **log loss**; the SVM below uses the **hinge loss** — two different surrogates for the same goal of separating classes, leading to probabilistic vs. margin-based classifiers.""",
+                },
                 {
                     "heading": "Separating hyperplanes and margins",
                     "definition": (
@@ -521,11 +608,17 @@ Choose $$K$$ via BIC or cross-validated held-out log-likelihood. GMMs connect fo
                         "and predicts $$\\mathrm{sign}(f(\\mathbf{x}))$$. A **separating hyperplane** "
                         "satisfies $$y_n(\\mathbf{w}^{\\top}\\mathbf{x}_n + b) > 0$$ for all training points."
                     ),
-                    "body": """![Two-dimensional classification data with class labels (MML Fig. 12.1).](/assets/figures/day02/mml_svm_2d.png)
+                    "body": """![Two-dimensional classification data with two class labels.](/assets/figures/day02/mml_svm_2d.png)
 
-When classes are linearly separable, infinitely many hyperplanes work. **Support vector machines** pick the one with **maximum margin** — the distance to the nearest training points (**support vectors**).
+When classes are linearly separable, infinitely many hyperplanes work, and logistic regression's log loss does not single one out. **Support vector machines** pick the hyperplane with **maximum margin** — the largest distance to the nearest training points (the **support vectors**) — which is the choice with the best worst-case robustness.
 
-![Separating hyperplane geometry: normal vector $$\\mathbf{w}$$ and offset $$b$$ (MML Fig. 12.3).](/assets/figures/day02/mml_svm_hyperplane.png)""",
+**Distance from a point to a hyperplane.** The vector $$\\mathbf{w}$$ is normal to the hyperplane $$\\mathbf{w}^{\\top}\\mathbf{x}+b=0$$. Decompose any point as $$\\mathbf{x} = \\mathbf{x}_\\perp + r\\,\\tfrac{\\mathbf{w}}{\\|\\mathbf{w}\\|}$$ with $$\\mathbf{x}_\\perp$$ on the hyperplane. Plugging in and using $$\\mathbf{w}^{\\top}\\mathbf{x}_\\perp+b=0$$,
+
+$$\\mathbf{w}^{\\top}\\mathbf{x}+b = r\\,\\frac{\\mathbf{w}^{\\top}\\mathbf{w}}{\\|\\mathbf{w}\\|} = r\\,\\|\\mathbf{w}\\| \\quad\\Longrightarrow\\quad r = \\frac{\\mathbf{w}^{\\top}\\mathbf{x}+b}{\\|\\mathbf{w}\\|},$$
+
+so the **signed distance** is $$(\\mathbf{w}^{\\top}\\mathbf{x}+b)/\\|\\mathbf{w}\\|$$. We are free to rescale $$(\\mathbf{w},b)$$, so adopt the **canonical** normalization $$\\min_n |\\mathbf{w}^{\\top}\\mathbf{x}_n+b| = 1$$ at the closest points. The distance from the hyperplane to the nearest point is then $$1/\\|\\mathbf{w}\\|$$, and the full **margin** between the two classes is $$2/\\|\\mathbf{w}\\|$$.
+
+![Separating-hyperplane geometry: the normal vector $$\\mathbf{w}$$, offset $$b$$, and the signed distance of a point.](/assets/figures/day02/mml_svm_hyperplane.png)""",
                 },
                 {
                     "heading": "Hard-margin and soft-margin SVMs",
@@ -536,13 +629,25 @@ When classes are linearly separable, infinitely many hyperplanes work. **Support
                         "**Soft margin** adds slack $$\\xi_n \\geq 0$$ and penalty "
                         "$$C\\sum_n \\xi_n$$ for non-separable data."
                     ),
-                    "body": """The objective $$\\tfrac{1}{2}\\|\\mathbf{w}\\|^2$$ maximizes the margin $$2/\\|\\mathbf{w}\\|$$ while constraints keep points on the correct side. Only **support vectors** (points with $$y_n(\\mathbf{w}^{\\top}\\mathbf{x}_n + b) = 1$$ or, in the soft case, $$\\xi_n > 0$$) determine the solution — a sparse representation.
+                    "body": """**Maximizing the margin = minimizing $$\\|\\mathbf{w}\\|$$.** Maximizing $$2/\\|\\mathbf{w}\\|$$ is the same as minimizing $$\\tfrac12\\|\\mathbf{w}\\|^2$$ (monotone, and quadratic hence convex). With the canonical scaling, "every point on the correct side of its margin" becomes $$y_n(\\mathbf{w}^{\\top}\\mathbf{x}_n+b)\\geq 1$$. That gives the **hard-margin primal** — a convex quadratic program:
 
-![Maximum-margin classifier: support vectors lie on the margin boundaries (MML Fig. 12.7).](/assets/figures/day02/mml_svm_margin.png)
+$$\\min_{\\mathbf{w},b}\\ \\tfrac12\\|\\mathbf{w}\\|^2 \\qquad \\text{s.t.}\\quad y_n(\\mathbf{w}^{\\top}\\mathbf{x}_n+b)\\geq 1,\\ \\forall n.$$
 
-![Hinge loss is a convex upper bound on zero-one loss — the surrogate optimized by soft-margin SVMs (MML Fig. 12.8).](/assets/figures/day02/mml_soft_margin.png)
+![Maximum-margin classifier: the support vectors lie exactly on the margin boundaries.](/assets/figures/day02/mml_svm_margin.png)
 
-The hyperparameter $$C$$ trades margin width against training errors: large $$C$$ punishes slack heavily (narrow margin, fewer errors); small $$C$$ tolerates misclassification (wider margin, simpler boundary). Tune $$C$$ by cross-validation.""",
+**Soft margin for non-separable data.** Real data overlap, so no $$\\mathbf{w}$$ satisfies every constraint. Introduce **slack** $$\\xi_n\\geq 0$$ measuring each point's margin violation and pay for it linearly:
+
+$$\\min_{\\mathbf{w},b,\\boldsymbol{\\xi}}\\ \\tfrac12\\|\\mathbf{w}\\|^2 + C\\sum_n \\xi_n \\qquad \\text{s.t.}\\quad y_n(\\mathbf{w}^{\\top}\\mathbf{x}_n+b)\\geq 1-\\xi_n,\\ \\xi_n\\geq 0.$$
+
+**This is hinge-loss minimization in disguise.** At the optimum each slack takes its smallest feasible value, $$\\xi_n = \\max(0,\\,1 - y_n(\\mathbf{w}^{\\top}\\mathbf{x}_n+b))$$. Substituting turns the constrained QP into an unconstrained regularized loss:
+
+$$\\min_{\\mathbf{w},b}\\ \\underbrace{\\sum_{n}\\max\\big(0,\\,1-y_n(\\mathbf{w}^{\\top}\\mathbf{x}_n+b)\\big)}_{\\textcolor{teal}{\\text{hinge loss}}} + \\underbrace{\\tfrac{1}{2C}\\|\\mathbf{w}\\|^2}_{\\textcolor{purple}{\\ell_2\\text{ regularizer}}}.$$
+
+So the SVM is "hinge loss + ridge penalty", the exact analogue of logistic regression's "log loss + ridge penalty". The **hinge loss** is a convex upper bound on the 0/1 error that is *flat* once a point is correctly classified beyond the margin — which is why only nearby points matter.
+
+![The hinge loss (kinked at margin 1) is a convex upper bound on the 0/1 loss — the surrogate the soft-margin SVM minimizes.](/assets/figures/day02/mml_soft_margin.png)
+
+The hyperparameter $$C$$ sets the trade-off: large $$C$$ punishes slack heavily (narrow margin, few training errors, risk of overfitting); small $$C$$ tolerates violations (wider, simpler margin). Tune $$C$$ by cross-validation.""",
                 },
                 {
                     "heading": "Dual formulation and the kernel trick",
@@ -552,17 +657,27 @@ The hyperparameter $$C$$ trades margin width against training errors: large $$C$
                         "**kernel** $$k(\\mathbf{x}_n, \\mathbf{x}_m)$$ to learn nonlinear "
                         "boundaries in an implicit feature space."
                     ),
-                    "body": """The Lagrangian dual is
+                    "body": """**Deriving the dual.** Attach multipliers $$\\alpha_n\\geq 0$$ to the hard-margin constraints and form the Lagrangian:
 
-$$\\max_{\\boldsymbol{\\alpha}} \\sum_{n=1}^{N} \\alpha_n - \\tfrac{1}{2}\\sum_{n,m}\\alpha_n \\alpha_m y_n y_m\\, k(\\mathbf{x}_n, \\mathbf{x}_m)$$
+$$\\mathcal{L}(\\mathbf{w},b,\\boldsymbol{\\alpha}) = \\tfrac12\\|\\mathbf{w}\\|^2 - \\sum_n \\alpha_n\\big[y_n(\\mathbf{w}^{\\top}\\mathbf{x}_n+b)-1\\big].$$
 
-subject to $$0 \\leq \\alpha_n \\leq C$$ and $$\\sum_n \\alpha_n y_n = 0$$. Predictions use support vectors:
+Stationarity in the primal variables gives the key identities
 
-$$f(\\mathbf{x}) = \\sum_{n \\in \\mathrm{SV}} \\alpha_n y_n\\, k(\\mathbf{x}_n, \\mathbf{x}) + b.$$
+$$\\frac{\\partial\\mathcal{L}}{\\partial\\mathbf{w}} = \\mathbf{0}\\ \\Rightarrow\\ \\textcolor{teal}{\\mathbf{w} = \\sum_n \\alpha_n y_n \\mathbf{x}_n}, \\qquad \\frac{\\partial\\mathcal{L}}{\\partial b} = 0\\ \\Rightarrow\\ \\sum_n \\alpha_n y_n = 0.$$
 
-Common kernels: **polynomial** $$k(\\mathbf{x}, \\mathbf{x}') = (\\mathbf{x}^{\\top}\\mathbf{x}' + c)^d$$; **RBF** $$k(\\mathbf{x}, \\mathbf{x}') = \\exp(-\\gamma\\|\\mathbf{x} - \\mathbf{x}'\\|^2)$$. The RBF kernel corresponds to an infinite-dimensional feature map — the same "lift to a richer space" idea as polynomial features in regression, but without explicit $$\\boldsymbol{\\phi}(\\mathbf{x})$$.
+The first says the solution is a **linear combination of the training points**. Substituting both back into $$\\mathcal{L}$$ eliminates $$\\mathbf{w}$$ and $$b$$ and leaves a problem in $$\\boldsymbol{\\alpha}$$ alone — the **dual**:
 
-SVMs use **hinge loss** (via the slack formulation) rather than logistic **log loss**; both are large-margin linear classifiers in feature space. Deep networks (Day 3+) learn $$\\boldsymbol{\\phi}$$ instead of hand-designing or kernelizing it.""",
+$$\\max_{\\boldsymbol{\\alpha}}\\ \\sum_{n} \\alpha_n - \\tfrac{1}{2}\\sum_{n,m}\\alpha_n \\alpha_m y_n y_m\\, \\textcolor{purple}{\\mathbf{x}_n^{\\top}\\mathbf{x}_m} \\qquad \\text{s.t.}\\quad 0\\leq\\alpha_n\\leq C,\\ \\ \\sum_n \\alpha_n y_n = 0.$$
+
+(The upper bound $$\\alpha_n\\le C$$ is what the soft-margin slack contributes.)
+
+**Support vectors fall out of the KKT conditions.** Complementary slackness, $$\\alpha_n[y_n(\\mathbf{w}^{\\top}\\mathbf{x}_n+b)-1]=0$$, forces $$\\alpha_n=0$$ for every point strictly beyond its margin. Only points **on** the margin (or violating it) have $$\\alpha_n>0$$ — these are the **support vectors**, and they alone determine $$\\mathbf{w}$$. The classifier is sparse:
+
+$$f(\\mathbf{x}) = \\sum_{n\\in\\mathrm{SV}} \\alpha_n y_n\\, k(\\mathbf{x}_n,\\mathbf{x}) + b.$$
+
+**The kernel trick.** The dual and the predictor touch the data *only* through inner products $$\\mathbf{x}_n^{\\top}\\mathbf{x}_m$$. Replace each with a **kernel** $$k(\\mathbf{x}_n,\\mathbf{x}_m) = \\langle\\boldsymbol{\\phi}(\\mathbf{x}_n),\\boldsymbol{\\phi}(\\mathbf{x}_m)\\rangle$$ and we learn a linear separator in a high-dimensional feature space $$\\boldsymbol{\\phi}$$ **without ever computing $$\\boldsymbol{\\phi}$$**. Common choices: **polynomial** $$k=(\\mathbf{x}^{\\top}\\mathbf{x}'+c)^d$$ and **RBF** $$k=\\exp(-\\gamma\\|\\mathbf{x}-\\mathbf{x}'\\|^2)$$, the latter corresponding to an *infinite*-dimensional feature map.
+
+SVMs (hinge loss, sparse support vectors, margins) and logistic regression (log loss, dense, calibrated probabilities) are the two canonical linear classifiers. Deep networks (Day 3+) take the complementary route: instead of fixing a kernel, they **learn** the feature map $$\\boldsymbol{\\phi}$$ end to end.""",
                 },
             ],
         },

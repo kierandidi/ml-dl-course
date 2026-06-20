@@ -289,14 +289,14 @@ $$D_{\\mathrm{KL}} = \\log\\frac{\\sigma_1}{\\sigma_0} + \\frac{\\sigma_0^2 + (\
 
 **ELBO.**
 
-$$\\log p(x) \\geq \\mathbb{E}_{q(z|x)}[\\log p(x|z)] - D_{\\mathrm{KL}}(q(z|x)\\|p(z)).$$
+$$\\log p(x) \\geq \\mathbb{E}_{q(z\\mid x)}[\\log p(x\\mid z)] - D_{\\mathrm{KL}}(q(z\\mid x)\\,\\|\\,p(z)).$$
 
 **VAE loss** = reconstruction + KL to prior $$\\mathcal{N}(0,I)$$.
 
 ## Exercises
 
 1. Pen-and-paper KL (then verify numerically)
-2. Implement ELBO for factorized Gaussian $$q(z|x)$$
+2. Implement ELBO for factorized Gaussian $$q(z\\mid x)$$
 3. Train 1D VAE on synthetic mixture — plot samples
 4. **Reflection:** explicit vs implicit — one example each
 
@@ -512,26 +512,29 @@ links:
 
 # Final Assessment
 
-**Duration:** ~3 hours · **Submission:** PDF export of notebook + honor code statement
+**Duration:** ~3 hours · **Total:** 100 points (50 math + 50 coding) · **Submission:** PDF export of notebook + honor code statement
 
-## Part A — Written (40 points)
+Work through [`notebooks/assessment/final_assessment.ipynb`](/notebooks/assessment/final_assessment.ipynb); write math answers in its markdown cells and code in its code cells. Before submitting, run **Kernel → Restart & Run All**.
 
-1. **(10 pts)** Derive the ELBO for a latent variable model with joint $$p_\\theta(x,z) = p_\\theta(x|z)p(z)$$ and variational $$q_\\phi(z|x)$$. Identify each term.
-2. **(10 pts)** Compute $$D_{\\mathrm{KL}}(\\mathcal{N}(0,1) \\| \\mathcal{N}(1, 4))$$ in closed form.
-3. **(10 pts)** Explain **explicit** vs **implicit** generative models with one example each (VAE/GAN acceptable).
-4. **(10 pts)** Write the **KV cache** memory formula for $$L$$ layers, batch $$B$$, sequence length $$T$$, hidden size $$d$$, and GQA with $$n_{\\mathrm{kv}}$$ KV heads.
+## Part A — Mathematics (50 points)
 
-## Part B — Coding (60 points)
+1. **A1 — Chain rule and gradients (10 pts).** Differentiate $$f(x,y) = \\sin(xy) + x^2$$, evaluate at a point, then apply the chain rule with $$x = t^2,\\ y = 3t$$.
+2. **A2 — Backpropagation sketch (10 pts).** For a one-hidden-unit network with squared loss, draw the computation graph and derive $$\\partial \\mathcal{L}/\\partial w_1$$.
+3. **A3 — KL divergence and ELBO (10 pts).** Write the closed-form $$\\mathrm{KL}(q \\,\\|\\, p)$$ for two univariate Gaussians, then explain why maximizing the ELBO $$\\mathbb{E}_{q_\\phi(z\\mid x)}[\\log p_\\theta(x\\mid z)] - \\mathrm{KL}(q_\\phi(z\\mid x) \\,\\|\\, p(z))$$ trades off reconstruction against a latent regularizer.
+4. **A4 — Forward diffusion and score matching (15 pts).** Show $$x_t = \\sqrt{\\bar{\\alpha}_t}\\,x_0 + \\sqrt{1 - \\bar{\\alpha}_t}\\,\\epsilon$$, relate the optimal noise predictor to the score $$\\nabla_{x_t}\\log q(x_t)$$, and explain why the signal-to-noise ratio falls with $$t$$.
+5. **A5 — Scaled dot-product attention (15 pts).** Give the shapes in $$\\mathrm{softmax}(QK^\\top/\\sqrt{d_k})V$$, justify the $$1/\\sqrt{d_k}$$ scaling, and describe the causal mask.
+
+## Part B — Coding (50 points)
 
 Use [`notebooks/assessment/final_assessment.ipynb`](/notebooks/assessment/final_assessment.ipynb) and `notebooks/data/assessment_synthetic.csv`.
 
 | Task | Points |
 |------|--------|
-| Train 3-layer MLP classifier on tabular data | 25 |
-| **Track A:** 10-step reverse diffusion sampler on 2D moons | 35 |
-| **Track B:** KV-cache forward pass for provided tiny GPT | 35 |
+| **B1 —** Train an MLP classifier (≥2 hidden layers) on the tabular data; report validation accuracy and plot the training loss | 25 |
+| **B2a —** 1-D reverse diffusion sampler for a known Gaussian-mixture score | 25 |
+| **B2b —** KV-cache greedy decoding for a tiny causal Transformer; report the tokens/sec speedup | 25 |
 
-Choose **one** generative track (A or B), not both.
+For **B2**, complete **one** track (B2a *or* B2b), not both.
 
 ## Grading rubric
 
@@ -541,8 +544,8 @@ Choose **one** generative track (A or B), not both.
 
 ## Figure reference
 
-![Assessment data](/assets/figures/day06/pdf0_page010.png)
-*Example generative modeling figure (course materials)*
+![The deep generative modeling landscape: transform a simple reference distribution into the data distribution by different model families.](/assets/figures/day06/pdm_dgm_zoo.png)
+*The generative-modeling map from Day 6 — useful background for Part A.*
 """
 
 

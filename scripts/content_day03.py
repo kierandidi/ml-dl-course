@@ -266,7 +266,7 @@ LECTURE = {
                         "$$f(\\boldsymbol{x}) = g^{(L)}\\!\\circ\\cdots\\circ g^{(1)}(\\boldsymbol{x}),$$ "
                         "where each $$g^{(l)}$$ is an affine map followed by a nonlinearity."
                     ),
-                    "body": """**Why this matters.** The whole reason deep learning exists is that most interesting decision boundaries are *not* hyperplanes. The textbook example is XOR: four points $$(0,0),(1,1)\\to 0$$ and $$(0,1),(1,0)\\to 1$$ cannot be separated by any single line. No choice of $$\\boldsymbol{w},b$$ in $$f(\\boldsymbol{x})=\\boldsymbol{w}^\\top\\boldsymbol{x}+b$$ works.
+                    "body": """**Why this matters.** The whole reason deep learning exists is that most interesting decision boundaries are *not* hyperplanes. The classic example is XOR: four points $$(0,0),(1,1)\\to 0$$ and $$(0,1),(1,0)\\to 1$$ cannot be separated by any single line. No choice of $$\\boldsymbol{w},b$$ in $$f(\\boldsymbol{x})=\\boldsymbol{w}^\\top\\boldsymbol{x}+b$$ works.
 
 The classical workaround is a **feature map** $$\\boldsymbol{\\phi}$$: instead of feeding raw $$\\boldsymbol{x}$$, we feed $$\\boldsymbol{\\phi}(\\boldsymbol{x})$$ and learn $$f(\\boldsymbol{x})=\\boldsymbol{w}^\\top\\boldsymbol{\\phi}(\\boldsymbol{x})$$. For XOR, the single extra feature $$\\phi_3 = x_1 x_2$$ makes the problem linearly separable. The catch: *someone has to design* $$\\boldsymbol{\\phi}$$. For images, audio, or text this is hopeless by hand.
 
@@ -285,7 +285,7 @@ The early layers play the role of $$\\boldsymbol{\\phi}$$ (representation), the 
                         "$$\\hat f(\\boldsymbol{x}) = \\sum_{j=1}^{N} v_j\\,\\sigma(\\boldsymbol{w}_j^\\top\\boldsymbol{x}+b_j)$$ "
                         "with $$\\sup_{\\boldsymbol{x}\\in K}|f(\\boldsymbol{x})-\\hat f(\\boldsymbol{x})|<\\varepsilon.$$"
                     ),
-                    "body": """![A single hidden layer with a squashing nonlinearity is dense in the space of continuous functions — but the theorem says nothing about how *wide* the layer must be (UCL L2).](/assets/figures/day03/dnn_universal_approx.png)
+                    "body": """![A single hidden layer with a squashing nonlinearity is dense in the space of continuous functions — but the theorem says nothing about how *wide* the layer must be.](/assets/figures/day03/dnn_universal_approx.png)
 
 This is a reassuring **existence** result: neural networks are *dense* in the space of continuous functions, so there is no function we are fundamentally unable to represent. But read the fine print:
 
@@ -311,7 +311,7 @@ There is also a representational story that matches intuition: a deep vision net
                         "with $$\\boldsymbol{a}^{(0)}=\\boldsymbol{x}$$ and output "
                         "$$\\hat{\\boldsymbol{y}}=\\boldsymbol{a}^{(L)}$$."
                     ),
-                    "body": """![A neural network is a computational graph: nodes are operations, edges carry tensors. Reverse-mode autodiff walks this graph backwards (UCL L2).](/assets/figures/day03/dnn_compgraph.png)
+                    "body": """![A neural network is a computational graph: nodes are operations, edges carry tensors. Reverse-mode autodiff walks this graph backwards.](/assets/figures/day03/dnn_compgraph.png)
 
 It pays to think of the network as a **computational graph** rather than a formula. Nodes are primitive operations (matmul, add, ReLU, softmax); edges carry tensors. Two facts about graphs drive everything that follows:
 
@@ -371,7 +371,7 @@ the difference between predicted and true distributions. This is the error signa
                         "$$L(\\theta) = \\frac{1}{m}\\sum_{i=1}^m \\ell\\big(f(\\boldsymbol{x}_i;\\theta),\\boldsymbol{y}_i\\big),$$ "
                         "by following the negative gradient $$-\\nabla_\\theta L$$."
                     ),
-                    "body": """![The standard training objective: an average loss over the data, minimized over the network's parameters (UCL L5).](/assets/figures/day03/dnn_train_objective.png)
+                    "body": """![The standard training objective: an average loss over the data, minimized over the network's parameters.](/assets/figures/day03/dnn_train_objective.png)
 
 Everything reduces to computing $$\\nabla_\\theta L$$ — possibly hundreds of millions of partial derivatives. The naive options are both unusable:
 
@@ -453,7 +453,7 @@ These four lines, applied from $$l=L$$ down to $$l=1$$, *are* backpropagation. N
                         "The direction $$-\\nabla L$$ is the steepest local decrease, and $$\\eta$$ is the "
                         "**learning rate**."
                     ),
-                    "body": """![Among all unit directions, $$-\\nabla L$$ gives the greatest first-order decrease; how far we can trust it depends on how smooth $$L$$ is (UCL L5).](/assets/figures/day03/opt_steepest.png)
+                    "body": """![Among all unit directions, $$-\\nabla L$$ gives the greatest first-order decrease; how far we can trust it depends on how smooth $$L$$ is.](/assets/figures/day03/opt_steepest.png)
 
 The justification is the first-order Taylor expansion around the current point:
 
@@ -469,7 +469,7 @@ To decrease $$L$$ fastest for a fixed step length, we minimize $$\\nabla L^\\top
                         "descent **zig-zags**. Conditioning is measured by "
                         "$$\\kappa = \\lambda_{\\max}/\\lambda_{\\min}$$ of the Hessian."
                     ),
-                    "body": """![Gradient descent in a narrow valley: a large learning rate bounces across the steep walls, a small one crawls along the flat floor (UCL L5).](/assets/figures/day03/opt_narrow_valley.png)
+                    "body": """![Gradient descent in a narrow valley: a large learning rate bounces across the steep walls, a small one crawls along the flat floor.](/assets/figures/day03/opt_narrow_valley.png)
 
 Picture a long, narrow valley. The gradient points mostly across the valley (the steep direction), so steps bounce from wall to wall while making little progress along the floor (the flat direction we actually want to travel). Quantitatively, for a quadratic with Hessian eigenvalues $$\\lambda_{\\min}\\le\\cdots\\le\\lambda_{\\max}$$, the stable learning rate is bounded by $$\\eta<2/\\lambda_{\\max}$$ (set by the steep direction), while progress along the flat direction goes as $$(1-\\eta\\lambda_{\\min})$$. The number of iterations to converge scales with the **condition number** $$\\kappa=\\lambda_{\\max}/\\lambda_{\\min}$$.
 
@@ -482,7 +482,7 @@ Neural-network losses are badly conditioned, so plain GD is slow. The next metho
                         "minibatch estimate. **Momentum** and **Adam** accelerate it by reusing the "
                         "history of past gradients."
                     ),
-                    "body": """![Trajectories in the narrow valley: plain gradient descent zig-zags, momentum smooths the path, and second-order methods cut straight to the minimum (UCL L5).](/assets/figures/day03/opt_methods.png)
+                    "body": """![Trajectories in the narrow valley: plain gradient descent zig-zags, momentum smooths the path, and second-order methods cut straight to the minimum.](/assets/figures/day03/opt_methods.png)
 
 **SGD.** Computing $$\\nabla L$$ on the full dataset every step is wasteful. SGD uses a random minibatch $$\\mathcal{B}$$: $$\\nabla L\\approx\\frac{1}{|\\mathcal{B}|}\\sum_{i\\in\\mathcal{B}}\\nabla\\ell_i$$. This is an *unbiased* estimate (Day 1's Monte-Carlo idea), so steps are cheap and noisy. The noise is not just tolerable — it helps the model escape sharp minima and acts as implicit regularization.
 
@@ -522,7 +522,7 @@ The name "heavy ball" comes from the physical analogy: plain GD is a massless pa
                         "training error falls monotonically while test error is **U-shaped**: it first "
                         "falls (less bias) then rises (more variance)."
                     ),
-                    "body": """![Training risk keeps dropping with capacity, but test risk is U-shaped; regularization and more data move the sweet spot to the right (UCL L2).](/assets/figures/day03/dnn_overfitting.png)
+                    "body": """![Training risk keeps dropping with capacity, but test risk is U-shaped; regularization and more data move the sweet spot to the right.](/assets/figures/day03/dnn_overfitting.png)
 
 The decomposition of expected test error into **bias** (error from too-simple a model) plus **variance** (sensitivity to the particular training sample) plus irreducible noise makes the trade-off precise. A model with too little capacity *underfits* (high bias); one with too much *overfits* (high variance), memorizing noise in the training set.
 

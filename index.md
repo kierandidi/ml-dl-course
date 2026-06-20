@@ -39,7 +39,3 @@ Each day has **lecture notes** (derivations), **PDF slides** (figures from MML, 
 ## Assessment
 
 [Final assessment](/projects/final-assessment/) — math + coding (~3 hours).
-
-## Deploy this site
-
-See [DEPLOY.md](DEPLOY.md) for GitHub + Netlify setup (same workflow as [sde-course](https://github.com/kierandidi/sde-course)).

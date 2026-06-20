@@ -40,7 +40,7 @@ FIGURES = [
 # Each part: (section title, [(slide_title, [bullets]), ...])
 SLIDES = (
     "Math Foundations",
-    "Linear algebra through differential equations — MML Part I",
+    "Linear algebra through differential equations",
     [
         (
             "The Mathematical Foundation",
@@ -50,9 +50,8 @@ SLIDES = (
                     [
                         "Data as vectors; tables of data as matrices (linear algebra)",
                         "Similarity via norms and inner products (analytic geometry)",
-                        "Structure via matrix decompositions; optimization via gradients (Ch. 4–5)",
+                        "Structure via matrix decompositions; optimization via gradients",
                         "Uncertainty via probability; dynamics via differential equations",
-                        "Source: Deisenroth, Faisal & Ong — *Mathematics for Machine Learning*",
                     ],
                 ),
                 (
@@ -203,7 +202,7 @@ SLIDES = (
                 (
                     "There and Back Again",
                     [
-                        "NeurIPS 2020 tutorial: integration *and* differentiation for ML",
+                        "Integration *and* differentiation for ML — two sides of one map",
                         "Integration: expectations, marginalization, Bayesian evidence",
                         "Differentiation: gradients for optimization, sensitivity analysis",
                         "Map metaphor: numerical integration swamps, Monte Carlo heights, Backprop Bay…",
@@ -330,7 +329,7 @@ LECTURE = {
     "title": "Math Foundations",
     "description": (
         "Linear algebra, analytic geometry, vector calculus, integration & differentiation, "
-        "probability, and differential equations — MML Part I foundations."
+        "probability, and differential equations — the mathematical foundations."
     ),
     "reading": [
         "[Deisenroth, Faisal & Ong — *Mathematics for Machine Learning*](https://mml-book.com), Ch. 2–6",
@@ -339,8 +338,7 @@ LECTURE = {
         "[Diffusion Book — Appendix A: Crash Course on Differential Equations](https://arxiv.org/abs/2510.21890) (pp. 399 ff.)",
     ],
     "intro": (
-        "Machine learning rests on four mathematical pillars laid out in Part I of "
-        "*Mathematics for Machine Learning* (MML): we represent data as vectors and matrices "
+        "Machine learning rests on four mathematical pillars: we represent data as vectors and matrices "
         "(linear algebra); measure similarity with norms and inner products (analytic geometry); "
         "exploit matrix structure and gradients (decompositions and vector calculus); and quantify "
         "uncertainty with probability. Today we also cover integration and differentiation "
@@ -371,7 +369,7 @@ Stacking the coefficients into a matrix lets one matrix–vector multiply encode
 
 $$\\underbrace{\\begin{pmatrix} a_{11} & a_{12} \\\\ a_{21} & a_{22} \\end{pmatrix}}_{\\mathbf{A}} \\underbrace{\\begin{pmatrix} x_1 \\\\ x_2 \\end{pmatrix}}_{\\mathbf{x}} = \\underbrace{\\begin{pmatrix} b_1 \\\\ b_2 \\end{pmatrix}}_{\\mathbf{b}}.$$
 
-![Linear systems and matrix view (MML Fig 2.3)](/assets/figures/day01/mml_linear_system.png)
+![Linear systems and matrix view](/assets/figures/day01/mml_linear_system.png)
 
 A matrix is not merely a table of numbers — it is a **linear map** $$f(\\mathbf{x}) = \\mathbf{A}\\mathbf{x}$$. There are two complementary ways to read $$\\mathbf{A}\\mathbf{x} = \\mathbf{b}$$:
 
@@ -401,7 +399,7 @@ These are tied together by the **rank–nullity theorem**:
 
 $$\\mathrm{rank}(\\mathbf{A}) + \\dim \\mathcal{N}(\\mathbf{A}) = n.$$
 
-![Vector subspace (MML Fig 2.6)](/assets/figures/day01/mml_subspace.png)
+![Vector subspace](/assets/figures/day01/mml_subspace.png)
 
 **Worked example.** Take $$\\mathbf{A} = \\begin{pmatrix} 1 & 2 \\\\ 2 & 4 \\end{pmatrix}$$. The second row is twice the first, so there is only **one** independent row: $$\\mathrm{rank}(\\mathbf{A}) = 1$$. By rank–nullity the null space has dimension $$2 - 1 = 1$$; indeed $$\\mathbf{A}(2,-1)^\\top = \\mathbf{0}$$, so $$\\mathcal{N}(\\mathbf{A}) = \\mathrm{span}\\{(2,-1)^\\top\\}$$. Because $$\\mathbf{A}$$ is rank-deficient it is **not invertible** — a warning sign that, as a feature matrix, its columns are collinear.""",
                 },
@@ -430,7 +428,7 @@ The **Cauchy–Schwarz inequality** $$|\\langle \\mathbf{x}, \\mathbf{y} \\rangl
 
 $$\\cos\\theta = \\frac{\\langle \\mathbf{x}, \\mathbf{y}\\rangle}{\\|\\mathbf{x}\\|_2\\,\\|\\mathbf{y}\\|_2}, \\qquad \\text{orthogonal} \\iff \\langle \\mathbf{x}, \\mathbf{y}\\rangle = 0.$$
 
-![Angle between vectors (MML Fig 3.6)](/assets/figures/day01/mml_angle.png)
+![Angle between vectors](/assets/figures/day01/mml_angle.png)
 
 **Worked example.** For $$\\mathbf{x} = (1,0)^\\top$$ and $$\\mathbf{y} = (1,1)^\\top$$: $$\\langle \\mathbf{x},\\mathbf{y}\\rangle = 1$$, $$\\|\\mathbf{x}\\|_2 = 1$$, $$\\|\\mathbf{y}\\|_2 = \\sqrt{2}$$, so $$\\cos\\theta = 1/\\sqrt{2}$$ and $$\\theta = 45^\\circ$$. This is exactly the "cosine similarity" used to compare text/image embeddings — it ignores magnitude and measures direction.""",
                 },
@@ -454,7 +452,7 @@ $$\\alpha = \\frac{\\mathbf{x}^\\top\\mathbf{y}}{\\mathbf{x}^\\top\\mathbf{x}} =
 
 The residual $$\\mathbf{y} - \\hat{\\mathbf{y}} = (0,3)^\\top$$ is indeed orthogonal to $$\\mathbf{x}$$ — we kept the component of $$\\mathbf{y}$$ along $$\\mathbf{x}$$ and discarded the rest.
 
-![Projection onto a subspace (MML Fig 3.11)](/assets/figures/day01/mml_projection.png)
+![Projection onto a subspace](/assets/figures/day01/mml_projection.png)
 
 **From a line to a subspace.** Projecting onto the column space of $$\\mathbf{A}$$ uses $$\\mathbf{P} = \\mathbf{A}(\\mathbf{A}^\\top \\mathbf{A})^{-1}\\mathbf{A}^\\top$$. **Ordinary least squares** minimizes $$\\|\\mathbf{A}\\mathbf{w} - \\mathbf{y}\\|_2^2$$; the same orthogonality condition ("residual $$\\perp$$ every column") gives the **normal equations**
 
@@ -488,7 +486,7 @@ $$\\nabla_{\\mathbf{w}} L = \\underbrace{2\\mathbf{X}^\\top\\mathbf{X}\\mathbf{w
 
 Setting this to $$\\mathbf{0}$$ recovers the normal equations from the previous section — calculus and geometry agree.
 
-![Gradient as the slope of a secant (MML Fig 5.3)](/assets/figures/day01/mml_gradient.png)
+![Gradient as the slope of a secant](/assets/figures/day01/mml_gradient.png)
 
 **Chain rule = backprop.** For $$\\mathbf{f}: \\mathbb{R}^n \\to \\mathbb{R}^m$$ the **Jacobian** $$\\mathbf{J}$$ has $$J_{ij} = \\partial f_i/\\partial x_j$$, and for a composition $$g \\circ \\mathbf{f}$$,
 $$\\nabla_{\\mathbf{x}} (g\\circ \\mathbf{f}) = \\mathbf{J}_{\\mathbf{f}}^\\top\\, \\nabla g.$$
@@ -511,7 +509,17 @@ Reverse-mode autodiff just multiplies these Jacobian-transposes from the loss ba
 
 The **SVD** $$\\mathbf{A} = \\mathbf{U}\\boldsymbol{\\Sigma}\\mathbf{V}^\\top$$ always exists and reads as *rotate ($$\\mathbf{V}^\\top$$) → scale ($$\\boldsymbol{\\Sigma}$$) → rotate ($$\\mathbf{U}$$)*. Truncating to the top-$$k$$ singular values gives the best rank-$$k$$ approximation (**Eckart–Young**) — the math behind image/embedding compression.
 
-![SVD geometry (MML Fig 4.9)](/assets/figures/day01/mml_svd.png)
+**Why the SVD always exists (constructive proof).** Eigendecomposition needs a square (ideally symmetric) matrix, but the SVD works for *any* $$\\mathbf{A}\\in\\mathbb{R}^{m\\times n}$$. The trick is to apply the spectral theorem to the symmetric matrix $$\\mathbf{A}^\\top\\mathbf{A}$$. It is symmetric and **positive semidefinite**, since $$\\mathbf{x}^\\top(\\mathbf{A}^\\top\\mathbf{A})\\mathbf{x} = \\|\\mathbf{A}\\mathbf{x}\\|_2^2 \\geq 0$$, so it has orthonormal eigenvectors $$\\mathbf{v}_i$$ with **non-negative** eigenvalues $$\\lambda_i \\geq 0$$:
+
+$$\\mathbf{A}^\\top\\mathbf{A}\\,\\mathbf{v}_i = \\lambda_i\\mathbf{v}_i, \\qquad \\lambda_1 \\geq \\cdots \\geq \\lambda_r > 0 = \\lambda_{r+1} = \\cdots.$$
+
+Define the **singular values** $$\\sigma_i = \\sqrt{\\lambda_i}$$ and, for each nonzero one, the left vector $$\\mathbf{u}_i = \\tfrac{1}{\\sigma_i}\\mathbf{A}\\mathbf{v}_i$$. These $$\\mathbf{u}_i$$ are automatically orthonormal:
+
+$$\\mathbf{u}_i^\\top\\mathbf{u}_j = \\frac{1}{\\sigma_i\\sigma_j}\\mathbf{v}_i^\\top\\underbrace{\\mathbf{A}^\\top\\mathbf{A}}_{\\lambda_j\\mathbf{v}_j}\\mathbf{v}_j = \\frac{\\lambda_j}{\\sigma_i\\sigma_j}\\,\\mathbf{v}_i^\\top\\mathbf{v}_j = \\delta_{ij}.$$
+
+By construction $$\\mathbf{A}\\mathbf{v}_i = \\sigma_i\\mathbf{u}_i$$, which stacked over all $$i$$ reads $$\\mathbf{A}\\mathbf{V} = \\mathbf{U}\\boldsymbol{\\Sigma}$$; right-multiplying by $$\\mathbf{V}^\\top$$ (orthogonal, so $$\\mathbf{V}\\mathbf{V}^\\top=\\mathbf{I}$$) gives $$\\mathbf{A} = \\mathbf{U}\\boldsymbol{\\Sigma}\\mathbf{V}^\\top$$. The number of nonzero singular values is the **rank** $$r$$, and the squared singular values are the eigenvalues of $$\\mathbf{A}^\\top\\mathbf{A}$$ — the exact link to PCA below.
+
+![Geometry of the SVD: a unit sphere is rotated, axis-scaled by the singular values, then rotated again into an ellipse.](/assets/figures/day01/mml_svd.png)
 
 **PCA** is SVD applied to centered data: the principal directions are eigenvectors of the covariance $$\\mathbf{C} = \\frac{1}{n}\\mathbf{X}^\\top \\mathbf{X}$$, and the eigenvalues are the variance captured along each axis. At a critical point of a loss, the sign pattern of the Hessian's eigenvalues classifies it as a minimum, maximum, or **saddle** — the dominant feature of high-dimensional neural loss landscapes.""",
                 },
@@ -528,7 +536,7 @@ The **SVD** $$\\mathbf{A} = \\mathbf{U}\\boldsymbol{\\Sigma}\\mathbf{V}^\\top$$ 
                         "or **Monte Carlo** (high dimension): "
                         "$$\\mathbb{E}[f(X)] \\approx \\frac{1}{N}\\sum_{i=1}^N f(\\mathbf{x}^{(i)}).$$"
                     ),
-                    "body": """**Why this matters.** A huge fraction of ML quantities are integrals in disguise: a marginal likelihood $$p(\\mathbf{x}) = \\int p(\\mathbf{x}\\mid\\mathbf{z})p(\\mathbf{z})\\,d\\mathbf{z}$$, an expected reward, the normalizing constant of a posterior. The NeurIPS 2020 tutorial [*There and Back Again: A Tale of Slopes and Expectations*](https://mml-book.github.io/slopes-expectations.html) frames integration and differentiation as two directions on the same map — expectations require integration; learning requires differentiation.
+                    "body": """**Why this matters.** A huge fraction of ML quantities are integrals in disguise: a marginal likelihood $$p(\\mathbf{x}) = \\int p(\\mathbf{x}\\mid\\mathbf{z})p(\\mathbf{z})\\,d\\mathbf{z}$$, an expected reward, the normalizing constant of a posterior. It helps to see integration and differentiation as two directions on the same map — expectations require integration; learning requires differentiation.
 
 ![Slopes and expectations map](/assets/figures/day01/slopes_map.jpg)
 
@@ -538,9 +546,7 @@ The **SVD** $$\\mathbf{A} = \\mathbf{U}\\boldsymbol{\\Sigma}\\mathbf{V}^\\top$$ 
 $$\\mathbb{E}_p[f] \\approx \\hat\\mu_N = \\frac{1}{N}\\sum_{i=1}^N f(\\mathbf{x}^{(i)}), \\qquad \\mathrm{Var}(\\hat\\mu_N) = \\frac{\\mathrm{Var}(f)}{N}.$$
 So the standard error is $$O(1/\\sqrt{N})$$ **regardless of dimension** — the reason MC dominates high-dimensional Bayesian and variational computation. **Importance sampling** reweights samples from an easier proposal $$q$$: $$\\mathbb{E}_p[f] = \\mathbb{E}_q[f\\,p/q]$$.
 
-![Unscented transform / sigma points (Modern Integration Methods, Fig 8)](/assets/figures/day01/integ_unscented.png)
-
-See also the MML supplementary chapter [*Modern Integration Methods in ML*](https://mml-book.github.io/book/additional_chapters/integration-methods.pdf).""",
+![Unscented transform / sigma points](/assets/figures/day01/integ_unscented.png)""",
                 },
                 {
                     "heading": "Differentiation: autodiff, adjoints, and gradient estimators",
@@ -567,7 +573,7 @@ The **method of adjoints** (and Lagrange multipliers) applies the same idea to O
 
 **Differentiating through randomness.** To get $$\\nabla_{\\boldsymbol\\theta}\\mathbb{E}[f(\\mathbf{z})]$$ we use either the **score-function/REINFORCE** estimator $$\\mathbb{E}[f(\\mathbf{z})\\,\\nabla_{\\boldsymbol\\theta}\\log p_{\\boldsymbol\\theta}(\\mathbf{z})]$$, or the lower-variance **reparameterization** $$\\mathbf{z} = g(\\boldsymbol{\\epsilon}, \\boldsymbol{\\theta})$$ with $$\\boldsymbol\\epsilon$$ noise — central to VAEs (Day 6) and policy gradients.
 
-![Monte Carlo samples across a sequence of distributions (Modern Integration Methods, Fig 6)](/assets/figures/day01/integ_samples.png)""",
+![Monte Carlo samples across a sequence of distributions](/assets/figures/day01/integ_samples.png)""",
                 },
             ],
         },
@@ -598,7 +604,7 @@ Key **closure** properties (each keeps you inside the Gaussian family):
 
 **Worked example (the diffusion forward step).** If $$\\mathbf{x}_0$$ is data and $$\\boldsymbol\\epsilon \\sim \\mathcal{N}(\\mathbf{0},\\mathbf{I})$$, then $$\\mathbf{x}_t = \\sqrt{\\bar\\alpha_t}\\,\\mathbf{x}_0 + \\sqrt{1-\\bar\\alpha_t}\\,\\boldsymbol\\epsilon$$ is an affine map of a Gaussian, so $$\\mathbf{x}_t \\mid \\mathbf{x}_0 \\sim \\mathcal{N}(\\sqrt{\\bar\\alpha_t}\\,\\mathbf{x}_0,\\,(1-\\bar\\alpha_t)\\mathbf{I})$$ in closed form — this is exactly the trick that makes diffusion training cheap (Day 6).
 
-![Gaussian distribution (MML Fig 6.7)](/assets/figures/day01/mml_gaussian.png)
+![Gaussian distribution](/assets/figures/day01/mml_gaussian.png)
 
 The Gaussian is also the **maximum-entropy** distribution with fixed mean and covariance, and the limiting distribution of normalized sums (**CLT**) — two reasons it shows up "by default".""",
                 },
@@ -629,7 +635,7 @@ Against a standard normal ($$\\mu_2=0,\\sigma_2=1$$) this reduces to $$\\tfrac12
 Finally, Jensen's inequality yields the **evidence lower bound (ELBO)**:
 $$\\log p(\\mathbf{x}) \\geq \\mathbb{E}_{q(\\mathbf{z})}[\\log p(\\mathbf{x}\\mid\\mathbf{z})] - D_{\\mathrm{KL}}(q(\\mathbf{z})\\,\\|\\,p(\\mathbf{z})).$$
 
-![Conjugate prior example (MML Fig 6.11)](/assets/figures/day01/mml_conjugate.png)""",
+![Conjugate prior example](/assets/figures/day01/mml_conjugate.png)""",
                 },
             ],
         },
@@ -667,9 +673,7 @@ The same **matrix exponential** $$\\mathbf{x}(t) = e^{\\mathbf{A}t}\\mathbf{x}(0
 
 **Worked Euler step.** For $$\\dot x = x$$, $$x(0)=1$$, $$h=0.5$$: one Euler step gives $$x_1 = 1 + 0.5\\cdot 1 = 1.5$$, versus the exact $$e^{0.5}\\approx 1.649$$. Halving $$h$$ roughly halves the error — the hallmark of a first-order method.
 
-![ODE Figure A.1 — left: step-by-step solver updates; right: exact trajectories flowing along the velocity field](/assets/figures/day01/ode_vectorfield.png)
-
-Source: *Diffusion Book* Appendix A (crash course on differential equations), from p. 399.""",
+![Left: step-by-step solver updates; right: exact trajectories flowing along the velocity field](/assets/figures/day01/ode_vectorfield.png)""",
                 },
                 {
                     "heading": "SDEs and numerical simulation",

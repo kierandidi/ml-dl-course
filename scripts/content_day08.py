@@ -272,7 +272,7 @@ In practice this "plain" conditioning often **under-uses** the condition: sample
                         "score: $$\\nabla\\log p_t(\\boldsymbol{x}\\mid c) = \\nabla\\log p_t(\\boldsymbol{x}) "
                         "+ \\nabla\\log p_t(c\\mid\\boldsymbol{x}),$$ scaled by a guidance weight $$w$$."
                     ),
-                    "body": """![Guidance steers the sampling trajectory toward regions consistent with the condition (Principles Fig 8.1).](/assets/figures/day08/pdm_guidance.png)
+                    "body": """![Guidance steers the sampling trajectory toward regions consistent with the condition.](/assets/figures/day08/pdm_guidance.png)
 
 By Bayes' rule, the conditional score decomposes into the unconditional score plus the gradient of a classifier's log-likelihood. So if we train a classifier $$p_\\phi(c\\mid\\boldsymbol{x}_t)$$ **on noisy inputs** (it must operate at every noise level), we can steer an unconditional model:
 
@@ -288,7 +288,7 @@ The weight $$w$$ controls how hard we push toward the class. The drawbacks are p
                         "$$\\tilde{\\boldsymbol{\\epsilon}} = (1+w)\\,\\boldsymbol{\\epsilon}_\\theta(\\boldsymbol{x}_t,t,c) "
                         "- w\\,\\boldsymbol{\\epsilon}_\\theta(\\boldsymbol{x}_t,t,\\varnothing).$$"
                     ),
-                    "body": """![Classifier-free guidance interpolates/extrapolates between conditional and unconditional predictions to control fidelity (Principles Fig 8.2).](/assets/figures/day08/pdm_cfg.png)
+                    "body": """![Classifier-free guidance interpolates/extrapolates between conditional and unconditional predictions to control fidelity.](/assets/figures/day08/pdm_cfg.png)
 
 The trick is to avoid a separate classifier by noting that its gradient equals the *difference* of conditional and unconditional scores (next subsection). During training we replace $$c$$ with a null token $$\\varnothing$$ a fraction of the time, so one network learns both predictions. At sampling we extrapolate **away** from the unconditional prediction and **toward** the conditional one:
 
@@ -333,7 +333,7 @@ So CFG is not a heuristic — it is Bayes' rule plus a sharpening exponent, expr
                         "probability-flow ODE from $$t=T$$ to $$t=0$$. Each step evaluates the network "
                         "once — one **number of function evaluations (NFE)**."
                     ),
-                    "body": """![Sampling runs a reverse-time process from noise back to data; numerically, this is integrating a differential equation (Principles Fig 4.4).](/assets/figures/day08/pdm_reverse_sde.png)
+                    "body": """![Sampling runs a reverse-time process from noise back to data; numerically, this is integrating a differential equation.](/assets/figures/day08/pdm_reverse_sde.png)
 
 On Day 7 we derived two dynamics with the right marginals — the reverse SDE and the PF-ODE. Turning either into an algorithm means choosing a **time discretization** $$T=t_0>t_1>\\dots>t_N=0$$ and a **numerical scheme** to step between consecutive times. The cost is dominated by the number of network evaluations (NFEs), since the network (the score/denoiser) is by far the most expensive operation.
 
@@ -360,7 +360,7 @@ The last line is a **continuity (Liouville) equation** $$\\partial_t p_t = -\\na
 
 $$\\boxed{\\;\\frac{\\mathrm{d}\\boldsymbol{x}}{\\mathrm{d}t} = \\textcolor{orange}{\\tilde{\\boldsymbol{\\mu}}(\\boldsymbol{x},t)} = \\textcolor{teal}{\\boldsymbol{f}(\\boldsymbol{x},t)} - \\tfrac12\\, g(t)^2\\,\\textcolor{purple}{\\boldsymbol{s}(\\boldsymbol{x},t)}.\\;}$$
 
-Compare the **reverse SDE** drift $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$ (Day 7): identical marginals $$\\{p_t\\}$$, but only **half** the score coefficient and no noise. The difference is exactly the half of the diffusion that the ODE converted into deterministic transport. This is why DDIM (Euler on the PF-ODE) and DDPM (the reverse SDE) **share one trained** $$\\boldsymbol{s}_\\theta$$ — they are two solvers for the same family of densities. Step-by-step algebra and the rigorous statement: optional block below ([SDE course §4](https://kierandidi.github.io/), Principles D.2.6).""",
+Compare the **reverse SDE** drift $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$ (Day 7): identical marginals $$\\{p_t\\}$$, but only **half** the score coefficient and no noise. The difference is exactly the half of the diffusion that the ODE converted into deterministic transport. This is why DDIM (Euler on the PF-ODE) and DDPM (the reverse SDE) **share one trained** $$\\boldsymbol{s}_\\theta$$ — they are two solvers for the same family of densities. Step-by-step algebra and the rigorous statement are in the optional block below.""",
                     "optional": DAY08_OPTIONAL,
                 },
                 {
@@ -370,7 +370,7 @@ Compare the **reverse SDE** drift $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$ (Day 7)
                         "the probability-flow ODE. It is non-Markovian, so it can take large steps with the "
                         "*same* trained model."
                     ),
-                    "body": """![DDIM is exactly the Euler discretization of the probability-flow ODE (Principles Fig 9.1).](/assets/figures/day08/pdm_ddim_euler.png)
+                    "body": """![DDIM is exactly the Euler discretization of the probability-flow ODE.](/assets/figures/day08/pdm_ddim_euler.png)
 
 Euler's method (Day 1) approximates $$\\boldsymbol{x}(s)\\approx\\boldsymbol{x}(t) + (s-t)\\,\\dot{\\boldsymbol{x}}(t)$$ using the slope at the start of the step. Applied to the PF-ODE $$\\dot{\\boldsymbol{x}} = \\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}_\\theta$$ it reproduces the **DDIM update** exactly. The cleanest way to see this uses the denoiser identity $$\\boldsymbol{x}_t=\\alpha_t\\hat{\\boldsymbol{x}}_0+\\sigma_t\\boldsymbol{\\epsilon}_\\theta$$: a single Euler step is equivalent to **freezing** the prediction $$(\\hat{\\boldsymbol{x}}_0,\\boldsymbol{\\epsilon}_\\theta)$$ at $$t$$ and re-evaluating the forward rule at the next time $$s<t$$,
 
@@ -395,7 +395,7 @@ DDIM is **first-order**: its local error per step is $$O(\\Delta t^2)$$, which i
                         "numerical approximation. It shrinks as steps increase and grows with trajectory "
                         "curvature, accumulating along the path."
                     ),
-                    "body": """![Sampling a 2-D distribution with the Score SDE; too few steps leaves visible structure errors (Principles Fig 4.7).](/assets/figures/day08/pdm_score_sde_2d.png)
+                    "body": """![Sampling a 2-D distribution with the Score SDE; too few steps leaves visible structure errors.](/assets/figures/day08/pdm_score_sde_2d.png)
 
 Two sources of error compound. **Local** error is made at each step (for Euler, $$O(\\Delta t^2)$$ per step, $$O(\\Delta t)$$ globally); it shrinks as we add steps. But more steps mean more NFEs — the very cost we want to avoid. **Curvature** is the other factor: the more the trajectory bends, the worse a straight-line (Euler) step approximates it.
 
@@ -432,7 +432,7 @@ A useful hybrid (EDM's "churn") runs an ODE solver but injects a controlled amou
                         "evaluate the slope at the predicted endpoint, and step again with the **average** "
                         "of the two slopes. Local error drops to $$O(\\Delta t^3)$$."
                     ),
-                    "body": """![A higher-order (Heun) solver stepped in log-SNR time tracks the trajectory far more accurately than Euler (Principles Fig 9.3).](/assets/figures/day08/pdm_heun_logsnr.png)
+                    "body": """![A higher-order (Heun) solver stepped in log-SNR time tracks the trajectory far more accurately than Euler.](/assets/figures/day08/pdm_heun_logsnr.png)
 
 Euler uses only the slope at the start of the interval, so it consistently misses the bend of a curved trajectory. Heun corrects this:
 
@@ -461,7 +461,7 @@ EDM expresses the same insight through a carefully designed $$\\sigma$$ (noise-l
                         "term. **Exponential integrators** solve the linear part *exactly* (via an "
                         "integrating factor) and only approximate the smooth nonlinear part."
                     ),
-                    "body": """![Multistep exponential integrators (DEIS) reuse previous evaluations to achieve high order at low cost (Principles Fig 9.2).](/assets/figures/day08/pdm_deis.png)
+                    "body": """![Multistep exponential integrators (DEIS) reuse previous evaluations to achieve high order at low cost.](/assets/figures/day08/pdm_deis.png)
 
 The diffusion ODE has a **semilinear** form — a linear term in $$\\boldsymbol{x}$$ plus a term involving the network:
 
@@ -505,7 +505,7 @@ The shift in thinking is from *integration* to *amortization*: instead of repeat
                         "at time $$t$$ in a single learned evaluation: "
                         "$$\\boldsymbol{x}_t = \\Phi_{s\\to t}(\\boldsymbol{x}_s).$$"
                     ),
-                    "body": """![A flow map integrates the probability-flow ODE between two times in one step, rather than many small Euler steps (Principles Fig 11.2).](/assets/figures/day08/pdm_flowmap.png)
+                    "body": """![A flow map integrates the probability-flow ODE between two times in one step, rather than many small Euler steps.](/assets/figures/day08/pdm_flowmap.png)
 
 The PF-ODE defines, for any pair of times $$(s,t)$$, an exact map taking $$\\boldsymbol{x}_s$$ to $$\\boldsymbol{x}_t$$ — the solution operator of the ODE. A numerical solver approximates this map by chaining many tiny steps; a **flow map** $$\\Phi_{s\\to t}$$ *learns it directly* so it can be applied in one shot. The special case $$\\Phi_{T\\to 0}$$ is a **one-step generator**: noise in, sample out. The remaining questions are how to parameterize $$\\Phi$$ consistently across times and how to train it without simply storing a teacher's whole trajectory — answered by the semigroup/consistency structure. Compare flow-map model families:
 
@@ -519,7 +519,7 @@ The PF-ODE defines, for any pair of times $$(s,t)$$, an exact map taking $$\\bol
                         "$$\\Phi_{s\\to t} = \\Phi_{u\\to t}\\circ\\Phi_{s\\to u}$$ underlies self-consistent "
                         "training."
                     ),
-                    "body": """![The semigroup (consistency) property: composing partial jumps must equal the full jump (Principles Fig 11.3).](/assets/figures/day08/pdm_flowmap_semigroup.png)
+                    "body": """![The semigroup (consistency) property: composing partial jumps must equal the full jump.](/assets/figures/day08/pdm_flowmap_semigroup.png)
 
 Because the flow map is the solution operator of a deterministic ODE, it must satisfy
 
@@ -534,7 +534,7 @@ and in particular all points on a single ODE trajectory map to the **same** clea
                         "\\boldsymbol{x}_0$$ that is consistent along trajectories, enabling one- or few-step "
                         "generation. **Distillation** alternatively matches a multi-step teacher."
                     ),
-                    "body": """![The flow-map timeline: a learned map jumps directly toward the data manifold, collapsing many steps into a few (Principles Fig 11.1).](/assets/figures/day08/pdm_flowmap_timeline.png)
+                    "body": """![The flow-map timeline: a learned map jumps directly toward the data manifold, collapsing many steps into a few.](/assets/figures/day08/pdm_flowmap_timeline.png)
 
 Two routes to a fast student:
 

@@ -262,7 +262,7 @@ LECTURE = {
     "day": 9,
     "slug": "autoregressive-llms",
     "title": "Autoregressive Language Models",
-    "description": "Returning to the autoregressive family from Day 6: build and train a decoder-only Transformer language model, from tokens to logits, following Gordić, a Beyer-style sequence, and nanoGPT.",
+    "description": "Returning to the autoregressive family from Day 6: build and train a decoder-only Transformer language model, from tokens to logits, with nanoGPT as the concrete codebase.",
     "reading": [
         "[Aleksa Gordić — Inside the Transformer (the life of a token)](https://www.aleksagordic.com/blog/transformer)",
         "[Andrej Karpathy — nanoGPT (README + model.py)](https://github.com/karpathy/nanoGPT)",
@@ -277,12 +277,12 @@ LECTURE = {
         "the diffusion/score/flow world because it dominates image and audio generation. Today "
         "we return to autoregressive modeling, because large language models are where it *is* "
         "the main story. We take the Transformer block built on Day 5 and turn it into a "
-        "production **decoder-only** language model, following the 'life of a token' from raw "
+        "production **decoder-only** language model, tracing a token from raw "
         "text to a trained next-token predictor. We tokenize text, look up embeddings, walk "
         "through every submodule of a modern pre-norm block (RMSNorm, causal multi-head and "
         "grouped-query attention, rotary position embeddings, a gated MLP), stack it into a "
         "full GPT forward pass, and train it with next-token cross-entropy. Throughout, "
-        "[Karpathy's nanoGPT](https://github.com/karpathy/nanoGPT) is the concrete codebase we "
+        "[nanoGPT](https://github.com/karpathy/nanoGPT) is the concrete codebase we "
         "trace, and the practical has you build and train one yourself. Day 10 then covers how "
         "this base model is served efficiently and turned into a chat assistant."
     ),
@@ -298,7 +298,7 @@ LECTURE = {
                         "$$p(x) = \\prod_{t=1}^{T} p(x_t \\mid x_{<t}),$$ and is trained by exact "
                         "maximum likelihood — the *exact* likelihood-based corner of the Day 6 taxonomy."
                     ),
-                    "body": """![The Day 6 map of deep generative models: a shared goal (turn a simple reference distribution into $$p_{\\text{data}}$$) reached by different families. Autoregressive models sit in the exact-likelihood corner; diffusion in the bounded-likelihood corner (Principles Fig 1.2).](/assets/figures/day06/pdm_dgm_zoo.png)
+                    "body": """![The Day 6 map of deep generative models: a shared goal (turn a simple reference distribution into $$p_{\\text{data}}$$) reached by different families. Autoregressive models sit in the exact-likelihood corner; diffusion in the bounded-likelihood corner.](/assets/figures/day06/pdm_dgm_zoo.png)
 
 On **Day 6** we established a single goal shared by every deep generative model: transform a simple reference distribution (noise) into the data distribution $$p_{\\text{data}}$$. We then sorted the major families:
 
@@ -337,7 +337,7 @@ A useful through-line for the rest of Week 2: diffusion fought the cost of *many
                         "**all** the conditionals $$p(x_t\\mid x_{<t})$$ of a sequence in a single "
                         "parallel forward pass."
                     ),
-                    "body": """![After Transformers, one architecture family — scaled with data and compute — replaced the per-task zoo of older NLP systems (Beyer-style deck).](/assets/figures/day09/llmks_paradigm.png)
+                    "body": """![After Transformers, one architecture family — scaled with data and compute — replaced the per-task zoo of older NLP systems.](/assets/figures/day09/llmks_paradigm.png)
 
 The chain rule (Day 5) is exact and fully general:
 
@@ -403,9 +403,9 @@ Position must be injected too. The classic approach (Day 5) adds a learned or si
                         "$$h' = h + \\mathrm{MHA}(\\mathrm{LN}(h)),\\qquad "
                         "h'' = h' + \\mathrm{MLP}(\\mathrm{LN}(h')).$$"
                     ),
-                    "body": """![A residual (skip) connection wraps each sublayer so gradients flow cleanly through a deep stack (Beyer-style deck).](/assets/figures/day09/llmks_residual.png)
+                    "body": """![A residual (skip) connection wraps each sublayer so gradients flow cleanly through a deep stack.](/assets/figures/day09/llmks_residual.png)
 
-Following Gordić, we teach the block from the outside in. The skeleton is two **pre-norm residual** sublayers: first multi-head attention, then a position-wise MLP, each wrapped as $$h \\leftarrow h + \\mathrm{sublayer}(\\mathrm{LN}(h))$$. Two design choices distinguish this from the original (post-norm) Transformer of Day 5:
+We teach the block from the outside in. The skeleton is two **pre-norm residual** sublayers: first multi-head attention, then a position-wise MLP, each wrapped as $$h \\leftarrow h + \\mathrm{sublayer}(\\mathrm{LN}(h))$$. Two design choices distinguish this from the original (post-norm) Transformer of Day 5:
 
 - **Pre-norm.** Normalizing the *input* to each sublayer (rather than the output) gives a clean residual highway from input to output, which makes very deep stacks trainable without delicate learning-rate warmup tricks. Almost all modern LLMs are pre-norm.
 - **Residual highway.** As on Day 4 (ResNet), the identity path means each sublayer only has to learn a *correction*, and gradients reach early layers undiminished.
@@ -433,7 +433,7 @@ Empirically the centering step contributes little, so RMSNorm matches LayerNorm'
                         "$$A=\\mathrm{softmax}\\!\\big(QK^\\top/\\sqrt{d_k}\\big)$$ and a mask that zeroes "
                         "$$A_{ij}$$ for $$j>i$$."
                     ),
-                    "body": """![Attention as a soft dictionary lookup: a query is matched against keys to produce weights, which retrieve a blend of values (Beyer-style deck).](/assets/figures/day09/llmks_attention_dict.png)
+                    "body": """![Attention as a soft dictionary lookup: a query is matched against keys to produce weights, which retrieve a blend of values.](/assets/figures/day09/llmks_attention_dict.png)
 
 This is the Day 5 mechanism, now made strictly causal. Project each token vector into a **query**, **key**, and **value**:
 
@@ -450,7 +450,7 @@ For autoregressive modeling we add a **causal mask**: before the softmax, set th
                         "separate projections and concatenates them. **Grouped-query attention (GQA)** "
                         "lets several query heads **share** one key/value head, shrinking the KV cache."
                     ),
-                    "body": """![Multi-head attention: several heads attend in parallel, each capturing a different relation, then are concatenated and projected (Beyer-style deck).](/assets/figures/day09/llmks_mha.png)
+                    "body": """![Multi-head attention: several heads attend in parallel, each capturing a different relation, then are concatenated and projected.](/assets/figures/day09/llmks_mha.png)
 
 One attention map is a bottleneck — tokens can be related in many ways at once (syntax, coreference, topic). **Multi-head attention** runs $$H$$ heads in parallel, each with its own $$W_{Q,h},W_{K,h},W_{V,h}$$ projecting into a $$d/H$$-dimensional subspace, then concatenates the head outputs and mixes them with an output projection $$W_O$$. Each head is a separate "relevance map," directly analogous to multiple convolution filters in a CNN (Day 4).
 
@@ -464,9 +464,15 @@ A scaling refinement matters for Day 10. In standard multi-head attention every 
                         "score between positions $$m$$ and $$n$$ depends only on the **relative** offset "
                         "$$m-n$$."
                     ),
-                    "body": """![Rotary embeddings rotate queries and keys by a position-dependent angle, injecting *relative* position directly into the attention dot product (Su et al., 2021).](/assets/figures/day09/llmks_rope.png)
+                    "body": """![Rotary embeddings rotate queries and keys by a position-dependent angle, injecting *relative* position directly into the attention dot product.](/assets/figures/day09/llmks_rope.png)
 
-Instead of *adding* a position vector to the input (Day 5), RoPE *rotates* the query and key vectors. Split each into 2D pairs and rotate the pair at index $$k$$ by an angle $$m\\theta_k$$ that scales with position $$m$$ (with frequencies $$\\theta_k$$ decreasing across dimensions). Because a dot product of two rotated vectors depends on the difference of their rotation angles, the resulting attention logit between positions $$m$$ and $$n$$ depends only on the **relative** offset $$m-n$$:
+Instead of *adding* a position vector to the input (Day 5), RoPE *rotates* the query and key vectors. Split each into 2D pairs and rotate the pair at index $$k$$ by an angle $$m\\theta_k$$ that scales with position $$m$$ (with frequencies $$\\theta_k$$ decreasing across dimensions).
+
+**Why the relative offset is all that survives.** Take a single 2D pair and let $$R_\\phi$$ be the rotation by angle $$\\phi$$. A rotation is orthogonal and rotations compose additively, $$R_m^\\top R_n = R_{n-m}$$, so the attention score between a query at position $$m$$ and a key at position $$n$$ is
+
+$$\\langle R_{m\\theta}\\,q,\\; R_{n\\theta}\\,k\\rangle = (R_{m\\theta}q)^\\top (R_{n\\theta}k) = q^\\top \\underbrace{R_{m\\theta}^\\top R_{n\\theta}}_{=\\,R_{(n-m)\\theta}}\\,k = q^\\top R_{(n-m)\\theta}\\,k.$$
+
+The absolute positions $$m$$ and $$n$$ have cancelled: the logit depends only on the **relative** offset $$m-n$$,
 
 $$\\langle R_m q,\\; R_n k\\rangle = g(q,k,\\,m-n).$$
 
@@ -479,7 +485,7 @@ This has two big advantages: there is no learned position table to size in advan
                         "independently. Modern variants are **gated**: "
                         "$$\\mathrm{MLP}(x) = W_2\\big(\\mathrm{GELU}(W_0 x)\\odot (W_1 x)\\big).$$"
                     ),
-                    "body": """![Most of the parameters and compute live in the position-wise feed-forward network applied to every token (Beyer-style deck).](/assets/figures/day09/llmks_ffn.png)
+                    "body": """![Most of the parameters and compute live in the position-wise feed-forward network applied to every token.](/assets/figures/day09/llmks_ffn.png)
 
 After attention mixes information *across* the sequence, the MLP refines each token's vector *independently* — the same MLP weights at every position. The classic form expands to a wide hidden layer and contracts back:
 
@@ -498,7 +504,7 @@ usually with a hidden width near $$\\tfrac{8}{3}d$$ to keep the parameter count 
                         "final norm and a linear **`lm_head`** that maps each hidden vector to "
                         "$$V$$ logits, turned into a next-token distribution by softmax."
                     ),
-                    "body": """![The Transformer block, stacked $$N\\times$$ with embeddings and positions, produces context-aware representations that feed the output head (Beyer-style deck).](/assets/figures/day09/llmks_architecture.png)
+                    "body": """![The Transformer block, stacked $$N\\times$$ with embeddings and positions, produces context-aware representations that feed the output head.](/assets/figures/day09/llmks_architecture.png)
 
 Put the pieces together. Token ids are embedded into $$X^{(0)}\\in\\mathbb{R}^{T\\times d}$$; then $$L$$ blocks each apply causal multi-head attention and a gated MLP through pre-norm residuals:
 
@@ -519,13 +525,23 @@ A final RMSNorm precedes the output head $$\\mathrm{logits} = h^{(L)} W_{\\text{
                         "forcing** (ground-truth context) and labels equal to the inputs shifted by one. "
                         "**Perplexity** is $$\\exp(\\mathcal{L})$$."
                     ),
-                    "body": """![Training computes a next-token distribution at every position and compares it, via cross-entropy, to the shifted targets (Beyer-style deck).](/assets/figures/day09/llmks_training.png)
+                    "body": """![Training computes a next-token distribution at every position and compares it, via cross-entropy, to the shifted targets.](/assets/figures/day09/llmks_training.png)
 
-Because the model emits a distribution at *every* position in one pass, training is wonderfully simple. Take a block of tokens $$x_{1:T}$$, run the forward pass, and compare the predicted distribution at position $$i$$ to the actual next token $$x_{i+1}$$ with cross-entropy:
+**Maximum likelihood is cross-entropy is perplexity.** These three names describe the same objective. Maximum likelihood maximizes $$\\log p_\\theta(x_{1:T})$$; applying the autoregressive chain rule turns the joint into a sum, so the negative log-likelihood *is* a sum of per-token cross-entropies:
 
-$$\\mathcal{L} = -\\frac{1}{T}\\sum_{i=1}^{T} \\log p_\\theta(x_{i+1}\\mid x_{\\le i}).$$
+$$\\begin{aligned}
+-\\log p_\\theta(x_{1:T})
+&= -\\log \\prod_{i=1}^{T} p_\\theta(x_{i+1}\\mid x_{\\le i})
+= \\sum_{i=1}^{T} \\underbrace{\\big(-\\log p_\\theta(x_{i+1}\\mid x_{\\le i})\\big)}_{\\textcolor{teal}{\\text{cross-entropy at position } i}}.
+\\end{aligned}$$
 
-Two standard pieces of vocabulary: **teacher forcing** means we always condition on the *ground-truth* prefix during training (not the model's own guesses), which makes the loss above an exact maximum-likelihood objective and lets every position train in parallel. Implementation-wise, the labels are just the inputs **shifted by one position**. We monitor **perplexity** $$=\\exp(\\mathcal{L})$$, the effective branching factor of the predictor; lower is better. (The mismatch between teacher-forced training and free-running generation, *exposure bias*, is a Day 10 topic.)""",
+Averaging over positions gives the training loss, which is the cross-entropy between the data and the model and is minimized exactly when $$p_\\theta$$ matches the data's conditional distribution (its floor is the data's own entropy):
+
+$$\\mathcal{L} = -\\frac{1}{T}\\sum_{i=1}^{T} \\log p_\\theta(x_{i+1}\\mid x_{\\le i}) = \\mathbb{E}\\big[H(\\text{data},\\,p_\\theta)\\big] \\;\\ge\\; H(\\text{data}).$$
+
+Exponentiating turns nats into an interpretable count: **perplexity** $$=\\exp(\\mathcal{L})$$ is the *effective branching factor* — a perplexity of $$20$$ means the model is, on average, as uncertain as a uniform choice among 20 tokens.
+
+Because the model emits a distribution at *every* position in one pass, training is wonderfully simple. Take a block of tokens $$x_{1:T}$$, run the forward pass, and compare the predicted distribution at position $$i$$ to the actual next token $$x_{i+1}$$ with the cross-entropy above. Two standard pieces of vocabulary: **teacher forcing** means we always condition on the *ground-truth* prefix during training (not the model's own guesses), which makes the loss above an exact maximum-likelihood objective and lets every position train in parallel. Implementation-wise, the labels are just the inputs **shifted by one position**. We monitor **perplexity** $$=\\exp(\\mathcal{L})$$, the effective branching factor of the predictor; lower is better. (The mismatch between teacher-forced training and free-running generation, *exposure bias*, is a Day 10 topic.)""",
                 },
                 {
                     "heading": "The optimization stack",
@@ -568,7 +584,7 @@ These two estimates let you reason about model and dataset sizing *before* launc
                         "four files map cleanly onto the concepts above: `model.py` (architecture), "
                         "`train.py` (the loop), `config` (hyperparameters), and `sample.py` (generation)."
                     ),
-                    "body": """![A decoder generating with masked self-attention — the structure nanoGPT's `CausalSelfAttention` implements (Beyer-style deck).](/assets/figures/day09/llmks_decoder_masked.png)
+                    "body": """![A decoder generating with masked self-attention — the structure nanoGPT's `CausalSelfAttention` implements.](/assets/figures/day09/llmks_decoder_masked.png)
 
 Everything in this lecture is concretely realized in [nanoGPT](https://github.com/karpathy/nanoGPT). The file-to-concept map:
 
