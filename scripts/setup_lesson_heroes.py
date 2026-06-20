@@ -28,8 +28,8 @@ HERO_SOURCES: dict[int, tuple[str, tuple[float, float, float, float]]] = {
     6:  ("day06/pdm_ddpm_overview.png",    (0.08, 0.05, 0.94, 0.46)),  # DDPM forward/reverse chain
     7:  ("day07/pdm_score_field.png",      (0.02, 0.00, 0.99, 0.86)),  # score vector field
     8:  ("day08/pdm_cfg.png",              (0.00, 0.02, 1.00, 0.72)),  # classifier-free guidance
-    9:  ("day09/llmks_attention_dict.png", (0.05, 0.24, 0.97, 0.76)),  # attention as a soft dictionary lookup
-    10: ("day10/llmks_kvcache.png",        (0.02, 0.24, 0.98, 0.93)),  # KV cache
+    9:  ("day09/llmks_attention_dict.png", (0.03, 0.15, 0.98, 0.72)),  # attention as a soft dictionary lookup
+    10: ("day10/llmks_topk_topp.png",      (0.33, 0.655, 0.58, 0.98)),  # top-k / top-p sampling: probability bars
 }
 
 

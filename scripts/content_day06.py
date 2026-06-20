@@ -390,9 +390,15 @@ The two ELBO terms have clean interpretations: the first is a **reconstruction**
 
 $$\\nabla_\\phi\\, \\mathbb{E}_{q_\\phi}[f(\\boldsymbol{z})] = \\mathbb{E}_{\\boldsymbol{\\epsilon}}\\big[\\nabla_\\phi\\, f(\\boldsymbol{\\mu}_\\phi + \\boldsymbol{\\sigma}_\\phi \\odot \\boldsymbol{\\epsilon})\\big],$$
 
-a low-variance, pathwise estimator (Day 1's "reparameterization gradient"). For Gaussian $$q$$ and $$p$$, the KL term is available in **closed form**:
+a low-variance, pathwise estimator (Day 1's "reparameterization gradient"). For Gaussian $$q$$ and $$p$$ the KL term is available in **closed form**. Taking $$q=\\mathcal{N}(\\boldsymbol{\\mu},\\mathrm{diag}\\,\\boldsymbol{\\sigma}^2)$$ and $$p=\\mathcal{N}(\\mathbf{0},\\mathbf{I})$$ (so the dimensions decouple), write the KL as an expectation of the log-ratio of densities and use $$\\mathbb{E}_q[(z_i-\\mu_i)^2]=\\sigma_i^2$$, $$\\mathbb{E}_q[z_i^2]=\\mu_i^2+\\sigma_i^2$$:
 
-$$D_{\\mathrm{KL}}\\big(\\mathcal{N}(\\boldsymbol{\\mu},\\mathrm{diag}\\,\\boldsymbol{\\sigma}^2)\\,\\|\\,\\mathcal{N}(\\mathbf{0},\\mathbf{I})\\big) = \\tfrac{1}{2}\\sum_i \\big(\\mu_i^2 + \\sigma_i^2 - 1 - \\log \\sigma_i^2\\big).$$
+$$\\begin{aligned}
+D_{\\mathrm{KL}}\\big(q\\,\\|\\,p\\big)
+&= \\mathbb{E}_{q}\\!\\big[\\log q(\\boldsymbol{z}) - \\log p(\\boldsymbol{z})\\big] \\\\
+&= \\sum_i \\mathbb{E}_{q}\\!\\Big[\\,\\underbrace{-\\tfrac12\\log(2\\pi\\sigma_i^2) - \\tfrac{(z_i-\\mu_i)^2}{2\\sigma_i^2}}_{\\textcolor{teal}{\\log q}} \\;+\\; \\underbrace{\\tfrac12\\log(2\\pi) + \\tfrac{z_i^2}{2}}_{\\textcolor{purple}{-\\log p}}\\Big] \\\\
+&= \\sum_i \\Big(-\\tfrac12\\log\\sigma_i^2 - \\tfrac12 + \\tfrac12(\\mu_i^2+\\sigma_i^2)\\Big)
+= \\tfrac{1}{2}\\sum_i \\big(\\mu_i^2 + \\sigma_i^2 - 1 - \\log \\sigma_i^2\\big).
+\\end{aligned}$$
 
 **Key idea for diffusion.** A DDPM is what you get if you (i) replace the single latent by a long chain $$\\boldsymbol{x}_1,\\dots,\\boldsymbol{x}_T$$, (ii) **fix** the encoder to a simple Gaussian noising process instead of learning it, and (iii) learn only the decoder (the reverse/denoising steps). Everything below is the ELBO of that hierarchy.""",
                 },
@@ -557,9 +563,20 @@ Because both arguments of each $$L_{t-1}$$ are Gaussians with the **same** covar
 
 $$L_{t-1} \\overset{c}{=} \\frac{1}{2\\tilde\\beta_t}\\,\\big\\|\\tilde{\\boldsymbol{\\mu}}_t(\\boldsymbol{x}_t,\\boldsymbol{x}_0) - \\boldsymbol{\\mu}_\\theta(\\boldsymbol{x}_t,t)\\big\\|^2.$$
 
-Now substitute the two noise-prediction means from the previous section. The prefactors $$\\tfrac{1}{\\sqrt{a_t}}$$ and $$\\boldsymbol{x}_t$$ **cancel**, leaving a difference of noises:
+Now substitute the two noise-prediction means. The target mean comes from putting the *true* noise $$\\boldsymbol{\\epsilon}$$ (via $$\\boldsymbol{x}_0=(\\boldsymbol{x}_t-\\sqrt{1-\\bar\\alpha_t}\\,\\boldsymbol{\\epsilon})/\\sqrt{\\bar\\alpha_t}$$) into $$\\tilde{\\boldsymbol{\\mu}}_t$$, and the model mean uses $$\\boldsymbol{\\epsilon}_\\theta$$; both have the **same** $$\\tfrac{1}{\\sqrt{a_t}}\\boldsymbol{x}_t$$ piece:
 
-$$L_{t-1} \\overset{c}{=} \\textcolor{purple}{\\frac{\\beta_t^2}{2\\tilde\\beta_t\\, a_t\\,(1-\\bar\\alpha_t)}}\\,\\big\\|\\boldsymbol{\\epsilon} - \\boldsymbol{\\epsilon}_\\theta(\\boldsymbol{x}_t,t)\\big\\|^2,\\qquad \\boldsymbol{x}_t = \\sqrt{\\bar\\alpha_t}\\,\\boldsymbol{x}_0 + \\sqrt{1-\\bar\\alpha_t}\\,\\boldsymbol{\\epsilon}.$$""",
+$$\\tilde{\\boldsymbol{\\mu}}_t = \\tfrac{1}{\\sqrt{a_t}}\\Big(\\boldsymbol{x}_t - \\tfrac{\\beta_t}{\\sqrt{1-\\bar\\alpha_t}}\\,\\textcolor{teal}{\\boldsymbol{\\epsilon}}\\Big), \\qquad \\boldsymbol{\\mu}_\\theta = \\tfrac{1}{\\sqrt{a_t}}\\Big(\\boldsymbol{x}_t - \\tfrac{\\beta_t}{\\sqrt{1-\\bar\\alpha_t}}\\,\\textcolor{purple}{\\boldsymbol{\\epsilon}_\\theta}\\Big).$$
+
+Subtracting, the $$\\tfrac{1}{\\sqrt{a_t}}\\boldsymbol{x}_t$$ terms **cancel** and only the noises survive:
+
+$$\\begin{aligned}
+\\tilde{\\boldsymbol{\\mu}}_t - \\boldsymbol{\\mu}_\\theta
+&= \\frac{\\beta_t}{\\sqrt{a_t}\\,\\sqrt{1-\\bar\\alpha_t}}\\,\\big(\\textcolor{purple}{\\boldsymbol{\\epsilon}_\\theta} - \\textcolor{teal}{\\boldsymbol{\\epsilon}}\\big), \\\\
+L_{t-1} = \\frac{1}{2\\tilde\\beta_t}\\big\\|\\tilde{\\boldsymbol{\\mu}}_t - \\boldsymbol{\\mu}_\\theta\\big\\|^2
+&\\overset{c}{=} \\textcolor{purple}{\\frac{\\beta_t^2}{2\\tilde\\beta_t\\, a_t\\,(1-\\bar\\alpha_t)}}\\,\\big\\|\\boldsymbol{\\epsilon} - \\boldsymbol{\\epsilon}_\\theta(\\boldsymbol{x}_t,t)\\big\\|^2,
+\\end{aligned}$$
+
+with $$\\boldsymbol{x}_t = \\sqrt{\\bar\\alpha_t}\\,\\boldsymbol{x}_0 + \\sqrt{1-\\bar\\alpha_t}\\,\\boldsymbol{\\epsilon}$$.""",
                 },
                 {
                     "heading": "The simple objective and ancestral sampling",

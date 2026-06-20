@@ -2,11 +2,6 @@
 layout: post
 title: Day 4 - Convolutional Neural Networks
 image: /assets/img/lessons/day04.png
-accent_image: 
-  background: url('/assets/img/lessons/day04.png') center/cover
-  overlay: false
-accent_color: '#ccc'
-theme_color: '#ccc'
 description: >
   Locality, weight sharing, and hierarchy: the convolution operation, classic architectures, and dense prediction.
 invert_sidebar: true

@@ -2,11 +2,6 @@
 layout: post
 title: Day 3 - Deep Neural Networks
 image: /assets/img/lessons/day03.png
-accent_image: 
-  background: url('/assets/img/lessons/day03.png') center/cover
-  overlay: false
-accent_color: '#ccc'
-theme_color: '#ccc'
 description: >
   Multilayer perceptrons, backpropagation, and the optimization and regularization that make them learn.
 invert_sidebar: true

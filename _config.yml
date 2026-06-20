@@ -338,6 +338,8 @@ exclude:
   - slides
   - scripts
   - .venv
+  - material           # raw source material + nested site copies (their _posts pollute site.posts)
+  - solutions          # answer-key notebooks (local only; never published)
   # notebooks/ is published as static files (see include) for download links
 include:
   - .well-known

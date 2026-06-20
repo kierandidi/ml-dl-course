@@ -237,7 +237,7 @@ LECTURE = {
         "[Song et al. — Denoising Diffusion Implicit Models (DDIM, 2021)](https://arxiv.org/abs/2010.02502)",
         "[Karras et al. — Elucidating the Design Space of Diffusion Models (EDM, 2022)](https://arxiv.org/abs/2206.00364)",
         "[Song et al. — Consistency Models (2023)](https://arxiv.org/abs/2303.01469)",
-        "[SDE course — Lesson 2 §4: PF-ODE derivation from the FPE](/material/sde-course/) (local notes)",
+        "[SDE course — Lesson 2 §4: PF-ODE derivation from the FPE](https://kierandidi.github.io/) (Generative Modelling with SDEs)",
     ],
     "intro": (
         "Days 6–7 built diffusion models and showed that sampling means running a learned dynamics "
@@ -346,13 +346,21 @@ This reframing is liberating: the quality–speed trade-off becomes a classic **
                         "for an ODE with drift $$\\tilde{\\boldsymbol{\\mu}} = \\boldsymbol{f} - \\tfrac12 g^2\\boldsymbol{s}$$ "
                         "— the probability-flow ODE, sharing marginals with the forward/reverse SDE."
                     ),
-                    "body": """The forward SDE $$\\mathrm{d}\\boldsymbol{x}=\\boldsymbol{f}\\,\\mathrm{d}t+g\\,\\mathrm{d}\\boldsymbol{w}$$ evolves $$p_t$$ by the Fokker–Planck equation. Applying the **log-derivative trick** $$\\nabla p_t=p_t\\boldsymbol{s}$$ and factoring $$p_t$$ outside the divergence gives
+                    "body": """The forward SDE $$\\mathrm{d}\\boldsymbol{x}=\\boldsymbol{f}\\,\\mathrm{d}t+g\\,\\mathrm{d}\\boldsymbol{w}$$ evolves its density $$p_t$$ by the **Fokker–Planck equation (FPE)**. The goal is to find a *deterministic* ODE that pushes the **same** $$p_t$$. The whole derivation is one rewrite of the diffusion term, using the **log-derivative trick** $$\\nabla p_t=p_t\\boldsymbol{s}$$ with $$\\boldsymbol{s}=\\nabla\\log p_t$$:
 
-$$\\partial_t p_t = -\\nabla\\cdot\\Big(p_t\\,\\big(\\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}\\big)\\Big),$$
+$$\\begin{aligned}
+\\partial_t p_t
+&= -\\nabla\\cdot\\big(\\textcolor{teal}{\\boldsymbol{f}}\\,p_t\\big) + \\tfrac12 g^2\\,\\Delta p_t & &\\text{(Fokker–Planck)} \\\\
+&= -\\nabla\\cdot\\big(\\textcolor{teal}{\\boldsymbol{f}}\\,p_t\\big) + \\tfrac12 g^2\\,\\nabla\\cdot\\big(\\nabla p_t\\big) & &\\big(\\Delta = \\nabla\\cdot\\nabla\\big) \\\\
+&= -\\nabla\\cdot\\big(\\textcolor{teal}{\\boldsymbol{f}}\\,p_t\\big) + \\tfrac12 g^2\\,\\nabla\\cdot\\big(p_t\\,\\textcolor{purple}{\\boldsymbol{s}}\\big) & &\\big(\\nabla p_t = p_t\\,\\textcolor{purple}{\\boldsymbol{s}}\\big) \\\\
+&= -\\nabla\\cdot\\Big(\\underbrace{\\big[\\,\\textcolor{teal}{\\boldsymbol{f}} - \\tfrac12 g^2\\,\\textcolor{purple}{\\boldsymbol{s}}\\,\\big]}_{\\textcolor{orange}{\\tilde{\\boldsymbol{\\mu}}}}\\,p_t\\Big) & &\\text{(collect into one drift)}.
+\\end{aligned}$$
 
-which is the FPE of a process with **zero diffusion** — an ODE $$\\mathrm{d}\\boldsymbol{x}=[\\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}]\\,\\mathrm{d}t$$. Compare the **reverse SDE** drift $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$: same $$\\{p_t\\}$$, but half the score coefficient and no noise. That is why DDIM (Euler on the PF-ODE) and DDPM share one trained $$\\boldsymbol{s}_\\theta$$.
+The last line is a **continuity (Liouville) equation** $$\\partial_t p_t = -\\nabla\\cdot(\\textcolor{orange}{\\tilde{\\boldsymbol{\\mu}}}\\,p_t)$$ with **no** second-order term — precisely the FPE of a noise-free process. Hence the marginals are transported by the deterministic **probability-flow ODE**
 
-Step-by-step algebra: optional block below ([SDE course §4](https://kierandidi.github.io/), Principles D.2.6).""",
+$$\\boxed{\\;\\frac{\\mathrm{d}\\boldsymbol{x}}{\\mathrm{d}t} = \\textcolor{orange}{\\tilde{\\boldsymbol{\\mu}}(\\boldsymbol{x},t)} = \\textcolor{teal}{\\boldsymbol{f}(\\boldsymbol{x},t)} - \\tfrac12\\, g(t)^2\\,\\textcolor{purple}{\\boldsymbol{s}(\\boldsymbol{x},t)}.\\;}$$
+
+Compare the **reverse SDE** drift $$\\boldsymbol{f}-g^2\\boldsymbol{s}$$ (Day 7): identical marginals $$\\{p_t\\}$$, but only **half** the score coefficient and no noise. The difference is exactly the half of the diffusion that the ODE converted into deterministic transport. This is why DDIM (Euler on the PF-ODE) and DDPM (the reverse SDE) **share one trained** $$\\boldsymbol{s}_\\theta$$ — they are two solvers for the same family of densities. Step-by-step algebra and the rigorous statement: optional block below ([SDE course §4](https://kierandidi.github.io/), Principles D.2.6).""",
                     "optional": DAY08_OPTIONAL,
                 },
                 {
@@ -364,7 +372,16 @@ Step-by-step algebra: optional block below ([SDE course §4](https://kierandidi.
                     ),
                     "body": """![DDIM is exactly the Euler discretization of the probability-flow ODE (Principles Fig 9.1).](/assets/figures/day08/pdm_ddim_euler.png)
 
-Euler's method (Day 1) approximates $$\\boldsymbol{x}(t-\\Delta t)\\approx\\boldsymbol{x}(t) - \\Delta t\\,\\dot{\\boldsymbol{x}}(t)$$ using the slope at the start of the step. Applying this to the PF-ODE $$\\dot{\\boldsymbol{x}} = \\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}_\\theta$$ reproduces the DDIM update exactly. The consequences are large:
+Euler's method (Day 1) approximates $$\\boldsymbol{x}(s)\\approx\\boldsymbol{x}(t) + (s-t)\\,\\dot{\\boldsymbol{x}}(t)$$ using the slope at the start of the step. Applied to the PF-ODE $$\\dot{\\boldsymbol{x}} = \\boldsymbol{f}-\\tfrac12 g^2\\boldsymbol{s}_\\theta$$ it reproduces the **DDIM update** exactly. The cleanest way to see this uses the denoiser identity $$\\boldsymbol{x}_t=\\alpha_t\\hat{\\boldsymbol{x}}_0+\\sigma_t\\boldsymbol{\\epsilon}_\\theta$$: a single Euler step is equivalent to **freezing** the prediction $$(\\hat{\\boldsymbol{x}}_0,\\boldsymbol{\\epsilon}_\\theta)$$ at $$t$$ and re-evaluating the forward rule at the next time $$s<t$$,
+
+$$\\begin{aligned}
+\\boldsymbol{x}_s
+&= \\alpha_s\\,\\textcolor{teal}{\\hat{\\boldsymbol{x}}_0} + \\sigma_s\\,\\textcolor{purple}{\\boldsymbol{\\epsilon}_\\theta(\\boldsymbol{x}_t,t)} & &\\text{(re-noise the frozen prediction to time }s\\text{)} \\\\
+&= \\alpha_s\\,\\frac{\\boldsymbol{x}_t-\\sigma_t\\,\\textcolor{purple}{\\boldsymbol{\\epsilon}_\\theta}}{\\alpha_t} + \\sigma_s\\,\\textcolor{purple}{\\boldsymbol{\\epsilon}_\\theta} & &\\big(\\textcolor{teal}{\\hat{\\boldsymbol{x}}_0}=(\\boldsymbol{x}_t-\\sigma_t\\boldsymbol{\\epsilon}_\\theta)/\\alpha_t\\big) \\\\
+&= \\frac{\\alpha_s}{\\alpha_t}\\,\\boldsymbol{x}_t + \\alpha_s\\Big(\\frac{\\sigma_s}{\\alpha_s}-\\frac{\\sigma_t}{\\alpha_t}\\Big)\\textcolor{purple}{\\boldsymbol{\\epsilon}_\\theta} & &\\text{(rearrange).}
+\\end{aligned}$$
+
+Dividing the last line by $$\\alpha_s$$ gives $$\\boldsymbol{x}_s/\\alpha_s = \\boldsymbol{x}_t/\\alpha_t + (\\rho_s-\\rho_t)\\,\\boldsymbol{\\epsilon}_\\theta$$ with $$\\rho_t:=\\sigma_t/\\alpha_t$$ — literally an **Euler step in the log-SNR clock**, which is the modern view of DDIM (and the base case of DPM-Solver). The consequences are large:
 
 - **Step skipping.** Because DDIM is non-Markovian (it depends on the marginal at $$t$$, not a Markov chain), we can use a coarse time grid — e.g. 20–50 steps instead of DDPM's 1000 — with no retraining.
 - **Determinism.** With the noise fixed (an ODE, no $$\\mathrm{d}\\boldsymbol{w}$$), the map from initial noise to sample is deterministic and invertible — enabling latent interpolation, semantic editing, and exact reconstruction.
@@ -446,7 +463,19 @@ EDM expresses the same insight through a carefully designed $$\\sigma$$ (noise-l
                     ),
                     "body": """![Multistep exponential integrators (DEIS) reuse previous evaluations to achieve high order at low cost (Principles Fig 9.2).](/assets/figures/day08/pdm_deis.png)
 
-The diffusion ODE can be written as $$\\dot{\\boldsymbol{x}} = a(t)\\,\\boldsymbol{x} + b(t)\\,\\boldsymbol{\\epsilon}_\\theta(\\boldsymbol{x},t)$$ — a **linear** term plus a term involving the network. The linear part is exactly the kind of equation we solved on Day 1 with an **integrating factor**, so we can integrate it in closed form and avoid the error a generic solver would make on it. Only the slowly varying network term $$\\boldsymbol{\\epsilon}_\\theta$$ needs numerical approximation:
+The diffusion ODE has a **semilinear** form — a linear term in $$\\boldsymbol{x}$$ plus a term involving the network:
+
+$$\\dot{\\boldsymbol{x}} = \\textcolor{teal}{a(t)\\,\\boldsymbol{x}} + \\textcolor{purple}{b(t)\\,\\boldsymbol{\\epsilon}_\\theta(\\boldsymbol{x},t)}.$$
+
+The linear part is exactly the kind of equation we solved on Day 1 with an **integrating factor** $$e^{-A(t)}$$, $$A(t)=\\int_0^t a(u)\\,\\mathrm{d}u$$. Multiplying through collapses the linear term into a total derivative, and integrating from $$t$$ to $$s$$ gives **variation of constants**:
+
+$$\\begin{aligned}
+\\frac{\\mathrm{d}}{\\mathrm{d}t}\\Big(e^{-A(t)}\\boldsymbol{x}\\Big)
+&= e^{-A(t)}\\big(\\dot{\\boldsymbol{x}} - \\textcolor{teal}{a(t)\\boldsymbol{x}}\\big) = e^{-A(t)}\\,\\textcolor{purple}{b(t)\\,\\boldsymbol{\\epsilon}_\\theta} & &\\text{(integrating factor)} \\\\
+\\Longrightarrow\\quad \\boldsymbol{x}_s &= \\underbrace{e^{A(s)-A(t)}\\,\\boldsymbol{x}_t}_{\\textcolor{teal}{\\text{linear part: exact}}} \\;+\\; \\underbrace{\\int_t^s e^{A(s)-A(u)}\\,b(u)\\,\\textcolor{purple}{\\boldsymbol{\\epsilon}_\\theta(\\boldsymbol{x}_u,u)}\\,\\mathrm{d}u}_{\\textcolor{purple}{\\text{network part: approximate}}}.
+\\end{aligned}$$
+
+The first term is **exact** — no discretization error from the stiff linear drift. Only the smooth integral of $$\\boldsymbol{\\epsilon}_\\theta$$ is approximated: freezing $$\\boldsymbol{\\epsilon}_\\theta$$ at $$t$$ recovers DDIM (first order); a Taylor/multistep expansion of $$\\boldsymbol{\\epsilon}_\\theta$$ in the log-SNR variable $$\\lambda$$ gives the high-order solvers:
 
 - **DPM-Solver** applies this exponential-integrator idea with high-order Taylor expansions of $$\\boldsymbol{\\epsilon}_\\theta$$ along log-SNR time.
 - **DEIS** uses a **multistep** variant, reusing network evaluations from previous steps (like Adams–Bashforth) to reach high order with roughly one NFE per step.

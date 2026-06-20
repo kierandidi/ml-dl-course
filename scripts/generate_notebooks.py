@@ -1,7 +1,20 @@
 #!/usr/bin/env python3
-"""Generate 10 practical Jupyter notebooks for the ML & DL course."""
+"""Generate the 10 practical Jupyter notebooks for the ML & DL course.
+
+Each builder below writes the *full reference solution*. From it we emit two
+versions:
+
+* **Student notebooks** -> ``notebooks/practicals/dayNN.ipynb`` (committed and
+  published; opened via the Colab/download links). Every block after a
+  ``# YOUR CODE HERE`` marker is replaced with ``raise NotImplementedError`` so
+  students fill it in themselves.
+* **Solution notebooks** -> ``solutions/dayNN.ipynb`` (LOCAL ONLY: git-ignored
+  and excluded from the Jekyll build, so the answer key never reaches the repo
+  or the website).
+"""
 from __future__ import annotations
 
+import copy
 import json
 import uuid
 from pathlib import Path
@@ -10,7 +23,71 @@ import nbformat
 from nbformat.v4 import new_code_cell, new_markdown_cell, new_notebook
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT_DIR = ROOT / "notebooks" / "practicals"
+OUT_DIR = ROOT / "notebooks" / "practicals"      # student versions (repo + web)
+SOLUTIONS_DIR = ROOT / "solutions"               # full answer key (local only)
+
+# Stub that replaces every solution block in the student notebooks.
+STUB = 'raise NotImplementedError("TODO: complete this exercise")'
+
+
+def blank_solution_source(src: str) -> str:
+    """Replace each ``# YOUR CODE HERE`` solution block with a stub.
+
+    The marker is the first statement of a suite, so the solution is the run of
+    following lines indented at least as much as the marker (blank lines inside
+    the block are kept; trailing blanks and dedented driver/scaffolding code are
+    preserved untouched).
+    """
+    lines = src.split("\n")
+    out: list[str] = []
+    i, n = 0, len(lines)
+    while i < n:
+        line = lines[i]
+        if line.lstrip().startswith("# YOUR CODE HERE"):
+            indent = len(line) - len(line.lstrip())
+            out.append(line)  # keep the marker (and any inline hint after it)
+            j, last = i + 1, i
+            while j < n:
+                stripped = lines[j].strip()
+                if stripped == "":
+                    j += 1
+                    continue
+                cur_indent = len(lines[j]) - len(lines[j].lstrip())
+                if cur_indent >= indent:
+                    last = j
+                    j += 1
+                else:
+                    break
+            out.append(" " * indent + STUB)
+            i = last + 1
+        else:
+            out.append(line)
+            i += 1
+    return "\n".join(out)
+
+
+def make_student_nb(nb: nbformat.NotebookNode) -> nbformat.NotebookNode:
+    """Blank every solution block; clear any outputs/exec counts."""
+    student = copy.deepcopy(nb)
+    for cell in student.cells:
+        if cell.cell_type == "code":
+            if "# YOUR CODE HERE" in cell.source:
+                cell.source = blank_solution_source(cell.source)
+            cell.outputs = []
+            cell.execution_count = None
+    return student
+
+
+def make_solution_nb(nb: nbformat.NotebookNode) -> nbformat.NotebookNode:
+    """Tag the full notebook as the answer key (local copy only)."""
+    solution = copy.deepcopy(nb)
+    banner = md(
+        "> **Solutions / answer key — local copy only.** Not committed to the "
+        "repository and not published on the website. The student notebook in "
+        "`notebooks/practicals/` has each `# YOUR CODE HERE` block blanked out."
+    )
+    solution.cells.insert(0, banner)
+    return solution
 
 
 def _uid() -> str:
@@ -50,8 +127,9 @@ def week1_intro(day: int, title: str, blurb: str) -> list[nbformat.NotebookNode]
         md(f"# Day {day:02d}: {title}"),
         md(
             f"Welcome to practical {day}! {blurb}\n\n"
-            "Work through each exercise in order. Look for `# YOUR CODE HERE` markers "
-            "— replace the reference implementations with your own solutions."
+            "Work through each exercise in order. Wherever you see a `# YOUR CODE HERE` "
+            "marker, replace the `raise NotImplementedError(...)` below it with your own "
+            "implementation, then run the cell."
         ),
     ]
 
@@ -62,7 +140,8 @@ def week2_intro(day: int, title: str, blurb: str) -> list[nbformat.NotebookNode]
         md(
             f"Welcome to practical {day}! {blurb}\n\n"
             "This notebook follows the MIT lab style: abstract base classes, PyTorch, "
-            "and LaTeX in markdown. Fill in methods marked `# YOUR CODE HERE`."
+            "and LaTeX in markdown. Wherever you see a `# YOUR CODE HERE` marker, replace "
+            "the `raise NotImplementedError(...)` below it with your own implementation."
         ),
     ]
 
@@ -1370,12 +1449,19 @@ BUILDERS = [
 
 def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
+    SOLUTIONS_DIR.mkdir(parents=True, exist_ok=True)
     for i, builder in enumerate(BUILDERS, start=1):
-        nb = builder()
-        path = OUT_DIR / f"day{i:02d}.ipynb"
-        with path.open("w", encoding="utf-8") as f:
-            nbformat.write(nb, f)
-        print(f"Wrote {path.relative_to(ROOT)}")
+        nb = builder()  # full reference solution
+
+        student = make_student_nb(nb)
+        with (OUT_DIR / f"day{i:02d}.ipynb").open("w", encoding="utf-8") as f:
+            nbformat.write(student, f)
+
+        solution = make_solution_nb(nb)
+        with (SOLUTIONS_DIR / f"day{i:02d}.ipynb").open("w", encoding="utf-8") as f:
+            nbformat.write(solution, f)
+
+        print(f"day{i:02d}: student -> notebooks/practicals/, solution -> solutions/")
 
 
 if __name__ == "__main__":

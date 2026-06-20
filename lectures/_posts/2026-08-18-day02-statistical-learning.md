@@ -2,11 +2,6 @@
 layout: post
 title: Day 2 - Statistical Learning
 image: /assets/img/lessons/day02.png
-accent_image: 
-  background: url('/assets/img/lessons/day02.png') center/cover
-  overlay: false
-accent_color: '#ccc'
-theme_color: '#ccc'
 description: >
   MML Part II: the supervised/unsupervised framework, linear regression, PCA, Gaussian mixture models, and support vector machines.
 invert_sidebar: true
@@ -16,7 +11,7 @@ invert_sidebar: true
 
 ### Optional reading for this lesson
 - [Deisenroth, Faisal & Ong — *Mathematics for Machine Learning*](https://mml-book.com), Ch. 8–12
-- [MML PDF (local)](/material/mml-book.pdf)
+- [Mathematics for Machine Learning (free PDF)](https://mml-book.github.io/book/mml-book.pdf)
 - [scikit-learn User Guide](https://scikit-learn.org/stable/user_guide.html)
 
 ### [Slides](/assets/slides/day02.pdf)

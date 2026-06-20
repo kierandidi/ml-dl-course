@@ -844,11 +844,82 @@ def render_pdf_pages(pdf_path: Path, pages: list[int], out_dir: Path, prefix: st
     return count
 
 
+def _crop_llmks_slide(img: "Image.Image") -> "Image.Image":
+    """Strip the template's grey header/footer bands and trim margins so the
+    slide *content* fills the figure.
+
+    The Transformers/LLM deck uses a fixed template: a full-width light-grey
+    header band (with the slide title) near the top and a full-width grey
+    footer band (with the source URL) near the bottom, separated by a white
+    content area. We already render our own heading/caption, so both bands are
+    redundant and make the embedded image look tiny. We detect each band by the
+    fraction of grey *background* pixels per row (robust to the dark title text
+    sitting on top of the band) and keep only the content in between.
+    """
+    import numpy as np
+
+    rgb = img.convert("RGB")
+    arr = np.asarray(rgb).astype(np.int16)
+    H, W, _ = arr.shape
+
+    minc = arr.min(axis=2)
+    maxc = arr.max(axis=2)
+    spread = maxc - minc
+    # Per-pixel masks: near-white background vs. the template's grey band colour.
+    white_px = minc >= 249
+    grey_px = (spread <= 14) & (minc >= 198) & (maxc <= 247)
+    white_frac = white_px.mean(axis=1)
+    grey_frac = grey_px.mean(axis=1)
+
+    band = grey_frac > 0.30  # a band row is mostly grey even with dark title text
+
+    # Header band: skip the top white margin, then consume the contiguous band.
+    y = 0
+    while y < H and white_frac[y] > 0.6:
+        y += 1
+    start = y
+    while y < H and band[y]:
+        y += 1
+    header_bottom = y if (y - start) > H * 0.015 else 0
+
+    # Footer band: same from the bottom.
+    y = H - 1
+    while y > 0 and white_frac[y] > 0.6:
+        y -= 1
+    end = y
+    while y >= 0 and band[y]:
+        y -= 1
+    footer_top = y + 1 if (end - y) > H * 0.015 else H
+
+    top, bottom = header_bottom, footer_top
+    if bottom - top < H * 0.25:  # detection went wrong → keep the full slide
+        top, bottom = 0, H
+    out = rgb.crop((0, top, W, bottom))
+
+    # Trim any remaining uniform (white/grey) margins so the content fills.
+    if ImageChops is not None:
+        for bg in ((255, 255, 255), (236, 236, 236)):
+            diff = ImageChops.difference(out, Image.new("RGB", out.size, bg))
+            bbox = diff.getbbox()
+            if bbox:
+                out = out.crop(bbox)
+    return out
+
+
 def extract_llmks_figures():
-    """Render hand-picked full slides from the Transformers/LLM deck for days 9–10."""
+    """Render hand-picked slides from the Transformers/LLM deck for days 9–10.
+
+    Each page is rendered full, then the grey template header/footer bands are
+    cropped away (see ``_crop_llmks_slide``) so the diagram fills the figure.
+    """
     if fitz is None:
         print("pymupdf not installed, skipping LLMKS render")
         return
+    if Image is None:
+        print("Pillow not installed, skipping LLMKS render")
+        return
+    import io
+
     src = COURSE_MATERIAL / LLMKS_PDF
     if not src.exists():
         print(f"skip missing: {src}")
@@ -864,9 +935,10 @@ def extract_llmks_figures():
                 print(f"day{day:02d}: page {page_1based} out of range for {name}")
                 continue
             pix = doc[p].get_pixmap(matrix=fitz.Matrix(2, 2))
-            pix.save(day_dir / f"{name}.png")
+            img = Image.open(io.BytesIO(pix.tobytes("png")))
+            _crop_llmks_slide(img).save(day_dir / f"{name}.png")
             ok += 1
-        print(f"day{day:02d}: {ok}/{len(figs)} LLMKS slides rendered")
+        print(f"day{day:02d}: {ok}/{len(figs)} LLMKS slides rendered (bands cropped)")
     doc.close()
 
 

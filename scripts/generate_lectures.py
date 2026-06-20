@@ -612,16 +612,14 @@ def expand_viz_markers(text: str) -> str:
 
 
 def front_matter(day: int, title: str, description: str) -> str:
+    # ``image`` is only the lesson-card thumbnail / OG image. We deliberately do
+    # NOT set ``accent_image`` so the article's sidebar keeps the site-wide
+    # background (site.accent_image) instead of a cropped version of the hero.
     hero = f"/assets/img/lessons/day{day:02d}.png"
     return f"""---
 layout: post
 title: Day {day} - {title}
 image: {hero}
-accent_image: 
-  background: url('{hero}') center/cover
-  overlay: false
-accent_color: '#ccc'
-theme_color: '#ccc'
 description: >
   {description}
 invert_sidebar: true

@@ -2,11 +2,6 @@
 layout: post
 title: Day 9 - Autoregressive Language Models
 image: /assets/img/lessons/day09.png
-accent_image: 
-  background: url('/assets/img/lessons/day09.png') center/cover
-  overlay: false
-accent_color: '#ccc'
-theme_color: '#ccc'
 description: >
   Returning to the autoregressive family from Day 6: build and train a decoder-only Transformer language model, from tokens to logits, following Gordić, a Beyer-style sequence, and nanoGPT.
 invert_sidebar: true

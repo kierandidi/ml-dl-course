@@ -283,7 +283,7 @@ LECTURE = {
     ),
     "reading": [
         "[Deisenroth, Faisal & Ong — *Mathematics for Machine Learning*](https://mml-book.com), Ch. 8–12",
-        "[MML PDF (local)](/material/mml-book.pdf)",
+        "[Mathematics for Machine Learning (free PDF)](https://mml-book.github.io/book/mml-book.pdf)",
         "[scikit-learn User Guide](https://scikit-learn.org/stable/user_guide.html)",
     ],
     "intro": (

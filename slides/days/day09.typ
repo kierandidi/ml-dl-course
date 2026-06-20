@@ -29,7 +29,7 @@
 
 == 1.1  Where We Are: the Generative Map (Day 6)
 
-#align(center + horizon)[#image("/assets/figures/day06/pdm_dgm_zoo.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day06/pdm_dgm_zoo.png", width: 100%, height: 90%, fit: "contain")]
 
 == 1.2  Autoregressive vs Diffusion
 
@@ -57,7 +57,7 @@
 
 == 1.4  Architecture Families
 
-#align(center + horizon)[#image("/assets/figures/day09/llmks_paradigm.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day09/llmks_paradigm.png", width: 100%, height: 90%, fit: "contain")]
 
 = 2 · From Text to Tokens
 
@@ -97,7 +97,7 @@
 
 == 3.1  The Pre-Norm Residual Block
 
-#align(center + horizon)[#image("/assets/figures/day09/llmks_residual.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day09/llmks_residual.png", width: 100%, height: 90%, fit: "contain")]
 
 == 3.2  RMSNorm
 
@@ -117,7 +117,7 @@
 
 == 3.3  Causal Self-Attention
 
-#align(center + horizon)[#image("/assets/figures/day09/llmks_attention_dict.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day09/llmks_attention_dict.png", width: 100%, height: 90%, fit: "contain")]
 
 == 3.4  Multi-Head & Grouped-Query Attention
 
@@ -129,7 +129,7 @@
 
 == 3.4  Multi-Head & Grouped-Query Attention
 
-#align(center + horizon)[#image("/assets/figures/day09/llmks_mha.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day09/llmks_mha.png", width: 100%, height: 90%, fit: "contain")]
 
 == 3.5  Rotary Position Embeddings (RoPE)
 
@@ -141,7 +141,7 @@
 
 == 3.5  Rotary Position Embeddings (RoPE)
 
-#align(center + horizon)[#image("/assets/figures/day09/llmks_rope.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day09/llmks_rope.png", width: 100%, height: 90%, fit: "contain")]
 
 == 3.6  The MLP: GeGLU / SwiGLU
 
@@ -153,7 +153,7 @@
 
 == 3.6  The MLP: GeGLU / SwiGLU
 
-#align(center + horizon)[#image("/assets/figures/day09/llmks_ffn.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day09/llmks_ffn.png", width: 100%, height: 90%, fit: "contain")]
 
 == 3.7  Stacking the Block to Logits
 
@@ -165,7 +165,7 @@
 
 == 3.7  Stacking the Block to Logits
 
-#align(center + horizon)[#image("/assets/figures/day09/llmks_architecture.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day09/llmks_architecture.png", width: 100%, height: 90%, fit: "contain")]
 
 = 4 · Training One Model End-to-End
 
@@ -179,7 +179,7 @@
 
 == 4.1  The Training Objective
 
-#align(center + horizon)[#image("/assets/figures/day09/llmks_training.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day09/llmks_training.png", width: 100%, height: 90%, fit: "contain")]
 
 == 4.2  Optimization Stack
 
@@ -207,7 +207,7 @@
 
 == 4.4  nanoGPT Code Map
 
-#align(center + horizon)[#image("/assets/figures/day09/llmks_decoder_masked.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day09/llmks_decoder_masked.png", width: 100%, height: 90%, fit: "contain")]
 
 == 4.5  Scaling and What Is Next
 

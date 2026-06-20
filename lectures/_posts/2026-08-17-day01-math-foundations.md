@@ -2,11 +2,6 @@
 layout: post
 title: Day 1 - Math Foundations
 image: /assets/img/lessons/day01.png
-accent_image: 
-  background: url('/assets/img/lessons/day01.png') center/cover
-  overlay: false
-accent_color: '#ccc'
-theme_color: '#ccc'
 description: >
   Linear algebra, analytic geometry, vector calculus, integration & differentiation, probability, and differential equations — MML Part I foundations.
 invert_sidebar: true

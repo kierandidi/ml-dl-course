@@ -29,7 +29,7 @@
 
 == 1.1  The Decode Loop
 
-#align(center + horizon)[#image("/assets/figures/day10/llmks_generation.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_generation.png", width: 100%, height: 90%, fit: "contain")]
 
 == 1.2  Exposure Bias
 
@@ -49,7 +49,7 @@
 
 == 1.3  Greedy, Sampling, and Beam
 
-#align(center + horizon)[#image("/assets/figures/day10/llmks_beam.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_beam.png", width: 100%, height: 90%, fit: "contain")]
 
 = 2 · KV Cache & Memory
 
@@ -71,7 +71,7 @@
 
 == 2.2  The KV Cache
 
-#align(center + horizon)[#image("/assets/figures/day10/llmks_kvcache.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_kvcache.png", width: 100%, height: 90%, fit: "contain")]
 
 == 2.3  KV-Cache Memory and GQA
 
@@ -83,7 +83,7 @@
 
 == 2.3  KV-Cache Memory and GQA
 
-#align(center + horizon)[#image("/assets/figures/day10/llmks_kv_bottleneck.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_kv_bottleneck.png", width: 100%, height: 90%, fit: "contain")]
 
 = 3 · Sampling & Systems
 
@@ -97,7 +97,7 @@
 
 == 3.1  Temperature
 
-#align(center + horizon)[#image("/assets/figures/day10/llmks_sampling.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_sampling.png", width: 100%, height: 90%, fit: "contain")]
 
 == 3.2  Top-k and Top-p (Nucleus)
 
@@ -109,7 +109,7 @@
 
 == 3.2  Top-k and Top-p (Nucleus)
 
-#align(center + horizon)[#image("/assets/figures/day10/llmks_topk_topp.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_topk_topp.png", width: 100%, height: 90%, fit: "contain")]
 
 == 3.3  Throughput: Prefill vs Decode
 
@@ -147,7 +147,7 @@
 
 == 4.1  From Base Model to Assistant
 
-#align(center + horizon)[#image("/assets/figures/day10/llmks_paradigm_shift.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_paradigm_shift.png", width: 100%, height: 90%, fit: "contain")]
 
 == 4.2  Supervised Fine-Tuning (SFT)
 
@@ -175,7 +175,7 @@
 
 == 4.4  Course Recap
 
-#align(center + horizon)[#image("/assets/figures/day10/llmks_summary.png", width: 92%, height: 82%, fit: "contain")]
+#align(center + horizon)[#image("/assets/figures/day10/llmks_summary.png", width: 100%, height: 90%, fit: "contain")]
 
 == Summary
 

@@ -2,11 +2,6 @@
 layout: post
 title: Day 10 - LLM Inference and Alignment
 image: /assets/img/lessons/day10.png
-accent_image: 
-  background: url('/assets/img/lessons/day10.png') center/cover
-  overlay: false
-accent_color: '#ccc'
-theme_color: '#ccc'
 description: >
   How a trained base language model is served efficiently (decode loop, KV cache, sampling, systems) and lightly post-trained into a chat assistant (SFT and preference tuning).
 invert_sidebar: true

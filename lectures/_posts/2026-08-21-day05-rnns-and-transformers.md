@@ -2,11 +2,6 @@
 layout: post
 title: Day 5 - Sequence Models: RNNs, Attention, and Transformers
 image: /assets/img/lessons/day05.png
-accent_image: 
-  background: url('/assets/img/lessons/day05.png') center/cover
-  overlay: false
-accent_color: '#ccc'
-theme_color: '#ccc'
 description: >
   From recurrence and the seq2seq bottleneck to attention and the Transformer architecture.
 invert_sidebar: true
